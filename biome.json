@@ -1,0 +1,45 @@
+{
+  "json": {
+    "__formatter": {
+      "indentWidth": 2,
+      "indentStyle": "space",
+      "enabled": true
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentWidth": 12,
+    "formatWithErrors": false,
+    "indentStyle": "space"
+  },
+  "linter": {
+    "enabled": false,
+    "rules": {
+      "suspicious": {
+        "noDebugger": "off"
+      },
+      "style": {
+        "noShoutyConstants": "warn",
+        "useNamingConvention": "off",
+        "noNonNullAssertion": "off"
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "off",
+        "noLabelWithoutControl": "off",
+        "noSvgWithoutTitle": "off",
+        "useAltText": "off",
+        "useButtonType": "off",
+        "noStaticElementInteractions": "off"
+      },
+      "performance": {
+        "noAccumulatingSpread": "warn"
+      },
+      "correctness": {
+        "noChildrenProp": "off",
+        "noVoidElementsWithChildren": "off",
+        "useJsxKeyInIterable": "off"
+      }
+    }
+  }
+}
+

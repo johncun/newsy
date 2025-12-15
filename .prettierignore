@@ -1,0 +1,8 @@
+# Directories to ignore
+/dist
+/node_modules
+/coverage
+
+# Configuration files
+package-lock.json
+*-lock.json
