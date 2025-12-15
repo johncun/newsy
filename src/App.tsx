@@ -65,7 +65,6 @@ const onSwipeLeft = (guid: string) => {
 
 
 const List = (props: { as: Accessor<ArticleRecords> }) => {
-  if (!props.as() || !props.as().length) return null
 
   const as = () => getAllByState('live')(props.as())
 

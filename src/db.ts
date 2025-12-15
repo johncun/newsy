@@ -31,6 +31,7 @@ export const [memData, setMemData] = createSignal<ArticleRecords>([])
 //
 
 export const saveAllToLocal = (): void => {
+  console.log('saving to local', { data: memData() })
   localStorage.setItem(STORAGE_KEY, JSON.stringify(memData()))
 }
 
@@ -97,7 +98,10 @@ export const [allLive, setAllLive] = createSignal<ArticleRecords>([])
 
 createEffect(() => {
 
+
   const md = memData()
+  if (!md || !md.length) return
+
   // updatedGuidsFromMem()
   saveAllToLocal()
   setAllLive(getAllByState('live'))
@@ -111,7 +115,9 @@ export const getAllFromLocal = () => {
     setMemData([])
   }
   try {
+    console.log({ data })
     const parsed = ArticleRecords.parse(JSON.parse(data || "[]"))
+    console.log('parsed', parsed.length);
     setMemData(parsed)
   }
   catch (e) {
