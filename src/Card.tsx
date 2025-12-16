@@ -119,7 +119,7 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
           <img
             src={props.data.image /*|| "/placeholder.svg"*/}
             alt={props.data.title}
-            class="absolute inset-0 w-full h-full object-cover"
+            class="absolute inset-0 w-full h-full object-cover blur-[4px]"
             onError={(e) => {
               const element = e.target as HTMLImageElement
               element.src = "/the-guardian-logo.jpg"
@@ -138,7 +138,8 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
         <div class="absolute top-2 left-2 bg-black/30 text-white text-xs px-1 py-1 rounded-md">{props.data.source}</div>
         <div class="absolute top-2 right-2 bg-black/30 text-white text-xs px-1 py-1 rounded-md">{dt()}</div>
         <div class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-200"></div>
-        <div class="absolute font-extrabold inset-x-0 mx-4 bottom-6">{props.data.title}</div>
+        <div class="absolute font-extrabold text-shadow-black/30 text-xl font-stretch-90% text-shadow-md
+        inset-x-0 mx-4 bottom-6">{props.data.title}</div>
       </div>
     </div>
     <div class="w-[20vw] flex items-center justify-center"><div class="flex items-center justify-center rounded-lg w-4/5 h-12 bg-red-700">Delete</div></div>

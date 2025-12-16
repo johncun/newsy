@@ -1,7 +1,9 @@
 import { createResource, ErrorBoundary, createEffect, For, Accessor } from 'solid-js';
-import { ArticleRecords, FeedResult } from './schemas/FeedItem';
+import { ArticleRecords, ArticleState, FeedResult } from './schemas/FeedItem';
 import Card from './Card';
 import { getAllByState, memData, refreshDbWithFeedItems, updateState } from './db';
+import Banner from './Banner';
+import { mode } from './signals';
 
 // --- Data Fetcher Function with Zod Validation ---
 const fetchItems = async (): Promise<FeedResult> => {
@@ -41,13 +43,15 @@ const App: any = () => {
 
   return (
     <ErrorBoundary fallback={<div>Failed to load or validate API data.</div>}>
+      <Banner />
       <div class="absolute top-0 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll">
-        <div class="relative flex flex-col pt-4 pb-8 gap-4 items-center py-4 ">
-          <List as={memData} />
+
+        <div class="relative flex flex-col pt-16 pb-8 gap-4 items-center py-4 ">
+          <List as={memData} mode={mode} />
           {
             !memData() ?
               <div class="absolute inset-y-0 inset-x-4 flex bg-linear-to-br from-zinc-800 to-slate-800
-                items-center justify-center">Loading...</div> : null
+            items-center justify-center">Loading...</div> : null
           }
 
         </div>
@@ -64,9 +68,9 @@ const onSwipeLeft = (guid: string) => {
 }
 
 
-const List = (props: { as: Accessor<ArticleRecords> }) => {
+const List = (props: { as: Accessor<ArticleRecords>, mode: Accessor<ArticleState> }) => {
 
-  const as = () => getAllByState('live')(props.as())
+  const as = () => getAllByState(mode())(props.as())
 
   return <><For each={as()}>{it =>
     <Card data={it} onSwipeLeft={onSwipeLeft} onSwipeRight={onSwipeRight} />}</For></>
