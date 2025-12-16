@@ -49,14 +49,16 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
       const current = scroll_div.scrollLeft + viewport_center;
       dx = current - scroll_center;
       x = (scroll_div.scrollWidth - scroll_div.clientWidth) / 2;
-      /* console.log({ dx, sw: scroll_div.scrollWidth, cw: scroll_div.clientWidth, x }); */
+      {/* console.log({ dx, sw: scroll_div.scrollWidth, cw: scroll_div.clientWidth, x }); */ }
     }
 
     function on_touchend(_e: any) {
       console.log('ontouchend');
+      console.log({ dx, x });
 
 
-      if (dx > 0 && Math.abs(dx - x) < 5) {
+      if (dx > 0 && (Math.abs(dx) - x) < 5) {
+        console.log({ dx, x });
         animate(elRef, {
           translateX: [0, -500],
           duration: 200,
@@ -71,7 +73,8 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
           }
         })
       }
-      if (dx < 0 && Math.abs(dx - x) < 5) {
+      if (dx < 0 && (Math.abs(dx) - x) < 5) {
+        console.log({ dx, x });
         animate(elRef, {
           translateX: [0, 500],
           duration: 200,
