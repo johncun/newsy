@@ -2,6 +2,7 @@ import { createEffect, createSignal } from "solid-js"
 import { ArticleRecord, ArticleRecords, ArticleState, FeedItem, FeedItems } from "./schemas/FeedItem"
 
 const STORAGE_KEY = "newsy:articles"
+const STORAGE_KILLS = "newsy:killedlist"
 
 // export const currentLiveGuids = new Set<string>()
 // export const currentDeletedGuids = new Set<string>()
@@ -11,28 +12,50 @@ const STORAGE_KEY = "newsy:articles"
 //   .union(currentSavedGuids)
 
 export const [memData, setMemData] = createSignal<ArticleRecords>([])
+export const [killedList, setKilledList] = createSignal<Set<string>>(new Set([]))
 
+export const getAllFromLocal = () => {
+  const data = localStorage.getItem(STORAGE_KEY)
+  if (!data) {
+    console.log("No data in localStorage")
+    setMemData([])
+  }
+  try {
+    console.log({ data })
+    const parsed = ArticleRecords.parse(JSON.parse(data || "[]"))
+    console.log('parsed', parsed.length);
+    setMemData(parsed)
+  }
+  catch (e) {
+    console.error("Error parsing data from localStorage:", e)
+    setMemData([])
+  }
+}
 
-// const updatedGuidsFromMem = (): void => {
-//   currentLiveGuids.clear()
-//   currentDeletedGuids.clear()
-//   currentSavedGuids.clear()
-//   memData().forEach((record) => {
-//     currentAllGuids.add(record.guid)
-//     if (record.state === "live") {
-//       currentLiveGuids.add(record.guid)
-//     } else if (record.state === "deleted") {
-//       currentDeletedGuids.add(record.guid)
-//     } else if (record.state === "saved") {
-//       currentSavedGuids.add(record.guid)
-//     }
-//   })
-// }
-//
+export const getKillListFromLocal = () => {
+  const data = localStorage.getItem(STORAGE_KILLS)
+  if (!data) {
+    console.log("No data in localStorage")
+    setKilledList(new Set([]))
+  }
+  try {
+    const parsed: string[] = JSON.parse(data || "[]")
+    console.log('parsed', parsed.length);
+    setKilledList(new Set(parsed))
+  }
+  catch (e) {
+    console.error("Error parsing data from localStorage:", e)
+    setKilledList(new Set([]))
+  }
+}
 
-export const saveAllToLocal = (): void => {
-  console.log('saving to local', { data: memData() })
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(memData()))
+getAllFromLocal()
+getKillListFromLocal()
+
+export const saveAllToLocal = (md: ArticleRecords, kills: Set<string>): void => {
+  console.log('saving to local', { data: md, kills: [...kills] })
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(md))
+  localStorage.setItem(STORAGE_KILLS, JSON.stringify([...kills]))
 }
 
 const FeedItemToNewRecord = (item: FeedItem): ArticleRecord => {
@@ -41,11 +64,15 @@ const FeedItemToNewRecord = (item: FeedItem): ArticleRecord => {
     state: "live",
   }
 }
+export const getArticleByGuid = (guid: string): ArticleRecord | undefined => memData().find(a => a.guid === guid) || undefined
 
 export const refreshDbWithFeedItems = (items: FeedItems): void => {
   if (items.length === 0) return
 
   const allGuids = new Set(memData().map(it => it.guid))
+  if (killedList()) {
+    for (const a of killedList()) { allGuids.add(a) }
+  }
 
   const newRecords: ArticleRecord[] = items.map(FeedItemToNewRecord).filter((record: ArticleRecord) => !allGuids.has(record.guid))
 
@@ -55,14 +82,22 @@ export const refreshDbWithFeedItems = (items: FeedItems): void => {
 }
 
 export const updateState = (guid: string, newState: ArticleState) => {
-  // if (!currentAllGuids.has(guid)) {
-  //   console.error(`Cannot change state for missing guid: ${guid}`)
-  // }
-  //
-  console.log('updateState: ', guid, newState)
   setMemData(mds => {
     return mds.map(a => {
       if (a.guid === guid) {
+        return { ...a, state: newState }
+      }
+      else return a
+
+    })
+  })
+}
+
+export const updateStates = (guids: string[], newState: ArticleState) => {
+  const gset = new Set(guids)
+  setMemData(mds => {
+    return mds.map(a => {
+      if (gset.has(a.guid)) {
         return { ...a, state: newState }
       }
       else return a
@@ -94,10 +129,16 @@ export const removeOldDeletes = (_md: ArticleRecords) => {
   }
 }
 
-export const killArticle = (guid: string) => {
+export const killArticles = (guids: string[]) => {
+
+  const toKills = new Set(guids)
+
+  const ks = killedList()
+
   setMemData(mds => {
     return mds.flatMap(a => {
-      if (a.guid === guid) {
+      if (toKills.has(a.guid)) {
+        ks.add(a.guid)
         return []
       }
       else return [a]
@@ -105,41 +146,41 @@ export const killArticle = (guid: string) => {
     })
   })
 
+  setKilledList(ks)
+
+}
+
+export const killArticle = (guid: string) => {
+
+  const ks = killedList()
+
+  setMemData(mds => {
+    return mds.flatMap(a => {
+      if (a.guid === guid) {
+        ks.add(guid)
+        return []
+      }
+      else return [a]
+
+    })
+  })
+
+  setKilledList(ks)
+
 }
 
 export const [allLive, setAllLive] = createSignal<ArticleRecords>([])
 
 createEffect(() => {
 
+  const ks = killedList()
 
-  const md = memData()
-  if (!md || !md.length) return
+  const md = memData() || []
 
-  // updatedGuidsFromMem()
-  saveAllToLocal()
+  saveAllToLocal(md, ks)
   setAllLive(getAllByState('live'))
   removeOldDeletes(md)
 })
-
-export const getAllFromLocal = () => {
-  const data = localStorage.getItem(STORAGE_KEY)
-  if (!data) {
-    console.log("No data in localStorage")
-    setMemData([])
-  }
-  try {
-    console.log({ data })
-    const parsed = ArticleRecords.parse(JSON.parse(data || "[]"))
-    console.log('parsed', parsed.length);
-    setMemData(parsed)
-  }
-  catch (e) {
-    console.error("Error parsing data from localStorage:", e)
-    setMemData([])
-  }
-}
-
-getAllFromLocal()
 
 
 //   const database = await initDB()

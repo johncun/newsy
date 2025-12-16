@@ -9,7 +9,7 @@ const FEED_URLS = [
 ]
 
 export default async function handler(
-  request: VercelRequest,
+  _request: VercelRequest,
   response: VercelResponse
 ) {
 
