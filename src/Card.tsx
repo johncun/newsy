@@ -54,10 +54,10 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
 
     function on_touchend(_e: any) {
       console.log('ontouchend');
-      console.log({ dx, x });
+      const diff = Math.abs(Math.abs(dx) - x);
 
 
-      if (dx > 0 && (Math.abs(dx) - x) < 5) {
+      if (dx > 0 && diff < 5) {
         console.log({ dx, x });
         animate(elRef, {
           translateX: [0, -500],
@@ -69,11 +69,11 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
           paddingLeft: 0,
           paddingRight: 0,
           complete: () => {
-            setTimeout(() => props.onSwipeLeft(props.data.guid), 200)
+            setTimeout(() => props.onSwipeLeft(props.data.guid), 50)
           }
         })
       }
-      if (dx < 0 && (Math.abs(dx) - x) < 5) {
+      if (dx < 0 && diff < 5) {
         console.log({ dx, x });
         animate(elRef, {
           translateX: [0, 500],
@@ -85,12 +85,11 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
           paddingLeft: 0,
           paddingRight: 0,
           complete: () => {
-            setTimeout(() => props.onSwipeRight(props.data.guid), 200)
+            setTimeout(() => props.onSwipeRight(props.data.guid), 50)
           }
         })
 
       }
-
     }
 
     el.addEventListener("scroll", on_scroll);
