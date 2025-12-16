@@ -1,6 +1,6 @@
 import { onMount } from 'solid-js';
 import { FeedItem } from './schemas/FeedItem';
-import anime from 'animejs';
+import { animate } from 'animejs';
 // @ts-ignore
 // import { swipe, SwipeDirection } from "./swipe";
 
@@ -52,16 +52,15 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
       /* console.log({ dx, sw: scroll_div.scrollWidth, cw: scroll_div.clientWidth, x }); */
     }
 
-    function on_touchend(e: any) {
+    function on_touchend(_e: any) {
       console.log('ontouchend');
 
 
-      if (dx >= x) {
-        anime({
-          targets: elRef,
+      if (dx > 0 && Math.abs(dx - x) < 5) {
+        animate(elRef, {
           translateX: [0, -500],
           duration: 200,
-          easing: "linear",
+          ease: "easeInQuad",
           height: 0,
           paddingTop: 0,
           paddingBottom: 0,
@@ -72,9 +71,8 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
           }
         })
       }
-      if (dx <= -x) {
-        anime({
-          targets: elRef,
+      if (dx < 0 && Math.abs(dx - x) < 5) {
+        animate(elRef, {
           translateX: [0, 500],
           duration: 200,
           easing: "easeInQuad",
