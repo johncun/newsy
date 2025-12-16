@@ -1,7 +1,7 @@
-- Show number of lives
-- Show number of saves
-- Allow saved view
-- Show deleted view - undelete
+- [x] Show number of lives
+- [x] Show number of saves
+- [x] Allow saved view
+- [x] Show deleted view - undelete
 - Save images as base64?
 - Undo button
 

@@ -94,6 +94,19 @@ export const removeOldDeletes = (_md: ArticleRecords) => {
   }
 }
 
+export const killArticle = (guid: string) => {
+  setMemData(mds => {
+    return mds.flatMap(a => {
+      if (a.guid === guid) {
+        return []
+      }
+      else return [a]
+
+    })
+  })
+
+}
+
 export const [allLive, setAllLive] = createSignal<ArticleRecords>([])
 
 createEffect(() => {

@@ -1,10 +1,13 @@
 import { onMount } from 'solid-js';
-import { FeedItem } from './schemas/FeedItem';
+import { ArticleState, FeedItem } from './schemas/FeedItem';
 import { animate } from 'animejs';
+import { mode } from './signals';
 // @ts-ignore
 // import { swipe, SwipeDirection } from "./swipe";
 
-const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSwipeRight: (guid: string) => void }) => {
+export type Action = 'Kill' | 'Save' | 'Delete' | '';
+
+const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string, action: Action) => void, onSwipeRight: (guid: string, action: Action) => void }) => {
 
   const dt = () => {
     const date = new Date(props.data.pubDate);
@@ -12,7 +15,7 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
       year: 'numeric',
       month: 'short',
       day: 'numeric',
-    });
+    }) + ' ' + date.toLocaleTimeString(undefined, { hour12: true, hour: '2-digit', minute: '2-digit' });
   }
   let elRef!: HTMLDivElement
 
@@ -35,6 +38,8 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
   //
   // }
 
+  const leftText = (): Action => { return ((({ 'live': 'Save', 'saved': '', 'deleted': 'Save' } as { [key: string]: Action })[mode()]) || '') }
+  const rightText = (): Action => { return ((({ 'live': 'Delete', 'saved': 'Delete', 'deleted': 'Kill' } as { [key: string]: Action })[mode()]) || '') }
 
   const swiper = (el: HTMLDivElement) => {
 
@@ -69,7 +74,7 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
           paddingLeft: 0,
           paddingRight: 0,
           complete: () => {
-            setTimeout(() => props.onSwipeLeft(props.data.guid), 50)
+            setTimeout(() => props.onSwipeLeft(props.data.guid, rightText()), 50)
           }
         })
       }
@@ -85,7 +90,7 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
           paddingLeft: 0,
           paddingRight: 0,
           complete: () => {
-            setTimeout(() => props.onSwipeRight(props.data.guid), 50)
+            setTimeout(() => props.onSwipeRight(props.data.guid, leftText()), 50)
           }
         })
 
@@ -108,11 +113,14 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
 
   });
 
+
+  const bgx = (s: string, bg: string) => !s ? 'bg-transparent' : bg;
+
   return <div ref={elRef} class="swipe w-full">
-    <div class="w-[20vw] flex items-center justify-center"><div class="flex items-center justify-center rounded-lg w-4/5 h-12 bg-green-700">Save</div></div>
+    <div class="w-[20vw] flex items-center justify-center"><div class={`flex items-center justify-center rounded-lg w-4/5 h-12 ${bgx(leftText(), 'bg-green-700')}`}>{leftText()}</div></div>
 
     <div class="flex flex-col items-center group cursor-pointer mx-0 bg-slate-800 rounded-2xl p-2 min-h-60 relative overflow-hidden"
-      onClick={() => window.open(props.data.link, "_blank")}
+      onClick={() => window.open(props.data.link, '_blank', 'noopener,noreferrer')}
     >
       <div class="absolute inset-0 p-0">
         {props.data.image ? (
@@ -142,7 +150,7 @@ const Card = (props: { data: FeedItem, onSwipeLeft: (guid: string) => void, onSw
         inset-x-0 mx-4 bottom-6">{props.data.title}</div>
       </div>
     </div>
-    <div class="w-[20vw] flex items-center justify-center"><div class="flex items-center justify-center rounded-lg w-4/5 h-12 bg-red-700">Delete</div></div>
+    <div class="w-[20vw] flex items-center justify-center"><div class={`flex items-center justify-center rounded-lg w-4/5 h-12 ${bgx(rightText(), 'bg-red-700')}`}>{rightText()}</div></div>
   </div>
 };
 

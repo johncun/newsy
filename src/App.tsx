@@ -1,9 +1,9 @@
 import { createResource, ErrorBoundary, createEffect, For, Accessor } from 'solid-js';
 import { ArticleRecords, ArticleState, FeedResult } from './schemas/FeedItem';
-import Card from './Card';
-import { getAllByState, memData, refreshDbWithFeedItems, updateState } from './db';
+import Card, { Action } from './Card';
+import { getAllByState, killArticle, memData, refreshDbWithFeedItems, updateState } from './db';
 import Banner from './Banner';
-import { mode } from './signals';
+import { mode, refetch } from './signals';
 
 // --- Data Fetcher Function with Zod Validation ---
 const fetchItems = async (): Promise<FeedResult> => {
@@ -24,7 +24,7 @@ const fetchItems = async (): Promise<FeedResult> => {
 
 const App: any = () => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
-  const [feed] = createResource(fetchItems);
+  const [feed] = createResource(() => refetch(), fetchItems);
 
   createEffect(() => {
     if (feed.error) {
@@ -56,15 +56,27 @@ const App: any = () => {
 
         </div>
       </div>
+
     </ErrorBoundary >
   );
 };
 
-const onSwipeRight = (guid: string) => {
-  updateState(guid, 'saved')
+type ActionToState = { [key: string]: ArticleState }
+const actionToState: ActionToState = {
+  'Save': 'saved',
+  'Delete': 'deleted',
 }
-const onSwipeLeft = (guid: string) => {
-  updateState(guid, 'deleted')
+const onSwipeRight = (guid: string, action: Action) => {
+  if (action === '') return
+  if (action === 'Kill') killArticle(guid);
+
+  updateState(guid, actionToState[action])
+}
+const onSwipeLeft = (guid: string, action: Action) => {
+  if (action === '') return
+  if (action === 'Kill') killArticle(guid);
+
+  updateState(guid, actionToState[action])
 }
 
 
