@@ -1,58 +1,7 @@
-import { FeedItem, FeedResult } from '@/schemas/FeedItem';
-import { VercelRequest, VercelResponse } from '@vercel/node';
-import { decode } from 'html-entities';
+import { FeedItem } from "../shared/feed-types.js"
+import { decode } from "html-entities"
 
-const FEED_URLS = [
-
-  { name: "BBC News", url: "https://feeds.bbci.co.uk/news/rss.xml" },
-  { name: "The Guardian", url: "https://www.theguardian.com/uk/rss" },
-  { name: "The Journal", url: "https://www.thejournal.ie/feed/" },
-  { name: "Sky News", url: "https://feeds.skynews.com/feeds/rss/home.xml" },
-  { name: "RTE", url: "https://www.rte.ie/rss/news.xml" },
-  { name: "RTE Sport", url: "https://www.rte.ie/rss/sport.xml" },
-  { name: "Galway Beo", url: "https://www.galwaybeo.ie/?service=rss" },
-  { name: "Dublin Live", url: "https://www.dublinlive.ie/?service=rss" }
-]
-
-export default async function handler(
-  _request: VercelRequest,
-  response: VercelResponse
-) {
-
-  try {
-    const allFeeds = await Promise.all(FEED_URLS.map((feed) => parseRSSFeed(feed.url, feed.name)))
-
-    const allItems = allFeeds
-      .flat()
-      .filter((item) => item.title && item.link)
-      .sort((a, b) => {
-        const dateA = new Date(a.pubDate).getTime()
-        const dateB = new Date(b.pubDate).getTime()
-        if (isNaN(dateA) || isNaN(dateB)) {
-          return 0
-        }
-        return dateB - dateA
-      })
-      .slice(0, 100)
-
-    console.log("total articles returned:", allItems.length)
-
-    const result: FeedResult = {
-      items: allItems,
-      count: allItems.length,
-      sources: FEED_URLS.map((f) => f.name),
-      lastUpdated: new Date().toISOString(),
-    }
-
-    response.status(200).json(result)
-  } catch (error) {
-    console.error("Error in feeds API:", error)
-    response.status(500).json({ error: "Failed to fetch feeds" })
-  }
-}
-
-// Simple XML parser
-function parseXMLElement(xmlText: string, tagName: string, index = 0): string {
+export function parseXMLElement(xmlText: string, tagName: string, index = 0): string {
   const regex = new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)<\\/${tagName}>`, "i")
   let searchText = xmlText
   let count = 0
@@ -78,7 +27,7 @@ function parseXMLElement(xmlText: string, tagName: string, index = 0): string {
   return value.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&")
 }
 
-function getItemsFromXML(xmlText: string): string[] {
+export function getItemsFromXML(xmlText: string): string[] {
   const items: string[] = []
   const itemRegex = /<item>([\s\S]*?)<\/item>/g
   let match
@@ -90,7 +39,7 @@ function getItemsFromXML(xmlText: string): string[] {
   return items
 }
 
-function extractImageFromItem(itemText: string): string | undefined {
+export function extractImageFromItem(itemText: string): string | undefined {
   // media:content
   let match = itemText.match(/<media:content[^>]+url=["']([^"']+)["']/)
   if (match) return match[1]
@@ -122,7 +71,7 @@ function extractImageFromItem(itemText: string): string | undefined {
   return undefined
 }
 
-function getPlaceholderImageUrl(title: string): string {
+export function getPlaceholderImageUrl(title: string): string {
   const hash = title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
 
   const colors = [
@@ -150,8 +99,7 @@ function getPlaceholderImageUrl(title: string): string {
 
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`
 }
-
-async function parseRSSFeed(feedUrl: string, sourceName: string): Promise<FeedItem[]> {
+export async function parseRSSFeed(feedUrl: string, sourceName: string): Promise<FeedItem[]> {
   try {
     const response = await fetch(feedUrl, {
       headers: { "User-Agent": "NewsApp/1.0" },
@@ -204,4 +152,50 @@ async function parseRSSFeed(feedUrl: string, sourceName: string): Promise<FeedIt
   }
 }
 
+export interface VotingItem {
+  name: string;
+  n: number;
+}
 
+export function distributeWeight(list: VotingItem[], M: number): VotingItem[] {
+  if (list.length === 0) return [];
+  if (M < list.length) return list.map(item => ({ ...item, n: 0 }));
+
+  const totalWeight = list.reduce((sum, item) => sum + item.n, 0);
+
+  if (totalWeight === 0) {
+    const base = Math.floor(M / list.length);
+    let extra = M % list.length;
+    return list.map((item, i) => ({
+      name: item.name,
+      n: i < extra ? base + 1 : base
+    }));
+  }
+
+  const adjustedM = M - list.length;
+
+  const shares = list.map(item => {
+    const quota = (item.n / totalWeight) * adjustedM;
+    return {
+      name: item.name,
+      base: 1 + Math.floor(quota),
+      remainder: quota - Math.floor(quota)
+    };
+  });
+
+  const currentTotal = shares.reduce((sum, s) => sum + s.base, 0);
+  let remainderToDistribute = M - currentTotal;
+
+  const sortedShares = [...shares].sort((a, b) => b.remainder - a.remainder);
+
+  for (let i = 0; i < remainderToDistribute; i++) {
+    const itemToUpdate = sortedShares[i];
+    const target = shares.find(s => s === itemToUpdate);
+    if (target) target.base += 1;
+  }
+
+  return shares.map(s => ({
+    name: s.name,
+    n: s.base
+  }));
+}

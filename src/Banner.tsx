@@ -1,12 +1,14 @@
 import { getAllByState, memData } from "./db";
-import { mode, setIsFetching, setMode } from "./signals";
+import { mode, setIsFetching, setMode, setShowOptions } from "./signals";
 import { Motion } from 'solid-motionone';
+import { SvgOptions } from "./svgs";
 
 const Banner = () => {
 
-  const modeDesc = () => {
-    return { 'live': "Latest", 'saved': "Saved", 'deleted': "Bin" }[mode()]
+  const modeDesc = (): string => {
+    return { 'live': "Latest", 'saved': "Saved", 'deleted': "Bin" }[mode() || ""]
   }
+
   return <div class="flex justify-between items-center bg-blue-950/95 h-14 absolute inset-x-0 p-2 z-20 gap-4">
     <div class="w-20 font-normal pl-2 text-xl">{modeDesc()}</div>
     <div class="flex gap-4">
@@ -21,6 +23,9 @@ const Banner = () => {
     <Motion.div press={{ scale: 1.3 }} onClick={() => {
       setIsFetching(true)
     }} class="font-bold text-2xl px-2">↻</Motion.div>
+    <Motion.div press={{ scale: 1.3 }} onClick={() => {
+      setShowOptions(true)
+    }} class="font-bold text-2xl px-2 w-10 h-10 flex items-center justify-center"><SvgOptions fill="white" /></Motion.div>
 
   </div >
 }

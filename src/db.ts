@@ -1,5 +1,5 @@
 import { createEffect, createSignal } from "solid-js"
-import { ArticleRecord, ArticleRecords, ArticleState, FeedItem, FeedItems } from "./schemas/FeedItem"
+import { ArticleRecord, ArticleRecords, ArticleState, FeedItem, FeedItems } from "@shared/feed-types"
 
 const STORAGE_KEY = "newsy:articles"
 const STORAGE_KILLS = "newsy:killedlist"

@@ -1,24 +1,30 @@
 import { createResource, ErrorBoundary, createEffect, For, Accessor, onMount, createSignal, Match, Switch } from 'solid-js';
-import { ArticleRecord, ArticleRecords, ArticleState, FeedResult } from './schemas/FeedItem';
+import { ArticleRecord, ArticleRecords, ArticleState, FeedResult } from '@shared/feed-types';
 import Card, { Action } from './Card';
 import { getAllByState, getArticleByGuid, killArticle, killArticles, memData, refreshDbWithFeedItems, updateState, updateStates } from './db';
 import Banner from './Banner';
-import { isFetching, menuGuid, mode, setIsFetching, setMenuGuid } from './signals';
+import { isFetching, menuGuid, mode, setIsFetching, setMenuGuid, setShowOptions, showOptions, userSources } from './signals';
 import { Motion, Presence } from 'solid-motionone';
 import { Pulse } from './Pulse';
+import { SvgCross } from './svgs';
+import FeedsForm from './FeedsForm';
 
-// --- Data Fetcher Function with Zod Validation ---
 const fetchItems = async (): Promise<FeedResult> => {
-  const response = await fetch('/api/feeds');
+  const response = await fetch('/api/selectedFeeds', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sources: userSources,
+      maxPerRequest: 20
 
+    }),
+  });
   if (!response.ok) {
     throw new Error(`HTTP error! Status: ${response.status}`);
   }
-
   const data = await response.json();
-
-  // Zod Validation: .parse() throws on failure. 
-  // If it passes, TypeScript knows the return value is of type HelloData.
   const validatedData = FeedResult.parse(data);
 
   return validatedData;
@@ -105,6 +111,18 @@ const App: any = () => {
               <Motion.div exit={{ scale: 0 }} transition={{ duration: .2 }} initial={{ scale: 0 }} animate={{ scale: 1 }} id='menu' class='absolute z-50 inset-0 bg-slate-800/50'>
                 <div class="absolute rounded-lg inset-8 border border-slate-700 bg-linear-to-br from-slate-700 to-orange-900 text-black">
                   <MenuItems />
+                </div>
+              </Motion.div>}
+          </Presence>
+          <Presence exitBeforeEnter>
+            {showOptions() &&
+              <Motion.div exit={{ scale: 0 }} transition={{ duration: .2 }} initial={{ scale: 0 }} animate={{ scale: 1 }} id='menu' class='absolute z-50 inset-0 bg-slate-800/50'>
+                <div class="absolute rounded-lg inset-3 border-2 border-slate-100 bg-linear-to-b from-slate-700 to-slate-800 text-black">
+                  <div class="absolute inset-x-0 top-0 h-12 border-b border-b-slate-900 flex text-xl items-center justify-center text-white ">Options Form</div>
+                  <div class="absolute w-8 h-8 top-2 right-2 flex items-center justify-center text-white " onClick={() => setShowOptions(false)} ><SvgCross fill="orange" /> </div>
+                  <div class="absolute top-16 left-2 right-2 bottom-1 overflow-x-hidden px-2">
+                    <FeedsForm onSaved={() => setShowOptions(false)} />
+                  </div>
                 </div>
               </Motion.div>}
           </Presence>

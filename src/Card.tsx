@@ -1,12 +1,10 @@
-import { createSignal, onMount } from 'solid-js';
-import { FeedItem } from './schemas/FeedItem';
+import { Accessor, createSignal, onMount } from 'solid-js';
+import { FeedItem } from '@shared/feed-types';
 import { animate } from 'animejs';
 import { mode, selectedGuid, setMenuGuid, setSelectedGuid } from './signals';
 import { Motion } from 'solid-motionone';
 import { SvgAdd, SvgTrash } from './svgs';
 import { getAllByState, memData } from './db';
-// @ts-ignore
-// import { swipe, SwipeDirection } from "./swipe";
 
 export type Action = 'Kill' | 'Save' | 'Delete' | '';
 
@@ -23,24 +21,6 @@ const Card = (props: { data: FeedItem, index: number, onSwipeLeft: (guid: string
   let elRef!: HTMLDivElement
 
   const getNextGuid = getAllByState(mode())(memData())[props.index]?.guid || ''
-  // const handleSwipe = (direction: SwipeDirection, el: HTMLElement) => {
-  //   elRef = el
-  //   console.log({ el, elRef })
-  //   if (direction === "left") {
-  //     deleteStory()
-  //     // setSelectedDay(addDays(selectedDay(), 1));
-  //   } else if (direction === "right") {
-  //     // sel();
-  //     saveStory()
-  //   }
-  // }
-  // const deleteStory = () => {
-  //   console.log("delete story")
-  // }
-  // const saveStory = () => {
-  //   console.log("save story")
-  //
-  // }
 
   const leftText = (): Action => { return ((({ 'live': 'Save', 'saved': '', 'deleted': 'Save' } as { [key: string]: Action })[mode()]) || '') }
   const rightText = (): Action => { return ((({ 'live': 'Delete', 'saved': 'Delete', 'deleted': 'Kill' } as { [key: string]: Action })[mode()]) || '') }
@@ -77,7 +57,6 @@ const Card = (props: { data: FeedItem, index: number, onSwipeLeft: (guid: string
 
   const swiper = (el: HTMLDivElement) => {
 
-    // document.getElementById("swipe");
     let dx = 0
     let x = 0
 
@@ -88,7 +67,6 @@ const Card = (props: { data: FeedItem, index: number, onSwipeLeft: (guid: string
       const current = scroll_div.scrollLeft + viewport_center;
       dx = current - scroll_center;
       x = (scroll_div.scrollWidth - scroll_div.clientWidth) / 2;
-      {/* console.log({ dx, sw: scroll_div.scrollWidth, cw: scroll_div.clientWidth, x }); */ }
     }
 
     function on_touchend(_e: any) {
@@ -97,12 +75,9 @@ const Card = (props: { data: FeedItem, index: number, onSwipeLeft: (guid: string
 
 
       if (dx > 0 && diff < 5) {
-        console.log({ dx, x });
         swipeLeft()
       }
       if (dx < 0 && diff < 5) {
-        {/* console.log({ dx, x }); */ }
-
         swipeRight()
       }
     }
@@ -131,6 +106,7 @@ const Card = (props: { data: FeedItem, index: number, onSwipeLeft: (guid: string
 
   const menuFor = (guid: string) => { setMenuGuid(guid) }
 
+
   return isDying() ?
     <div>Boom</div> :
     <div ref={elRef} class={`swipe w-full ${selectedGuid() === props.data.guid ? 'drop-shadow-[0px_3px_3px_rgba(0,0,0,0.25)] '
@@ -141,43 +117,25 @@ const Card = (props: { data: FeedItem, index: number, onSwipeLeft: (guid: string
         onClick={() => setSelectedGuid(props.data.guid)}
       >
         <div class="absolute inset-0 p-0">
-          {props.data.image ? (
-            <img
-              src={props.data.image /*|| "/placeholder.svg"*/}
-              alt={props.data.title}
-              class={`absolute inset-0 w-full h-full object-cover ${!isSelected() ? 'blur-xs' : ''}`}
-              onError={(e) => {
-                const element = e.target as HTMLImageElement
-                element.src = "/the-guardian-logo.jpg"
-                element.style.opacity = "20%"
-                element.style.display = "none"
-                const container = element.parentElement
-                if (container)
-                  container.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-              }}></img>)
-            : (
-              // <div class="absolute inset-0 bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500" />
-              <img src={"/the-guardian-logo.jpg"} alt="guardian" class="absolute inset-0 w-full h-full object " />
-            )}
+          <ImageFor data={props.data} isSelected={isSelected} />
           {isSelected() ? <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 3 }} class="absolute inset-0 bg-black/20" /> :
             <div class="absolute inset-0 bg-black/60" />}
-          <div class="absolute top-2 left-2 right-2 inset-shadow-gray-1000 flex items-center justify-between">
-            <div class="bg-black/30 text-white/70 text-xs z-10 px-1 py-1 rounded-md w-24">{props.data.source}</div>
-            <div class="bg-black/30 text-white text-xs z-10 px-1 py-1 rounded-md w-8 flex justify-center">{props.index}</div>
+          {!isSelected() ? <div class="absolute top-2 left-2 right-2 inset-shadow-gray-1000 flex items-center justify-between">
+            <div class="bg-black/30 text-white/70 text-xs z-10 px-1 py-1 rounded-md w-auto">{props.data.source}</div>
             <div class="bg-black/50 text-white/70 text-xs z-10 px-1 py-1 rounded-md">{dt()}</div>
-          </div>
+          </div> : null}
           <div id='title' class={`absolute font-extrabold text-shadow-black/30 text-xl font-stretch-80% text-shadow-md
         inset-x-0 mx-4 top-12 bottom-2 flex items-center flex-col gap-1 rounded-xl p-2 ${isSelected() ? 'bg-black/10' : ''}`}>
-            <div>{props.data.title}</div>
+            <div class="line-clamp-4">{props.data.title}</div>
             <div class="text-sm font-normal text-zinc-100/70 overflow-y-hidden line-clamp-3">{props.data.description}</div>
           </div>
-          <div class={`absolute bottom-2 h-10 z-30 inset-x-2 flex ${isSelected() ? 'bg-black/40' : ''} items-center rounded-2xl justify-between`}>
+          <div class={`absolute top-1 h-10 z-30 inset-x-2 flex ${isSelected() ? 'bg-black/40' : ''} items-center rounded-2xl justify-between`}>
             <Motion.div
               press={{ scale: [1, 1.3, 1] }}
-              class="p-1 w-8 h-8 rounded-full bg-red-800/80 flex items-center justify-center text-black"
-              onClick={swipeLeft}
+              class="p-1 w-9 h-9 rounded-full bg-green-400/80 flex items-center justify-center text-black"
+              onClick={swipeRight}
               style={{ visibility: isSelected() ? 'visible' : 'hidden' }}
-            ><SvgTrash stroke="white" fill="" /></Motion.div>
+            ><SvgAdd fill="white" /></Motion.div>
             <div class="flex gap-4">
               <Motion.div
                 press={{ scale: [1, 1.3, 1] }}
@@ -205,15 +163,75 @@ const Card = (props: { data: FeedItem, index: number, onSwipeLeft: (guid: string
             </div>
             <Motion.div
               press={{ scale: [1, 1.3, 1] }}
-              class="p-1 w-9 h-9 rounded-full bg-green-400/80 flex items-center justify-center text-black"
-              onClick={swipeRight}
+              class="p-1 w-8 h-8 rounded-full bg-red-800/80 flex items-center justify-center text-black"
+              onClick={swipeLeft}
               style={{ visibility: isSelected() ? 'visible' : 'hidden' }}
-            ><SvgAdd fill="white" /></Motion.div>
+            ><SvgTrash stroke="white" fill="" /></Motion.div>
           </div>
         </div>
       </div>
       <div class="w-[20vw] flex items-center justify-center"><div class={`flex items-center justify-center rounded-lg w-4/5 h-12 ${bgx(rightText(), 'bg-red-700')}`}>{rightText()}</div></div>
     </div >
 };
+
+const ImageFor = (props: { data: FeedItem, isSelected: Accessor<boolean> }) => {
+
+  const gradients = [
+    "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900",
+    "bg-gradient-to-bl from-zinc-950 via-zinc-900 to-zinc-950",
+    "bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-900",
+    "bg-gradient-to-bl from-slate-900 via-indigo-950 to-zinc-900",
+    "bg-gradient-to-br from-emerald-950 via-teal-950 to-slate-900",
+    "bg-gradient-to-bl from-rose-950 via-slate-900 to-zinc-900",
+    "bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900",
+    "bg-gradient-to-bl from-blue-950 via-slate-900 to-black",
+    "bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900",
+    "bg-gradient-to-bl from-zinc-900 via-stone-900 to-zinc-950",
+    "bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900",
+    "bg-gradient-to-bl from-cyan-950 via-slate-900 to-indigo-950",
+    "bg-gradient-to-br from-gray-900 via-gray-800 to-black",
+    "bg-gradient-to-bl from-violet-950 via-slate-900 to-slate-950",
+    "bg-gradient-to-br from-fuchsia-950 via-slate-900 to-zinc-900",
+    "bg-gradient-to-bl from-teal-950 via-emerald-950 to-neutral-900",
+    "bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-900",
+    "bg-gradient-to-bl from-indigo-900 via-slate-900 to-black",
+    "bg-gradient-to-br from-zinc-950 via-neutral-900 to-stone-950",
+    "bg-gradient-to-bl from-slate-800 via-slate-900 to-slate-950"
+  ];
+
+  function getDeterministicGradient(input: string): string {
+    let hash = 5381;
+
+    for (let i = 0; i < input.length; i++) {
+      hash = (hash << 5) + hash + input.charCodeAt(i);
+    }
+
+    const index = (hash >>> 0) % gradients.length;
+
+    return gradients[index];
+  }
+
+
+  return props.data.image && !props.data.source.startsWith("Sydney") ? (
+    <img
+      src={props.data.image /*|| "/placeholder.svg"*/}
+      alt={props.data.title}
+      class={`absolute inset-0 w-full h-full object-cover ${!props.isSelected() ? 'blur-xs' : ''}`}
+      onError={(e) => {
+        const element = e.target as HTMLImageElement
+        element.src = "/the-guardian-logo.jpg"
+        element.style.opacity = "20%"
+        element.style.display = "none"
+        const container = element.parentElement
+        if (container)
+          container.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      }}></img>)
+    : (
+      <div class={`absolute inset-0 ${getDeterministicGradient(props.data.guid)}`} />
+    )
+
+
+}
+
 
 export default Card;
