@@ -1,11 +1,17 @@
 import { FeedItem, FeedResult } from '@/schemas/FeedItem';
 import { VercelRequest, VercelResponse } from '@vercel/node';
+import { decode } from 'html-entities';
 
 const FEED_URLS = [
+
   { name: "BBC News", url: "https://feeds.bbci.co.uk/news/rss.xml" },
   { name: "The Guardian", url: "https://www.theguardian.com/uk/rss" },
   { name: "The Journal", url: "https://www.thejournal.ie/feed/" },
   { name: "Sky News", url: "https://feeds.skynews.com/feeds/rss/home.xml" },
+  { name: "RTE", url: "https://www.rte.ie/rss/news.xml" },
+  { name: "RTE Sport", url: "https://www.rte.ie/rss/sport.xml" },
+  { name: "Galway Beo", url: "https://www.galwaybeo.ie/?service=rss" },
+  { name: "Dublin Live", url: "https://www.dublinlive.ie/?service=rss" }
 ]
 
 export default async function handler(
@@ -160,8 +166,8 @@ async function parseRSSFeed(feedUrl: string, sourceName: string): Promise<FeedIt
 
     for (let i = 0; i < Math.min(items.length, 20); i++) {
       const itemText = items[i]
-      const title = parseXMLElement(itemText, "title")
-      const description = parseXMLElement(itemText, "description")
+      const title = decode(parseXMLElement(itemText, "title"))
+      const description = decode(parseXMLElement(itemText, "description"))
       let link = parseXMLElement(itemText, "link")
       const pubDate = parseXMLElement(itemText, "pubDate")
       const guid = parseXMLElement(itemText, "guid")

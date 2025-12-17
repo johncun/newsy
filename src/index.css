@@ -106,3 +106,18 @@ button:focus-visible {
     }
 }
 
+.pulse {
+    border-radius: 50%;
+    box-shadow: 0px 0px 1px 1px #0000001a;
+    animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+    0% {
+        box-shadow: 0 0 0 0px aqua;
+    }
+    100% {
+        box-shadow: 0 0 0 12px rgba(0, 0, 0, 0);
+    }
+}
+

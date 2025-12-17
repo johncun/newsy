@@ -14,6 +14,9 @@ importers:
       animejs:
         specifier: ^4.2.2
         version: 4.2.2
+      html-entities:
+        specifier: ^2.6.0
+        version: 2.6.0
       solid-js:
         specifier: ^1.9.10
         version: 1.9.10
@@ -1960,6 +1963,9 @@ packages:
 
   html-entities@2.3.3:
     resolution: {integrity: sha512-DV5Ln36z34NNTDgnz0EWGBLZENelNAtkiFA4kyNOG2tDI6Mz1uSWiq1wAKdyjnJwyDiDO7Fa2SO1CTxPXL8VxA==}
+
+  html-entities@2.6.0:
+    resolution: {integrity: sha512-kig+rMn/QOVRvr7c86gQ8lWXq+Hkv6CbAH1hLu+RG338StTpE8Z0b44SDVaqVu7HGKf27frdmUYEs9hTUX/cLQ==}
 
   http-errors@1.4.0:
     resolution: {integrity: sha512-oLjPqve1tuOl5aRhv8GK5eHpqP1C9fb+Ol+XTLjKfLltE44zdDbEdjPSbU7Ch5rSNsVFqZn97SrMmZLdu1/YMw==}
@@ -4612,6 +4618,8 @@ snapshots:
   hey-listen@1.0.8: {}
 
   html-entities@2.3.3: {}
+
+  html-entities@2.6.0: {}
 
   http-errors@1.4.0:
     dependencies:

@@ -1,10 +1,11 @@
-import { createResource, ErrorBoundary, createEffect, For, Accessor, onMount, createSignal } from 'solid-js';
+import { createResource, ErrorBoundary, createEffect, For, Accessor, onMount, createSignal, Match, Switch } from 'solid-js';
 import { ArticleRecord, ArticleRecords, ArticleState, FeedResult } from './schemas/FeedItem';
 import Card, { Action } from './Card';
 import { getAllByState, getArticleByGuid, killArticle, killArticles, memData, refreshDbWithFeedItems, updateState, updateStates } from './db';
 import Banner from './Banner';
-import { menuGuid, mode, refetch, setMenuGuid } from './signals';
-import { Motion } from 'solid-motionone';
+import { isFetching, menuGuid, mode, setIsFetching, setMenuGuid } from './signals';
+import { Motion, Presence } from 'solid-motionone';
+import { Pulse } from './Pulse';
 
 // --- Data Fetcher Function with Zod Validation ---
 const fetchItems = async (): Promise<FeedResult> => {
@@ -25,7 +26,7 @@ const fetchItems = async (): Promise<FeedResult> => {
 
 const App: any = () => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
-  const [feed] = createResource(() => refetch(), fetchItems);
+  const [feed] = createResource(() => isFetching(), fetchItems);
 
   createEffect(() => {
     if (feed.error) {
@@ -40,6 +41,8 @@ const App: any = () => {
     console.log("total items:", md.length);
     console.log("total LIVE items:", getAllByState('live')(md).length);
     console.log(getAllByState('saved')(md).map(it => it.guid).join(' '))
+
+    setIsFetching(false)
   });
 
   const [isUpScrolled, setIsUpScrolled] = createSignal(false)
@@ -83,26 +86,31 @@ const App: any = () => {
   return (
     <ErrorBoundary fallback={<div>Failed to load or validate API data.</div>}>
       <Banner />
-      <div ref={upSentinelRef} class={`absolute z-30 ${isUpScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-4 flex text-2xl items-center justify-center top-18 rounded-full bg-amber-800/80 text-cyan-100 drop-shadow-sm drop-shadow-slate-400`} onClick={toTop}>⇡</div>
-      <div ref={dnSentinelRef} class={`absolute z-30 ${!isDnScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-4 flex text-2xl items-center justify-center bottom-4 rounded-full bg-amber-800/80 text-cyan-100 drop-shadow-sm drop-shadow-slate-400`} onClick={toBottom}>⇣</div>
-      <div ref={scrollRef} class="absolute top-0 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll">
-
-        <div class="relative flex flex-col pt-16 pb-8 gap-4 items-center py-4 ">
-          <div ref={upSentinelRef} class={`h-1 w-1`}></div>
-          <List as={memData} mode={mode} />
-          <div ref={dnSentinelRef} class={`h-1 w-1`}></div>
-          {
-            !memData() ?
-              <div class="absolute inset-y-0 inset-x-4 flex bg-linear-to-br from-zinc-800 to-slate-800
-            items-center justify-center">Loading...</div> : null
-          }
-
-        </div>
-      </div>
-      {menuGuid() && <Motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} id='menu' class="absolute z-50 inset-0 bg-slate-800/50"><div class="absolute rounded-lg inset-8 border border-slate-700 bg-slate-700 text-black">
-        <MenuItems />
-      </div></Motion.div>}
-    </ErrorBoundary >
+      <Switch fallback={null}>
+        <Match when={isFetching()}>
+          <div class="absolute inset-0 flex items-center justify-center"><Pulse /></div>
+        </Match>
+        <Match when={!isFetching()}>
+          <div ref={upSentinelRef} class={`absolute z-30 ${isUpScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-4 flex text-2xl items-center justify-center top-18 rounded-full bg-amber-800/80 text-cyan-100 drop-shadow-sm drop-shadow-slate-400`} onClick={toTop}>⇡</div>
+          <div ref={dnSentinelRef} class={`absolute z-30 ${!isDnScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-4 flex text-2xl items-center justify-center bottom-4 rounded-full bg-amber-800/80 text-cyan-100 drop-shadow-sm drop-shadow-slate-400`} onClick={toBottom}>⇣</div>
+          <div ref={scrollRef} class='absolute top-0 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll'>
+            <div class='relative flex flex-col pt-16 pb-8 gap-4 items-center py-4'>
+              <div ref={upSentinelRef} class='h-1 w-1'></div>
+              <List as={memData} mode={mode} />
+              <div ref={dnSentinelRef} class='h-1 w-1'></div>
+            </div>
+          </div>
+          <Presence exitBeforeEnter>
+            {menuGuid() &&
+              <Motion.div exit={{ scale: 0 }} transition={{ duration: .2 }} initial={{ scale: 0 }} animate={{ scale: 1 }} id='menu' class='absolute z-50 inset-0 bg-slate-800/50'>
+                <div class="absolute rounded-lg inset-8 border border-slate-700 bg-linear-to-br from-slate-700 to-orange-900 text-black">
+                  <MenuItems />
+                </div>
+              </Motion.div>}
+          </Presence>
+        </Match>
+      </Switch>
+    </ErrorBoundary>
   );
 };
 
