@@ -1,5 +1,6 @@
 import { createEffect, createSignal } from "solid-js"
 import { ArticleRecord, ArticleRecords, ArticleState, FeedItem, FeedItems } from "@shared/feed-types"
+import { REMOVE_LIVE_AFTER_HOURS } from "./options"
 
 const STORAGE_KEY = "newsy:articles"
 const STORAGE_KILLS = "newsy:killedlist"
@@ -129,6 +130,27 @@ export const removeOldDeletes = (_md: ArticleRecords) => {
   }
 }
 
+
+export const removeLiveAfterHours = () => {
+  const allLive = getAllByState('live')(memData())
+  const pit = (Date.now() - 1000 * 3600 * REMOVE_LIVE_AFTER_HOURS)
+  const old = allLive.filter(a => (new Date(a.pubDate)).getTime() < pit)
+  if (!old.length) return
+
+  console.log({ old })
+  const toDeletes = new Set(old.map(a => a.guid))
+
+  setMemData(mds => {
+    return mds.map(a => {
+      if (toDeletes.has(a.guid)) {
+        a.state = 'deleted'
+      }
+      return a
+    })
+  })
+
+}
+
 export const killArticles = (guids: string[]) => {
 
   const toKills = new Set(guids)
@@ -182,6 +204,11 @@ createEffect(() => {
   removeOldDeletes(md)
 })
 
+removeLiveAfterHours()
+
+setInterval(() => {
+  removeLiveAfterHours()
+}, 15000)
 
 //   const database = await initDB()
 //   return new Promie(s(resolve, reject) => {
