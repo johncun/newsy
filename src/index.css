@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
 
-body { overflow: hidden; }
+body {
+  overflow: hidden;
+}
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -68,55 +70,54 @@ button:focus-visible {
 }
 
 * {
-    box-sizing: border-box;
-    scrollbar-width: none;
+  box-sizing: border-box;
+  scrollbar-width: none;
 }
 
 .swipe {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    overflow-x: auto;
-    --border-block: 1px #666 solid;
-    scroll-snap-type: x mandatory;
-    --container-type: inline-size;
-    scrollbar-width: none;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  overflow-x: auto;
+  --border-block: 1px #666 solid;
+  scroll-snap-type: x mandatory;
+  --container-type: inline-size;
+  scrollbar-width: none;
 
-    > :nth-child(2) {
-        width: calc(100vw - 2rem); 
-        scroll-snap-align: center;
-    }
+  > :nth-child(2) {
+    width: calc(100vw - 2rem);
+    scroll-snap-align: center;
+  }
 
-    &.hold {
-        > * {
-            &:first-child {
-                animation: scroll_hold 0.0001s forwards;
-                scroll-snap-align: start;
-            }
-            &:last-child {
-                scroll-snap-align: end;
-            }
-        }
+  &.hold {
+    > * {
+      &:first-child {
+        animation: scroll_hold 0.0001s forwards;
+        scroll-snap-align: start;
+      }
+      &:last-child {
+        scroll-snap-align: end;
+      }
     }
+  }
 }
 
 @keyframes scroll_hold {
-    to {
-        scroll-snap-align: start;
-    }
+  to {
+    scroll-snap-align: start;
+  }
 }
 
 .pulse {
-    border-radius: 50%;
-    box-shadow: 0px 0px 1px 1px #0000001a;
-    animation: pulse-animation 2s infinite;
+  border-radius: 50%;
+  box-shadow: 0px 0px 1px 1px #0000001a;
+  animation: pulse-animation 2s infinite;
 }
 
 @keyframes pulse-animation {
-    0% {
-        box-shadow: 0 0 0 0px aqua;
-    }
-    100% {
-        box-shadow: 0 0 0 12px rgba(0, 0, 0, 0);
-    }
+  0% {
+    box-shadow: 0 0 0 0px aqua;
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgba(0, 0, 0, 0);
+  }
 }
-

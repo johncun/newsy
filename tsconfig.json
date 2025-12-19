@@ -15,7 +15,12 @@
       "@shared/*": ["shared/*"],
       "@src/*": ["src/*"],
       "@api/*": ["api/*"]
-    }
-  },
+    },
+    "types": [
+      "vite/client", 
+      "vite-plugin-pwa/client",
+      "vite-plugin-pwa/solid" 
+    ] 
+  }, 
   "include": ["src/**/*", "api/**/*", "shared/**/*"]
 }

@@ -1,2 +1,1 @@
-export const REMOVE_LIVE_AFTER_HOURS = 8
-
+export const REMOVE_LIVE_AFTER_HOURS = 8;

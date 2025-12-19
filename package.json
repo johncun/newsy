@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@solidjs/meta": "^0.29.4",
     "@tailwindcss/vite": "^4.1.18",
     "animejs": "^4.2.2",
     "html-entities": "^2.6.0",
@@ -16,6 +17,7 @@
     "solid-motionone": "^1.0.4",
     "tailwindcss": "^4.1.18",
     "vercel": "^50.1.2",
+    "workbox-window": "^7.4.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {
@@ -28,6 +30,7 @@
     "prettier-plugin-sort-imports": "^1.8.9",
     "typescript": "^5.9.3",
     "vite": "^7.3.0",
+    "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-solid": "^2.11.10"
   }
 }

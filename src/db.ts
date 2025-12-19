@@ -1,9 +1,15 @@
-import { createEffect, createSignal } from "solid-js"
-import { ArticleRecord, ArticleRecords, ArticleState, FeedItem, FeedItems } from "@shared/feed-types"
-import { REMOVE_LIVE_AFTER_HOURS } from "./options"
+import {
+  ArticleRecord,
+  ArticleRecords,
+  ArticleState,
+  FeedItem,
+  FeedItems,
+} from '@shared/feed-types';
+import { createEffect, createSignal } from 'solid-js';
+import { REMOVE_LIVE_AFTER_HOURS } from './options';
 
-const STORAGE_KEY = "newsy:articles"
-const STORAGE_KILLS = "newsy:killedlist"
+const STORAGE_KEY = 'newsy:articles';
+const STORAGE_KILLS = 'newsy:killedlist';
 
 // export const currentLiveGuids = new Set<string>()
 // export const currentDeletedGuids = new Set<string>()
@@ -12,203 +18,202 @@ const STORAGE_KILLS = "newsy:killedlist"
 //   .union(currentDeletedGuids)
 //   .union(currentSavedGuids)
 
-export const [memData, setMemData] = createSignal<ArticleRecords>([])
-export const [killedList, setKilledList] = createSignal<Set<string>>(new Set([]))
+export const [memData, setMemData] = createSignal<ArticleRecords>([]);
+export const [killedList, setKilledList] = createSignal<Set<string>>(
+  new Set([]),
+);
 
 export const getAllFromLocal = () => {
-  const data = localStorage.getItem(STORAGE_KEY)
+  const data = localStorage.getItem(STORAGE_KEY);
   if (!data) {
-    console.log("No data in localStorage")
-    setMemData([])
+    console.log('No data in localStorage');
+    setMemData([]);
   }
   try {
-    console.log({ data })
-    const parsed = ArticleRecords.parse(JSON.parse(data || "[]"))
+    console.log({ data });
+    const parsed = ArticleRecords.parse(JSON.parse(data || '[]'));
     console.log('parsed', parsed.length);
-    setMemData(parsed)
+    setMemData(parsed);
+  } catch (e) {
+    console.error('Error parsing data from localStorage:', e);
+    setMemData([]);
   }
-  catch (e) {
-    console.error("Error parsing data from localStorage:", e)
-    setMemData([])
-  }
-}
+};
 
 export const getKillListFromLocal = () => {
-  const data = localStorage.getItem(STORAGE_KILLS)
+  const data = localStorage.getItem(STORAGE_KILLS);
   if (!data) {
-    console.log("No data in localStorage")
-    setKilledList(new Set([]))
+    console.log('No data in localStorage');
+    setKilledList(new Set([]));
   }
   try {
-    const parsed: string[] = JSON.parse(data || "[]")
+    const parsed: string[] = JSON.parse(data || '[]');
     console.log('parsed', parsed.length);
-    setKilledList(new Set(parsed))
+    setKilledList(new Set(parsed));
+  } catch (e) {
+    console.error('Error parsing data from localStorage:', e);
+    setKilledList(new Set([]));
   }
-  catch (e) {
-    console.error("Error parsing data from localStorage:", e)
-    setKilledList(new Set([]))
-  }
-}
+};
 
-getAllFromLocal()
-getKillListFromLocal()
+getAllFromLocal();
+getKillListFromLocal();
 
-export const saveAllToLocal = (md: ArticleRecords, kills: Set<string>): void => {
-  console.log('saving to local', { data: md, kills: [...kills] })
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(md))
-  localStorage.setItem(STORAGE_KILLS, JSON.stringify([...kills]))
-}
+export const saveAllToLocal = (
+  md: ArticleRecords,
+  kills: Set<string>,
+): void => {
+  console.log('saving to local', { data: md, kills: [...kills] });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(md));
+  localStorage.setItem(STORAGE_KILLS, JSON.stringify([...kills]));
+};
 
 const FeedItemToNewRecord = (item: FeedItem): ArticleRecord => {
   return {
     ...item,
-    state: "live",
-  }
-}
-export const getArticleByGuid = (guid: string): ArticleRecord | undefined => memData().find(a => a.guid === guid) || undefined
+    state: 'live',
+  };
+};
+export const getArticleByGuid = (guid: string): ArticleRecord | undefined =>
+  memData().find((a) => a.guid === guid) || undefined;
 
 export const refreshDbWithFeedItems = (items: FeedItems): void => {
-  if (items.length === 0) return
+  if (items.length === 0) return;
 
-  const allGuids = new Set(memData().map(it => it.guid))
+  const allGuids = new Set(memData().map((it) => it.guid));
   if (killedList()) {
-    for (const a of killedList()) { allGuids.add(a) }
+    for (const a of killedList()) {
+      allGuids.add(a);
+    }
   }
 
-  const newRecords: ArticleRecord[] = items.map(FeedItemToNewRecord).filter((record: ArticleRecord) => !allGuids.has(record.guid))
+  const newRecords: ArticleRecord[] = items
+    .map(FeedItemToNewRecord)
+    .filter((record: ArticleRecord) => !allGuids.has(record.guid));
 
-  if (newRecords.length === 0) return
+  if (newRecords.length === 0) return;
 
-  setMemData([...newRecords, ...memData()])
-}
+  setMemData([...newRecords, ...memData()]);
+};
 
 export const updateState = (guid: string, newState: ArticleState) => {
-  setMemData(mds => {
-    return mds.map(a => {
+  setMemData((mds) => {
+    return mds.map((a) => {
       if (a.guid === guid) {
-        return { ...a, state: newState }
-      }
-      else return a
-
-    })
-  })
-}
+        return { ...a, state: newState };
+      } else return a;
+    });
+  });
+};
 
 export const updateStates = (guids: string[], newState: ArticleState) => {
-  const gset = new Set(guids)
-  setMemData(mds => {
-    return mds.map(a => {
+  const gset = new Set(guids);
+  setMemData((mds) => {
+    return mds.map((a) => {
       if (gset.has(a.guid)) {
-        return { ...a, state: newState }
-      }
-      else return a
+        return { ...a, state: newState };
+      } else return a;
+    });
+  });
+};
 
-    })
-  })
-}
-
-export const getAllByState = (state: ArticleState) => (md: ArticleRecords): ArticleRecords => {
-  return md.filter(a => a.state === state)
-}
-const DELETED_MAX_ALLOWED_COUNT = 100
+export const getAllByState =
+  (state: ArticleState) =>
+  (md: ArticleRecords): ArticleRecords => {
+    return md.filter((a) => a.state === state);
+  };
+const DELETED_MAX_ALLOWED_COUNT = 100;
 
 export const removeOldDeletes = (_md: ArticleRecords) => {
-  const ds = getAllByState('deleted')(_md)
-  if (ds.length <= DELETED_MAX_ALLOWED_COUNT) return
+  const ds = getAllByState('deleted')(_md);
+  if (ds.length <= DELETED_MAX_ALLOWED_COUNT) return;
 
-  ds.sort((a, b) => (a.deletedAt || 0) - (b.deletedAt || 0))
+  ds.sort((a, b) => (a.deletedAt || 0) - (b.deletedAt || 0));
 
-  const wantedGuids = new Set(ds.slice(0, DELETED_MAX_ALLOWED_COUNT).map(a => a.guid))
-  const cleanedArr = _md.filter(a => a.state !== 'deleted' || wantedGuids.has(a.guid))
-  const cleaned = new Set(cleanedArr)
-  const mdset = new Set(_md)
-  const diff = mdset.difference(cleaned)
+  const wantedGuids = new Set(
+    ds.slice(0, DELETED_MAX_ALLOWED_COUNT).map((a) => a.guid),
+  );
+  const cleanedArr = _md.filter(
+    (a) => a.state !== 'deleted' || wantedGuids.has(a.guid),
+  );
+  const cleaned = new Set(cleanedArr);
+  const mdset = new Set(_md);
+  const diff = mdset.difference(cleaned);
   if (diff.size) {
     setTimeout(() => {
-      setMemData(cleanedArr)
-    }, 100)
+      setMemData(cleanedArr);
+    }, 100);
   }
-}
-
+};
 
 export const removeLiveAfterHours = () => {
-  const allLive = getAllByState('live')(memData())
-  const pit = (Date.now() - 1000 * 3600 * REMOVE_LIVE_AFTER_HOURS)
-  const old = allLive.filter(a => (new Date(a.pubDate)).getTime() < pit)
-  if (!old.length) return
+  const allLive = getAllByState('live')(memData());
+  const pit = Date.now() - 1000 * 3600 * REMOVE_LIVE_AFTER_HOURS;
+  const old = allLive.filter((a) => new Date(a.pubDate).getTime() < pit);
+  if (!old.length) return;
 
-  console.log({ old })
-  const toDeletes = new Set(old.map(a => a.guid))
+  console.log({ old });
+  const toDeletes = new Set(old.map((a) => a.guid));
 
-  setMemData(mds => {
-    return mds.map(a => {
+  setMemData((mds) => {
+    return mds.map((a) => {
       if (toDeletes.has(a.guid)) {
-        a.state = 'deleted'
+        a.state = 'deleted';
       }
-      return a
-    })
-  })
-
-}
+      return a;
+    });
+  });
+};
 
 export const killArticles = (guids: string[]) => {
+  const toKills = new Set(guids);
 
-  const toKills = new Set(guids)
+  const ks = killedList();
 
-  const ks = killedList()
-
-  setMemData(mds => {
-    return mds.flatMap(a => {
+  setMemData((mds) => {
+    return mds.flatMap((a) => {
       if (toKills.has(a.guid)) {
-        ks.add(a.guid)
-        return []
-      }
-      else return [a]
+        ks.add(a.guid);
+        return [];
+      } else return [a];
+    });
+  });
 
-    })
-  })
-
-  setKilledList(ks)
-
-}
+  setKilledList(ks);
+};
 
 export const killArticle = (guid: string) => {
+  const ks = killedList();
 
-  const ks = killedList()
-
-  setMemData(mds => {
-    return mds.flatMap(a => {
+  setMemData((mds) => {
+    return mds.flatMap((a) => {
       if (a.guid === guid) {
-        ks.add(guid)
-        return []
-      }
-      else return [a]
+        ks.add(guid);
+        return [];
+      } else return [a];
+    });
+  });
 
-    })
-  })
+  setKilledList(ks);
+};
 
-  setKilledList(ks)
-
-}
-
-export const [allLive, setAllLive] = createSignal<ArticleRecords>([])
+export const [allLive, setAllLive] = createSignal<ArticleRecords>([]);
 
 createEffect(() => {
+  const ks = killedList();
 
-  const ks = killedList()
+  const md = memData() || [];
 
-  const md = memData() || []
+  saveAllToLocal(md, ks);
+  setAllLive(getAllByState('live'));
+  removeOldDeletes(md);
+});
 
-  saveAllToLocal(md, ks)
-  setAllLive(getAllByState('live'))
-  removeOldDeletes(md)
-})
-
-removeLiveAfterHours()
+removeLiveAfterHours();
 
 setInterval(() => {
-  removeLiveAfterHours()
-}, 15000)
+  removeLiveAfterHours();
+}, 15000);
 
 //   const database = await initDB()
 //   return new Promie(s(resolve, reject) => {
@@ -227,8 +232,6 @@ setInterval(() => {
 //     request.onerror = () => reject(request.error)
 //     request.onsuccess = () => resolve()
 //   })
-
-
 
 // const DB_NAME = "NewsFeedDB"
 // const DB_VERSION = 3
