@@ -59,4 +59,7 @@ export const SourceRecordSchema = z.object({
   votes: z.number().int().nonnegative(),
 })
 
+export const SourceRecords = z.array(SourceRecordSchema)
+
 export type SourceRecord = z.infer<typeof SourceRecordSchema>
+export type SourceRecords = z.infer<typeof SourceRecords>

@@ -24,7 +24,7 @@ const CardStyleBasic = (props: {
 }) => {
   return <div
     class="flex flex-col items-center group cursor-pointer mx-0 bg-slate-800 rounded-2xl p-2 min-h-60 relative overflow-hidden"
-    onClick={() => setSelectedGuid(props.data.guid)}>
+    onClick={() => setSelectedGuid(props.isSelected() ? '' : props.data.guid)}>
     <Motion.div animate={{ scale: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} isSelected={props.isSelected} />
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}

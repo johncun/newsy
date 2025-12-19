@@ -1,6 +1,7 @@
 import {
   ArticleState,
   SourceRecord,
+  SourceRecords,
   SourceRecordSchema,
 } from '@shared/feed-types'
 import { createStore, reconcile } from 'solid-js/store'
@@ -15,18 +16,24 @@ export const [showOptions, setShowOptions] = createSignal(false)
 export const [menuGuid, setMenuGuid] = createSignal<string>('')
 
 export const [userSources, setUserSources] =
-  createStore<SourceRecord[]>(DEFAULT_FEED_URLS)
+  createStore<SourceRecords>(DEFAULT_FEED_URLS)
 
 export const loadSourcesFromStorage = () => {
   const fromLocal = localStorage.getItem('newsy:sources')
-  if (!fromLocal) return
+  if (!fromLocal) {
+    setUserSources(DEFAULT_FEED_URLS)
+    return
+  }
 
   try {
-    setUserSources(SourceRecordSchema.parse(JSON.parse(fromLocal)))
+    console.log({ fromLocal })
+    setUserSources(SourceRecords.parse(JSON.parse(fromLocal)))
   } catch (e) {
     console.error(e)
   }
 }
+
+loadSourcesFromStorage()
 
 export const saveSourcesToStorage = () => {
   console.log({ userSources })
