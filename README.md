@@ -6,4 +6,3 @@
 - Undo button
 - [ ] Input news feeds and disable, keep stats on news feeds
 - [ ] Icon
-

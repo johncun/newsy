@@ -1,10 +1,11 @@
 /* @refresh reload */
-import { MetaProvider } from '@solidjs/meta';
-import { render } from 'solid-js/web';
-import App from './App.jsx';
-import './index.css';
+import { MetaProvider } from '@solidjs/meta'
+import { render } from 'solid-js/web'
 
-const root = document.getElementById('root');
+import App from './App.jsx'
+import './index.css'
+
+const root = document.getElementById('root')
 
 render(
   () => (
@@ -13,4 +14,4 @@ render(
     </MetaProvider>
   ),
   root!,
-);
+)

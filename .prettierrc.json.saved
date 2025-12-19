@@ -15,5 +15,8 @@
   "bracketSameLine": true,
   "arrowParens": "avoid",
   "proseWrap": "always",
-  "htmlWhitespaceSensitivity": "ignore"
+  "htmlWhitespaceSensitivity": "ignore",
+  "importOrder": ["^components/(.*)$", "^[./]"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }

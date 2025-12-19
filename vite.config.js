@@ -1,8 +1,8 @@
-import tailwindcss from '@tailwindcss/vite';
-import { VitePWA } from 'vite-plugin-pwa';
-import solid from 'vite-plugin-solid';
-import { defineConfig } from 'vite';
-import path from 'path';
+import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
+import solid from 'vite-plugin-solid'
+import { defineConfig } from 'vite'
+import path from 'path'
 
 export default defineConfig({
   plugins: [
@@ -15,14 +15,14 @@ export default defineConfig({
         type: 'module', // Required if you use ESM in your service worker
         navigateFallback: 'index.html',
       },
-      includeAssets: ['assets/favicon.ico', 'assets/apple-touch-icon.png'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Newsy',
         short_name: 'Newsy',
         description: 'A modern news reader built with SolidJS',
         icons: [
           {
-            src: 'assets/web-app-manifest-192x192.png',
+            src: 'web-app-manifest-192x192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'maskable',
@@ -46,4 +46,4 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, './shared'),
     },
   },
-});
+})

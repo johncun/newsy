@@ -7,19 +7,19 @@ import {
   refreshDbWithFeedItems,
   updateState,
   updateStates,
-} from './db';
+} from './db'
 import {
-  createResource,
   ErrorBoundary,
-  createEffect,
   For,
+  Show,
   Accessor,
-  onMount,
-  createSignal,
   Match,
   Switch,
-  Show,
-} from 'solid-js';
+  createEffect,
+  createResource,
+  createSignal,
+  onMount,
+} from 'solid-js'
 import {
   isFetching,
   menuGuid,
@@ -29,27 +29,27 @@ import {
   setShowOptions,
   showOptions,
   userSources,
-} from './signals';
+} from './signals'
 import {
   ArticleRecord,
   ArticleRecords,
   ArticleState,
   FeedResult,
-} from '@shared/feed-types';
-import { useRegisterSW } from 'virtual:pwa-register/solid';
-import { Motion, Presence } from 'solid-motionone';
-import Card, { Action } from './Card';
-import { Meta } from '@solidjs/meta';
-import FeedsForm from './FeedsForm';
-import { SvgCross } from './svgs';
-import { Pulse } from './Pulse';
-import Banner from './Banner';
+} from '@shared/feed-types'
+import { useRegisterSW } from 'virtual:pwa-register/solid'
+import { Motion, Presence } from 'solid-motionone'
+import Card, { Action } from './Card'
+import { Meta } from '@solidjs/meta'
+import FeedsForm from './FeedsForm'
+import { SvgCross } from './svgs'
+import { Pulse } from './Pulse'
+import Banner from './Banner'
 
 function UpdateToast() {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
-  } = useRegisterSW();
+  } = useRegisterSW()
 
   return (
     <Show when={needRefresh()}>
@@ -59,7 +59,7 @@ function UpdateToast() {
         <button onClick={() => setNeedRefresh(false)}>Close</button>
       </div>
     </Show>
-  );
+  )
 }
 
 const fetchItems = async (): Promise<FeedResult> => {
@@ -72,83 +72,89 @@ const fetchItems = async (): Promise<FeedResult> => {
       sources: userSources,
       maxPerRequest: 20,
     }),
-  });
+  })
   if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`);
+    throw new Error(`HTTP error! Status: ${response.status}`)
   }
-  const data = await response.json();
-  const validatedData = FeedResult.parse(data);
+  const data = await response.json()
+  const validatedData = FeedResult.parse(data)
 
-  return validatedData;
-};
+  return validatedData
+}
 
 const App: any = () => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
-  const [feed] = createResource(() => isFetching(), fetchItems);
+  const [feed] = createResource(() => isFetching(), fetchItems)
 
   createEffect(() => {
     if (feed.error) {
-      console.error('Error loading or validating API data:', feed.error);
+      console.error('Error loading or validating API data:', feed.error)
     }
-    console.log('Fetched items:', feed()?.count);
+    console.log('Fetched items:', feed()?.count)
 
-    refreshDbWithFeedItems(feed()?.items || []);
+    refreshDbWithFeedItems(feed()?.items || [])
 
-    const md = memData();
+    const md = memData()
 
-    console.log('total items:', md.length);
-    console.log('total LIVE items:', getAllByState('live')(md).length);
+    console.log('total items:', md.length)
+    console.log('total LIVE items:', getAllByState('live')(md).length)
     console.log(
       getAllByState('saved')(md)
-        .map((it) => it.guid)
+        .map(it => it.guid)
         .join(' '),
-    );
+    )
 
-    setIsFetching(false);
-  });
+    setIsFetching(false)
+  })
 
-  const [isUpScrolled, setIsUpScrolled] = createSignal(false);
-  const [isDnScrolled, setIsDnScrolled] = createSignal(false);
+  const [isUpScrolled, setIsUpScrolled] = createSignal(false)
+  const [isDnScrolled, setIsDnScrolled] = createSignal(false)
 
-  let upSentinelRef!: HTMLDivElement;
-  let dnSentinelRef!: HTMLDivElement;
-  let scrollRef!: HTMLDivElement;
+  let upSentinelRef!: HTMLDivElement
+  let dnSentinelRef!: HTMLDivElement
+  let scrollRef!: HTMLDivElement
 
   onMount(() => {
     const upObserver = new IntersectionObserver(
       ([entry]) => {
-        setIsUpScrolled(!entry.isIntersecting);
+        setIsUpScrolled(!entry.isIntersecting)
       },
       { threshold: [1.0] },
-    );
-    upObserver.observe(upSentinelRef!);
+    )
+    upObserver.observe(upSentinelRef!)
 
     const dnObserver = new IntersectionObserver(
       ([entry]) => {
-        setIsDnScrolled(entry.isIntersecting);
+        setIsDnScrolled(entry.isIntersecting)
       },
       { threshold: [1.0] },
-    );
-    dnObserver.observe(dnSentinelRef!);
+    )
+    dnObserver.observe(dnSentinelRef!)
 
     return () => {
-      upObserver.disconnect();
-      dnObserver.disconnect();
-    };
-  });
+      upObserver.disconnect()
+      dnObserver.disconnect()
+    }
+  })
+
+  createEffect(() => {
+    if (mode() && scrollRef) {
+      scrollRef.scrollTop = 0
+    }
+  })
 
   const toTop = () => {
-    if (!scrollRef) return;
-    scrollRef.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    if (!scrollRef) return
+    scrollRef.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const toBottom = () => {
-    if (!scrollRef) return;
+    if (!scrollRef) return
     scrollRef.scrollTo({
       top: 100000, //scrollRef.scrollHeight,
       behavior: 'smooth',
-    });
-  };
+    })
+  }
 
   return (
     <ErrorBoundary fallback={<div>Failed to load or validate API data.</div>}>
@@ -174,21 +180,18 @@ const App: any = () => {
           <div
             ref={upSentinelRef}
             class={`absolute z-30 ${isUpScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-4 flex text-2xl items-center justify-center top-18 rounded-full bg-amber-800/80 text-cyan-100 drop-shadow-sm drop-shadow-slate-400`}
-            onClick={toTop}
-          >
+            onClick={toTop}>
             ⇡
           </div>
           <div
             ref={dnSentinelRef}
             class={`absolute z-30 ${!isDnScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-4 flex text-2xl items-center justify-center bottom-4 rounded-full bg-amber-800/80 text-cyan-100 drop-shadow-sm drop-shadow-slate-400`}
-            onClick={toBottom}
-          >
+            onClick={toBottom}>
             ⇣
           </div>
           <div
             ref={scrollRef}
-            class="absolute top-0 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll"
-          >
+            class="absolute top-0 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll">
             <div class="relative flex flex-col pt-16 pb-8 gap-4 items-center py-4">
               <div ref={upSentinelRef} class="h-1 w-1"></div>
               <List as={memData} mode={mode} />
@@ -203,10 +206,9 @@ const App: any = () => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 id="menu"
-                class="absolute z-50 inset-0 bg-slate-800/50"
-              >
+                class="absolute z-50 inset-0 bg-slate-800/50">
                 <div class="absolute rounded-lg inset-8 border border-slate-700 bg-linear-to-br from-slate-700 to-orange-900 text-black">
-                  <MenuItems />
+                  <OptionMenuItems />
                 </div>
               </Motion.div>
             )}
@@ -219,16 +221,14 @@ const App: any = () => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 id="menu"
-                class="absolute z-50 inset-0 bg-slate-800/50"
-              >
+                class="absolute z-50 inset-0 bg-slate-800/50">
                 <div class="absolute rounded-lg inset-3 border-2 border-slate-100 bg-linear-to-b from-slate-700 to-slate-800 text-black">
                   <div class="absolute inset-x-0 top-0 h-12 border-b border-b-slate-900 flex text-xl items-center justify-center text-white ">
                     Options Form
                   </div>
                   <div
                     class="absolute w-8 h-8 top-2 right-2 flex items-center justify-center text-white "
-                    onClick={() => setShowOptions(false)}
-                  >
+                    onClick={() => setShowOptions(false)}>
                     <SvgCross fill="orange" />{' '}
                   </div>
                   <div class="absolute top-16 left-2 right-2 bottom-1 overflow-x-hidden px-2">
@@ -242,50 +242,50 @@ const App: any = () => {
       </Switch>
       <UpdateToast />
     </ErrorBoundary>
-  );
-};
+  )
+}
 
-const MenuItems = () => {
-  const [a, setA] = createSignal<ArticleRecord>();
+const OptionMenuItems = () => {
+  const [a, setA] = createSignal<ArticleRecord>()
 
   onMount(() => {
-    setA(getArticleByGuid(menuGuid()));
-  });
+    setA(getArticleByGuid(menuGuid()))
+  })
 
   const follows = (): ArticleRecords => {
-    const as = getAllByState(mode())(memData());
-    if (!as || !as.length) return [];
-    const idx = as.findIndex((a) => a.guid === menuGuid());
-    if (idx < 0) return [];
-    return as.slice(idx);
-  };
+    const as = getAllByState(mode())(memData())
+    if (!as || !as.length) return []
+    const idx = as.findIndex(a => a.guid === menuGuid())
+    if (idx < 0) return []
+    return as.slice(idx)
+  }
 
   const delFollow = () => {
-    if (!follows().length) return;
+    if (!follows().length) return
 
-    const gs = follows().map((a) => a.guid);
-    updateStates(gs, 'deleted');
+    const gs = follows().map(a => a.guid)
+    updateStates(gs, 'deleted')
 
-    setMenuGuid('');
-  };
+    setMenuGuid('')
+  }
 
   const saveFollow = () => {
-    if (!follows().length) return;
+    if (!follows().length) return
 
-    const gs = follows().map((a) => a.guid);
-    updateStates(gs, 'saved');
+    const gs = follows().map(a => a.guid)
+    updateStates(gs, 'saved')
 
-    setMenuGuid('');
-  };
+    setMenuGuid('')
+  }
 
   const killFollow = () => {
-    if (!follows().length) return;
+    if (!follows().length) return
 
-    const gs = follows().map((a) => a.guid);
-    killArticles(gs);
+    const gs = follows().map(a => a.guid)
+    killArticles(gs)
 
-    setMenuGuid('');
-  };
+    setMenuGuid('')
+  }
 
   return (
     <div class="flex flex-col absolute inset-2">
@@ -309,77 +309,86 @@ const MenuItems = () => {
             {mode() === 'live' && (
               <div class="text-slate-400 p-4 flex justify-center">
                 <button
-                  onClick={saveFollow}
-                >{`Save this and following ${follows().length ?? ''}`}</button>
+                  onClick={
+                    saveFollow
+                  }>{`Save this and following ${follows().length ?? ''}`}</button>
               </div>
             )}
             {mode() === 'live' && (
               <div class="text-slate-400 p-4 flex justify-center">
                 <button
-                  onClick={delFollow}
-                >{`Delete this and following ${follows().length ?? ''}`}</button>
+                  onClick={
+                    delFollow
+                  }>{`Delete this and following ${follows().length ?? ''}`}</button>
               </div>
             )}
 
             {mode() === 'deleted' && (
               <div class="text-slate-400 p-4 flex justify-center">
                 <button
-                  onClick={killFollow}
-                >{`KILL this and following ${follows().length ?? ''}`}</button>
+                  onClick={
+                    killFollow
+                  }>{`KILL this and following ${follows().length ?? ''}`}</button>
               </div>
             )}
 
             {mode() === 'saved' && (
               <div class="text-slate-400 p-4 flex justify-center">
                 <button
-                  onClick={delFollow}
-                >{`Delete this and following ${follows().length ?? ''}`}</button>
+                  onClick={
+                    delFollow
+                  }>{`Delete this and following ${follows().length ?? ''}`}</button>
               </div>
             )}
           </>
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-type ActionToState = { [key: string]: ArticleState };
+type ActionToState = { [key: string]: ArticleState }
 const actionToState: ActionToState = {
   Save: 'saved',
   Delete: 'deleted',
-};
+}
 const onSwipeRight = (guid: string, action: Action) => {
-  if (action === '') return;
-  if (action === 'Kill') killArticle(guid);
+  if (action === '') return
+  if (action === 'Kill') killArticle(guid)
 
-  updateState(guid, actionToState[action]);
-};
+  updateState(guid, actionToState[action])
+}
 const onSwipeLeft = (guid: string, action: Action) => {
-  if (action === '') return;
-  if (action === 'Kill') killArticle(guid);
+  if (action === '') return
+  if (action === 'Kill') killArticle(guid)
 
-  updateState(guid, actionToState[action]);
-};
+  updateState(guid, actionToState[action])
+}
 
 const List = (props: {
-  as: Accessor<ArticleRecords>;
-  mode: Accessor<ArticleState>;
+  as: Accessor<ArticleRecords>
+  mode: Accessor<ArticleState>
 }) => {
-  const as = () => getAllByState(mode())(props.as());
-  return (
-    <>
-      <For each={as()}>
-        {(it, idx) => (
-          <Card
-            data={it}
-            index={idx() + 1}
-            onSwipeLeft={onSwipeLeft}
-            onSwipeRight={onSwipeRight}
-          />
-        )}
-      </For>
-    </>
-  );
-};
+  const as = () => getAllByState(mode())(props.as())
 
-export default App;
+  return <Switch fallback={
+    <For each={as()}>
+      {(it, idx) => (
+        <Card
+          data={it}
+          index={idx() + 1}
+          onSwipeLeft={onSwipeLeft}
+          onSwipeRight={onSwipeRight}
+        />
+      )}
+    </For>
+  }>
+    <Match when={!as()?.length}>
+      <div class="w-full h-40 text-zinc-500 inset-0 flex items-center justify-center">
+        <div>{`No items in ${props.mode()} list`}</div>
+      </div>
+    </Match>
+  </Switch>
+}
+
+export default App

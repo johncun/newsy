@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",   
+    "jsxImportSource": "solid-js",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -16,11 +16,7 @@
       "@src/*": ["src/*"],
       "@api/*": ["api/*"]
     },
-    "types": [
-      "vite/client", 
-      "vite-plugin-pwa/client",
-      "vite-plugin-pwa/solid" 
-    ] 
-  }, 
+    "types": ["vite/client", "vite-plugin-pwa/client", "vite-plugin-pwa/solid"]
+  },
   "include": ["src/**/*", "api/**/*", "shared/**/*"]
 }
