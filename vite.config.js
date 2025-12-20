@@ -36,7 +36,7 @@ export default defineConfig({
         ],
         display: 'standalone',
         theme_color: '#a99eee',
-        background_color: '#ffffff',
+        background_color: '#a99eee',
       },
     }),
   ],

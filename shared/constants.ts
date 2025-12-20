@@ -1,4 +1,5 @@
 import { SourceRecord } from './feed-types'
+export const SETTINGS_KEY = "newsy:settings"
 
 export const DEFAULT_FEED_URLS: SourceRecord[] = [
   { name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml', votes: 5 },

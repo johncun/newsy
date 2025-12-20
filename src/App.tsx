@@ -44,6 +44,7 @@ import FeedsForm from './FeedsForm'
 import { SvgCross } from './svgs'
 import { Pulse } from './Pulse'
 import Banner from './Banner'
+import { SettingsPage } from './Settings'
 
 function UpdateToast() {
   const {
@@ -232,7 +233,8 @@ const App: any = () => {
                     <SvgCross fill="orange" />{' '}
                   </div>
                   <div class="absolute top-16 left-2 right-2 bottom-1 overflow-x-hidden px-2">
-                    <FeedsForm onSaved={() => setShowOptions(false)} />
+                    {/* <FeedsForm onSaved={() => setShowOptions(false)} /> */}
+                    <SettingsPage />
                   </div>
                 </div>
               </Motion.div>

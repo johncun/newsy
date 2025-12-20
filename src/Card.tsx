@@ -81,13 +81,12 @@ const Card = (props: {
     }
 
     function on_touchend(_e: any) {
-      console.log('ontouchend')
       const diff = Math.abs(Math.abs(dx) - x)
 
-      if (dx > 0 && diff < 5) {
+      if (dx >= 0 && diff < 5) {
         swipeLeft()
       }
-      if (dx < 0 && diff < 5) {
+      if (dx <= 0 && diff < 5) {
         swipeRight()
       }
     }
@@ -100,7 +99,7 @@ const Card = (props: {
   let onsc: (e: any) => void, onte: (e: any) => void
 
   onMount(() => {
-    ;[onsc, onte] = swiper(elRef)
+    const [onsc, onte] = swiper(elRef)
     elRef.scrollLeft = 0
     return () => {
       removeEventListener('scroll', onsc)
