@@ -96,7 +96,6 @@ const Card = (props: {
     return [on_scroll, on_touchend]
   }
 
-  let onsc: (e: any) => void, onte: (e: any) => void
 
   onMount(() => {
     const [onsc, onte] = swiper(elRef)

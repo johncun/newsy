@@ -165,11 +165,11 @@ const App: any = () => {
         name="apple-mobile-web-app-status-bar-style"
         content="black-translucent"
       />
-      <Meta name="theme-color" content="#0f172a" />
+      <Meta name="theme-color" content="#120a0a" />
       <Meta
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-      />{' '}
+      />
       <Banner />
       <Switch fallback={null}>
         <Match when={isFetching()}>
@@ -217,23 +217,22 @@ const App: any = () => {
           <Presence exitBeforeEnter>
             {showOptions() && (
               <Motion.div
-                exit={{ scale: 0 }}
+                exit={{ y: '100%' }}
                 transition={{ duration: 0.2 }}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
                 id="menu"
-                class="absolute z-50 inset-0 bg-slate-800/50">
-                <div class="absolute rounded-lg inset-3 border-2 border-slate-100 bg-linear-to-b from-slate-700 to-slate-800 text-black">
+                class="absolute z-50 inset-0">
+                <div class="absolute inset-0 border-0 border-slate-100 bg-linear-to-b from-zinc-800 to-slate-800 text-black">
                   <div class="absolute inset-x-0 top-0 h-12 border-b border-b-slate-900 flex text-xl items-center justify-center text-white ">
-                    Options Form
+                    Configuration
                   </div>
                   <div
-                    class="absolute w-8 h-8 top-2 right-2 flex items-center justify-center text-white "
+                    class="absolute w-8 h-8 p-1 cursor-pointer top-2 right-2 flex items-center justify-center text-white "
                     onClick={() => setShowOptions(false)}>
                     <SvgCross fill="orange" />{' '}
                   </div>
-                  <div class="absolute top-16 left-2 right-2 bottom-1 overflow-x-hidden px-2">
-                    {/* <FeedsForm onSaved={() => setShowOptions(false)} /> */}
+                  <div class="absolute inset-0 top-16 left-2 right-2 bottom-1 overflow-x-hidden px-2">
                     <SettingsPage />
                   </div>
                 </div>

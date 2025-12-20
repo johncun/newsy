@@ -1,84 +1,20 @@
-import { createSignal, For } from "solid-js";
-import { settings, updateSetting, resetSettings, SettingItem } from "@shared/settings";
+import { createSignal, For, JSX } from "solid-js";
+import { settings, updateSetting, feedActions, SettingItem, FeedDef } from "@shared/settings";
 
-const menuItems: SettingItem[] = [
-  { id: "username", label: "Profile Name", desc: "Your public identity", help: "Used for display only.", type: "text" },
-  { id: "notifications", label: "Notifications", desc: "Enable push alerts", help: "Requires system permission.", type: "toggle" },
-  { id: "theme", label: "App Theme", desc: "Visual style", help: "Follows system appearance.", type: "select", options: ["Light", "Dark", "System"] },
-  { id: "apiEndpoint", label: "API Server", desc: "Custom server URL", help: "Leave blank for default.", type: "text" },
-];
-
-export const SettingsPage = () => {
-  const [search, setSearch] = createSignal("");
-
-  const filteredItems = () =>
-    menuItems.filter((i) =>
-      i.label.toLowerCase().includes(search().toLowerCase()) ||
-      i.desc.toLowerCase().includes(search().toLowerCase())
-    );
-
-  return (
-    <div class="flex flex-col h-screen bg-gray-50 max-w-md mx-auto overflow-hidden shadow-2xl">
-      {/* Header with Search and Reset */}
-      <div class="p-4 bg-white border-b sticky top-0 z-10 space-y-3">
-        <div class="flex justify-between items-center">
-          <h1 class="text-xl font-bold text-gray-800">Settings</h1>
-          <button
-            onClick={() => confirm("Reset all settings?") && resetSettings()}
-            class="text-sm text-red-500 font-medium active:opacity-50 transition-opacity"
-          >
-            Reset to Defaults
-          </button>
-        </div>
-        <div class="relative">
-          <input
-            type="text"
-            placeholder="Search settings..."
-            class="w-full pl-4 pr-10 py-2.5 bg-gray-100 rounded-xl focus:ring-2 ring-blue-500 outline-none transition-all"
-            value={search()}
-            onInput={(e) => setSearch(e.currentTarget.value)}
-          />
-        </div>
-      </div>
-
-      {/* Scrollable Settings List */}
-      <div class="flex-1 overflow-y-auto">
-        <div class="flex flex-col">
-          <For each={filteredItems()} fallback={
-            <p class="p-10 text-center text-gray-400">No settings found matching "{search()}"</p>
-          }>
-            {(item) => (
-              <div class="setting-item p-4 border-b border-gray-100 bg-white active:bg-gray-50 transition-colors">
-                <div class="flex justify-between items-start mb-1">
-                  <div class="flex-1 pr-4">
-                    <h3 class="text-gray-900 font-semibold text-base">{item.label}</h3>
-                    <p class="text-sm text-gray-500 leading-snug">{item.desc}</p>
-                  </div>
-                  <div class="flex-shrink-0 pt-1">
-                    <InputRenderer item={item} />
-                  </div>
-                </div>
-                <p class="text-xs text-gray-400 mt-1 italic">{item.help}</p>
-              </div>
-            )}
-          </For>
-        </div>
-      </div>
-    </div>
-  );
-};
-
+// 1. Internal Component: The Input Switcher (Fixes TS2322)
 const InputRenderer = (props: { item: SettingItem }) => {
-  const id = () => props.item.id;
+  const id = props.item.id;
 
   switch (props.item.type) {
     case "toggle":
+
       return (
-        <label class="android-switch">
+        <label class="relative inline-block h-6 w-10">
           <input
+            class="opacity-0 w-0 h-0"
             type="checkbox"
-            checked={settings[id()] as boolean}
-            onChange={(e) => updateSetting(id(), e.currentTarget.checked)}
+            checked={settings[id] as boolean}
+            onChange={(e) => updateSetting(id, e.currentTarget.checked)}
           />
           <span class="slider"></span>
         </label>
@@ -86,25 +22,137 @@ const InputRenderer = (props: { item: SettingItem }) => {
     case "select":
       return (
         <select
-          value={settings[id()] as string}
-          class="text-blue-600 bg-transparent font-semibold py-1 outline-none text-sm"
-          onChange={(e) => updateSetting(id(), e.currentTarget.value as any)}
+          value={settings[id] as string}
+          class="text-gray-100 bg-transparent font-semibold outline-none"
+          onChange={(e) => updateSetting(id, e.currentTarget.value as any)}
         >
-          <For each={props.item.options}>
-            {(opt) => <option value={opt}>{opt}</option>}
-          </For>
+          <For each={props.item.options}>{(opt) => <option value={opt}>{opt}</option>}</For>
         </select>
       );
     default:
       return (
         <input
           type="text"
-          value={settings[id()] as string}
-          class="border-b border-gray-200 text-right w-28 focus:border-blue-500 outline-none text-sm py-1 bg-transparent"
-          onInput={(e) => updateSetting(id(), e.currentTarget.value)}
+          value={settings[id] as string}
+          class="border-b border-gray-400 text-right w-24 outline-none focus:border-blue-500 text-gray-100"
+          onInput={(e) => updateSetting(id, e.currentTarget.value)}
         />
       );
   }
 };
 
+// 2. Internal Component: The Layout Row
+const SettingRow = (props: { item: SettingItem }) => (
+  <div class="p-4 ">
+    <div class="flex justify-between items-start">
+      <div class="flex-1 pr-4">
+        <h3 class="text-gray-300 font-medium">{props.item.label}</h3>
+        <p class="text-sm text-gray-500 leading-tight">{props.item.desc}</p>
+      </div>
+      <div class="flex-shrink-0 pt-1">
+        <InputRenderer item={props.item} />
+      </div>
+    </div>
+    <p class="text-xs text-gray-400 mt-2 italic">{props.item.help}</p>
+  </div>
+);
 
+// 3. Main Export
+export const SettingsPage = () => {
+  const [search, setSearch] = createSignal("");
+
+  const menuItems: SettingItem[] = [
+    { id: "username", label: "Profile Name", desc: "Display name", help: "Publicly visible.", type: "text" },
+    { id: "notifications", label: "Alerts", desc: "Push notifications", help: "Requires system permission.", type: "toggle" },
+    { id: "theme", label: "Theme", desc: "App appearance", help: "Dark mode saves battery.", type: "select", options: ["Light", "Dark", "System"] },
+  ];
+
+  const filteredGeneral = () => menuItems.filter(i => i.label.toLowerCase().includes(search().toLowerCase()));
+  const sortedFeeds = () => [...settings.feeds].sort((a, b) => b.priority - a.priority);
+
+  return (
+    <div class="flex flex-col h-screen max-w-md mx-auto overflow-hidden shadow-xl">
+      <div class="p-1 border-b sticky top-0 z-10 shadow-sm">
+        <div class="flex justify-between items-center mb-4 h-8 gap-4">
+          <input
+            type="text"
+            placeholder="Search..."
+            class="w-full p-2 bg-gray-500 rounded-lg h-full outline-none text-slate-100 focus:ring-2 ring-blue-400"
+            onInput={(e) => setSearch(e.currentTarget.value)}
+          />
+          <button onClick={() => confirm("Reset all?") && feedActions.reset()} class="border bg-amber-600 h-8 border-orange-600 rounded-lg  px-2 text-black ">Reset</button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto pb-20">
+        <For each={filteredGeneral()}>{(item) => <SettingRow item={item} />}</For>
+
+        <div class="p-4 flex justify-between items-center mt-4">
+          <h2 class="text-md font-bold text-slate-300 ">Newsfeeds</h2>
+          <button onClick={feedActions.add} class="text-blue-400 text-md font-bold">+ Add Feed</button>
+        </div>
+
+        <For each={sortedFeeds()}>
+          {(feed) => (
+            <div class="p-4 mb-4 border-b border-gray-100/20 w-full animate-fade-in flex flex-col items-start gap-1">
+              <div class="flex justify-between w-full gap-4">
+                <input
+                  class="border-b border-gray-400 flex-1 text-left outline-none focus:border-blue-500 text-gray-100"
+
+                  value={feed.name}
+                  onInput={(e) => feedActions.update(feed.id, { name: e.currentTarget.value })}
+                />
+
+                <div class="flex items-center ">
+                  <button
+                    onClick={() => feedActions.update(feed.id, { priority: Math.max(0, feed.priority - 1) })}
+                    class="w-6 h-6 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
+                  >
+                    <div>-</div>
+                  </button>
+                  <span class="w-8 text-center text-md font-mono font-bold text-gray-100">
+                    {feed.priority}
+                  </span>
+                  <button
+                    onClick={() => feedActions.update(feed.id, { priority: feed.priority + 1 })}
+                    class="w-6 h-6 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
+                  >
+                    <div>+</div>
+                  </button>
+                </div>
+              </div>
+
+              <input
+                class="flex-1 w-full my-2 border-b border-gray-400 text-left outline-none focus:border-blue-500 text-gray-400 bg-transparent truncate"
+                value={feed.url}
+                onInput={(e) => feedActions.update(feed.id, { url: e.currentTarget.value })}
+              />
+              <div class="flex w-full gap-4 justify-between items-center">
+                <button
+                  onClick={() => feedActions.test(feed.id, feed.url)}
+                  disabled={feed.status === "loading"}
+                  class={`rounded-md px-2 text-green-600 transition-all h-8 border ${feed.status === "success" ? "bg-green-50 border-green-200 text-green-600" :
+                    feed.status === "error" ? "bg-red-50 border-red-200 text-red-600" :
+                      "bg-gray-50 border-gray-200 text-gray-400 active:bg-gray-200"
+                    }`}
+                >
+                  {feed.status === "loading" ? "..." : feed.status === "success" ? "✓" : "Test"}
+                </button>
+                <button
+                  onClick={() => confirm("Delete feed?") && feedActions.remove(feed.id)}
+                  class="text-gray-300 rounded-full bg-red-600 w-8 h-8 p-2"
+                >
+                  <TrashIcon />
+                </button>
+              </div>
+            </div>
+
+          )}
+        </For>     </div >
+    </div >
+  );
+};
+
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg>
+);
