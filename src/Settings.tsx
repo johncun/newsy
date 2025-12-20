@@ -1,5 +1,5 @@
-import { createSignal, For, JSX } from "solid-js";
-import { settings, updateSetting, feedActions, SettingItem, FeedDef } from "@shared/settings";
+import { createSignal, For } from "solid-js";
+import { settings, updateSetting, feedActions, SettingItem } from "@shared/settings";
 
 // 1. Internal Component: The Input Switcher (Fixes TS2322)
 const InputRenderer = (props: { item: SettingItem }) => {
@@ -49,7 +49,7 @@ const SettingRow = (props: { item: SettingItem }) => (
         <h3 class="text-gray-300 font-medium">{props.item.label}</h3>
         <p class="text-sm text-gray-500 leading-tight">{props.item.desc}</p>
       </div>
-      <div class="flex-shrink-0 pt-1">
+      <div class="shrink-0 pt-1">
         <InputRenderer item={props.item} />
       </div>
     </div>
@@ -68,7 +68,7 @@ export const SettingsPage = () => {
   ];
 
   const filteredGeneral = () => menuItems.filter(i => i.label.toLowerCase().includes(search().toLowerCase()));
-  const sortedFeeds = () => [...settings.feeds].sort((a, b) => b.priority - a.priority);
+  const _sortedFeeds = () => [...settings.feeds].sort((a, b) => b.votes - a.votes);
 
   return (
     <div class="flex flex-col h-screen max-w-md mx-auto overflow-hidden shadow-xl">
@@ -92,7 +92,7 @@ export const SettingsPage = () => {
           <button onClick={feedActions.add} class="text-blue-400 text-md font-bold">+ Add Feed</button>
         </div>
 
-        <For each={sortedFeeds()}>
+        <For each={settings.feeds}>
           {(feed) => (
             <div class="p-4 mb-4 border-b border-gray-100/20 w-full animate-fade-in flex flex-col items-start gap-1">
               <div class="flex justify-between w-full gap-4">
@@ -105,16 +105,16 @@ export const SettingsPage = () => {
 
                 <div class="flex items-center ">
                   <button
-                    onClick={() => feedActions.update(feed.id, { priority: Math.max(0, feed.priority - 1) })}
+                    onClick={() => feedActions.update(feed.id, { votes: Math.max(0, feed.votes - 1) })}
                     class="w-6 h-6 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
                   >
                     <div>-</div>
                   </button>
                   <span class="w-8 text-center text-md font-mono font-bold text-gray-100">
-                    {feed.priority}
+                    {feed.votes}
                   </span>
                   <button
-                    onClick={() => feedActions.update(feed.id, { priority: feed.priority + 1 })}
+                    onClick={() => feedActions.update(feed.id, { votes: feed.votes + 1 })}
                     class="w-6 h-6 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
                   >
                     <div>+</div>

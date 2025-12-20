@@ -54,9 +54,12 @@ export const FeedRequestSchema = z.object({
 export type FeedRequestBody = z.infer<typeof FeedRequestSchema>
 
 export const SourceRecordSchema = z.object({
+  id: z.string(),
   name: z.string().min(1, 'Name required').max(50),
   url: z.url('Invalid URL'),
   votes: z.number().int().nonnegative(),
+  status: z.enum(["idle", "loading", "success", "error"]).optional(),
+
 })
 
 export const SourceRecords = z.array(SourceRecordSchema)

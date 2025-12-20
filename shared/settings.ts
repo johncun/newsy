@@ -1,23 +1,14 @@
 import { createStore } from "solid-js/store";
 import { z } from "zod";
-import { SETTINGS_KEY } from "@shared/constants";
+import { DEFAULT_FEED_URLS, SETTINGS_KEY } from "@shared/constants";
+import { SourceRecord, SourceRecordSchema } from "./feed-types";
 
-// 1. Schemas
-const FeedDefSchema = z.object({
-  id: z.string(),
-  name: z.string().min(1),
-  url: z.url("bad URL"),
-  priority: z.number().int().min(0),
-  status: z.enum(["idle", "loading", "success", "error"]).optional(),
-});
-
-export type FeedDef = z.infer<typeof FeedDefSchema>;
 
 export const SettingsSchema = z.object({
   username: z.string().min(1),
   notifications: z.boolean(),
   theme: z.enum(["Light", "Dark", "System"]),
-  feeds: z.array(FeedDefSchema),
+  feeds: z.array(SourceRecordSchema),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -36,7 +27,7 @@ const DEFAULTS: Settings = {
   username: "Guest",
   notifications: true,
   theme: "System",
-  feeds: [],
+  feeds: DEFAULT_FEED_URLS
 };
 
 // 2. Store & Persistence
@@ -52,7 +43,8 @@ const loadSettings = (): Settings => {
 
 export const [settings, setSettings] = createStore<Settings>(loadSettings());
 
-const persist = () => localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+const persist = () => { console.log('persist', { settings }); localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+persist()
 
 export const updateSetting = <K extends keyof Settings>(key: K, value: Settings[K]) => {
   setSettings(key, value);
@@ -61,7 +53,7 @@ export const updateSetting = <K extends keyof Settings>(key: K, value: Settings[
 
 export const feedActions = {
   add: () => {
-    const newFeed: FeedDef = { id: crypto.randomUUID(), name: "Enter Name", url: "https://", priority: 0, status: "idle" };
+    const newFeed: SourceRecord = { id: crypto.randomUUID(), name: "Enter Name", url: "https://", votes: 1 };
     setSettings("feeds", (f) => [...f, newFeed]);
     persist();
   },
@@ -69,7 +61,7 @@ export const feedActions = {
     setSettings("feeds", (f) => f.filter(feed => feed.id !== id));
     persist();
   },
-  update: (id: string, updates: Partial<FeedDef>) => {
+  update: (id: string, updates: Partial<SourceRecord>) => {
     setSettings("feeds", (f) => f.id === id, updates);
     persist();
   },

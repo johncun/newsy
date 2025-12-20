@@ -23,9 +23,9 @@ const CardStyleSimple = (props: {
   swipeRight: () => void
 }) => {
   return <div
-    class="group cursor-pointer mx-0 bg-slate-800 rounded-2xl h-30 relative overflow-hidden"
+    class="group cursor-pointer mx-0 bg-slate-800/0 rounded-2xl h-30 relative overflow-hidden"
     onClick={() => setSelectedGuid(props.data.guid)}>
-    <Motion.div animate={{ scale: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
+    <Motion.div animate={{ scale: [.7, 1] }} transition={{ duration: .4 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} isSelected={props.isSelected} />
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
 

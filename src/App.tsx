@@ -28,7 +28,6 @@ import {
   setMenuGuid,
   setShowOptions,
   showOptions,
-  userSources,
 } from './signals'
 import {
   ArticleRecord,
@@ -40,11 +39,12 @@ import { useRegisterSW } from 'virtual:pwa-register/solid'
 import { Motion, Presence } from 'solid-motionone'
 import Card, { Action } from './Card'
 import { Meta } from '@solidjs/meta'
-import FeedsForm from './FeedsForm'
+// import FeedsForm from './FeedsForm'
 import { SvgCross } from './svgs'
 import { Pulse } from './Pulse'
 import Banner from './Banner'
 import { SettingsPage } from './Settings'
+import { settings } from '@shared/settings'
 
 function UpdateToast() {
   const {
@@ -70,7 +70,7 @@ const fetchItems = async (): Promise<FeedResult> => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      sources: userSources,
+      sources: settings.feeds,
       maxPerRequest: 20,
     }),
   })
@@ -180,13 +180,13 @@ const App: any = () => {
         <Match when={!isFetching()}>
           <div
             ref={upSentinelRef}
-            class={`absolute z-30 ${isUpScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-4 flex text-2xl items-center justify-center top-18 rounded-full bg-amber-800/80 text-cyan-100 drop-shadow-sm drop-shadow-slate-400`}
+            class={`absolute z-30 ${isUpScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-2 flex text-2xl items-center justify-center top-18 rounded-full bg-black/90 text-cyan-100`}
             onClick={toTop}>
             ⇡
           </div>
           <div
             ref={dnSentinelRef}
-            class={`absolute z-30 ${!isDnScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-4 flex text-2xl items-center justify-center bottom-4 rounded-full bg-amber-800/80 text-cyan-100 drop-shadow-sm drop-shadow-slate-400`}
+            class={`absolute z-30 ${!isDnScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-4 flex text-2xl items-center justify-center bottom-4 rounded-full bg-black/60 text-cyan-100`}
             onClick={toBottom}>
             ⇣
           </div>
