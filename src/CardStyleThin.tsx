@@ -24,9 +24,9 @@ const CardStyleThin = (props: {
   swipeRight: () => void
 }) => {
   return <div
-    class="group cursor-pointer mx-0 bg-slate-800/0 rounded-2xl h-30 relative overflow-hidden"
+    class="group cursor-pointer mx-0 bg-slate-800/0 rounded-lg h-30 relative overflow-hidden"
     onClick={() => setSelectedGuid(props.data.guid)}>
-    <Motion.div animate={{ scale: [.7, 1] }} transition={{ duration: .4 }} class="absolute inset-0 p-0">
+    <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} isSelected={props.isSelected} />
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
 
@@ -36,14 +36,14 @@ const CardStyleThin = (props: {
           <Source value={props.data.source} />
           <PublishedTime value={props.data.pubDate} />
         </div>
-        <div class="absolute px-1 top-8 w-full flex flex-col overflow-hidden gap-0 ">
+        <div class="absolute px-1 top-8 w-full flex flex-col overflow-hidden gap-0 font-[Noto_Serif]">
           <Title value={props.data.title} />
           <Byline value={props.data.description} />
         </div>
       </div>
 
       <Show when={props.isSelected()}>
-        <Motion.div animate={{ opacity: [0, 1], scale: [0, 1] }}
+        <Motion.div animate={{ opacity: [0, 1], scale: [.7, 1] }} transition={{ duration: .2 }}
           class={`absolute bottom-1 h-10 z-30 inset-x-2 flex bg-black/40 items-center rounded-2xl justify-between`}>
           <AddBtn action={props.swipeRight} isSelected={props.isSelected} />
           <div class="flex gap-4">
@@ -69,7 +69,7 @@ const PublishedTime = (props: { value: string }) => <div class="bg-black/20 text
 </div>
 
 const Title = (props: { value: string }) =>
-  <div class="font-normal leading-4 pb-1 text-shadow-black/30 text-md font-stretch-70% text-shadow-md line-clamp-3">{props.value}</div>
+  <div class="font-normal leading-4 pb-1 text-shadow-black/30 text-md font-stretch-50% font-serif text-shadow-md line-clamp-3">{props.value}</div>
 
 const Byline = (props: { value: string }) =>
   <p class="text-xs font-normal text-zinc-100/70 overflow-y-hidden line-clamp-2 text-left w-full">
@@ -137,7 +137,7 @@ const OptionBtn = (props: { action: () => void, isSelected: Accessor<boolean> })
 
 const GoBtn = (props: { link: string, isSelected: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
-  class="w-14 font-stretch-90% font-extrabold text-xs h-8 rounded-full bg-green-200/80 flex items-center justify-center text-black"
+  class="w-14 font-stretch-90% p-1 font-extrabold text-xs h-8 rounded-full bg-green-200/80 flex items-center justify-center text-black"
   onClick={() =>
     window.open(
       props.link,

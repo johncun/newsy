@@ -23,9 +23,9 @@ const CardStyleLarge = (props: {
   swipeRight: () => void
 }) => {
   return <div
-    class="flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-2xl p-2 min-h-60 relative overflow-hidden"
+    class="flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-lg p-2 min-h-60 relative overflow-hidden"
     onClick={() => setSelectedGuid(props.isSelected() ? '' : props.data.guid)}>
-    <Motion.div animate={{ scale: [.7, 1] }} transition={{ duration: .4 }} class="absolute inset-0 p-0">
+    <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} isSelected={props.isSelected} />
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
       <Darken />
@@ -38,7 +38,7 @@ const CardStyleLarge = (props: {
       }
       <div
         id="title"
-        class={`absolute font-extrabold text-shadow-black/30 text-xl font-stretch-80% text-shadow-md
+        class={`absolute font-bold font-[Noto_Serif] text-shadow-black/30 text-xl font-stretch-75% text-shadow-md
         inset-x-0 mx-4 top-2 bottom-2 items-center justify-start flex flex-col gap-1 rounded-xl p-2 ${props.isSelected() ? 'bg-black/0' : ''}`}>
 
         <Title value={props.data.title} />
@@ -97,7 +97,7 @@ const AddBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) =>
 
 const OptionBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
-  class="text-3xl w-8 h-8 rounded-full bg-amber-200/80 flex items-center justify-center text-black"
+  class="text-3xl w-8 h-8 rounded-full bg-amber-200/80 p-1 flex items-center justify-center text-black"
   onClick={props.action}
   style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
   <svg viewBox="0 0 24 24" class="w-6">
@@ -148,7 +148,7 @@ const OptionBtn = (props: { action: () => void, isSelected: Accessor<boolean> })
 
 const GoBtn = (props: { link: string, isSelected: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
-  class="w-14 font-stretch-90% font-extrabold text-xs h-8 rounded-full bg-green-200/80 flex items-center justify-center text-black"
+  class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-green-200/80 flex items-center justify-center text-black"
   onClick={() =>
     window.open(
       props.link,
