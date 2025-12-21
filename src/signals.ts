@@ -4,7 +4,7 @@ import {
 import { createSignal } from 'solid-js'
 
 export const [mode, setMode] = createSignal<ArticleState>('live')
-export const [isFetching, setIsFetching] = createSignal(false)
+export const [isFetching, setIsFetching] = createSignal<boolean | null>(null)
 export const [selectedGuid, setSelectedGuid] = createSignal('')
 
 export const [showOptions, setShowOptions] = createSignal(false)

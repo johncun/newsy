@@ -3,7 +3,8 @@ import { Accessor, Show } from "solid-js"
 import { Motion } from "solid-motionone"
 import { setSelectedGuid, setMenuGuid } from "./signals"
 import { SvgAdd, SvgTrash } from "./svgs"
-import { dt } from "./common"
+import { dt, formatTimeAgo } from "./common"
+import { CachedImage } from "./CachedImage"
 
 const AnimatedBlackFade = () =>
   <Motion.div
@@ -13,9 +14,9 @@ const AnimatedBlackFade = () =>
     class="absolute inset-0 bg-black/20"
   />
 
-const Darken = () => <div class="absolute inset-0 bg-black/40" />
+const Darken = () => <div class="absolute inset-0 bg-black/20" />
 
-const CardStyleBasic = (props: {
+const CardStyleThin = (props: {
   isSelected: Accessor<boolean>,
   data: FeedItem
   index: number
@@ -23,26 +24,24 @@ const CardStyleBasic = (props: {
   swipeRight: () => void
 }) => {
   return <div
-    class="flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-2xl p-2 min-h-60 relative overflow-hidden"
-    onClick={() => setSelectedGuid(props.isSelected() ? '' : props.data.guid)}>
+    class="group cursor-pointer mx-0 bg-slate-800/0 rounded-2xl h-30 relative overflow-hidden"
+    onClick={() => setSelectedGuid(props.data.guid)}>
     <Motion.div animate={{ scale: [.7, 1] }} transition={{ duration: .4 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} isSelected={props.isSelected} />
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
-      <Darken />
 
-      {!props.isSelected() &&
-        <div class="absolute top-2 left-2 right-2 inset-shadow-gray-1000 flex items-center justify-between">
+
+      {/* <div class="absolute h-2 left-0 bottom-2 w-30 inset-shadow-gray-1000 flex flex-col items-center justify-between"> */}
+      {/* </div> */}
+      <div class={`absolute left-31 mx-1 right-0  ${props.isSelected() ? 'bg-black/0' : ''}`}>
+        <div class="flex justify-between absolute top-1 inset-x-0 h-5 items-center">
           <Source value={props.data.source} />
           <PublishedTime value={props.data.pubDate} />
         </div>
-      }
-      <div
-        id="title"
-        class={`absolute font-extrabold text-shadow-black/30 text-xl font-stretch-80% text-shadow-md
-        inset-x-0 mx-4 top-2 bottom-2 items-center justify-start flex flex-col gap-1 rounded-xl p-2 ${props.isSelected() ? 'bg-black/0' : ''}`}>
-
-        <Title value={props.data.title} />
-        <Byline value={props.data.description} />
+        <div class="absolute px-1 top-8 w-full flex flex-col overflow-hidden gap-0 ">
+          <Title value={props.data.title} />
+          <Byline value={props.data.description} />
+        </div>
       </div>
 
       <Show when={props.isSelected()}>
@@ -56,34 +55,26 @@ const CardStyleBasic = (props: {
           <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />
         </Motion.div>
       </Show>
-      {/*      <div
-        class={`absolute top-1 h-10 z-30 inset-x-2 flex ${props.isSelected() ? 'bg-black/40' : ''} items-center rounded-2xl justify-between`}>
-        <AddBtn action={props.swipeRight} isSelected={props.isSelected} />
-        <div class="flex gap-4">
-          <OptionBtn action={() => setMenuGuid(props.data.guid)} isSelected={props.isSelected} />
-          <GoBtn link={props.data.link} isSelected={props.isSelected} />
-        </div>
-        <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />
-      </div> */}
     </Motion.div >
-  </div>
+  </div >
 
 }
 
 
-const Source = (props: { value: string }) => <div class="bg-black/30 text-white/70 text-xs z-10 px-1 py-1 rounded-md w-auto">
+const Source = (props: { value: string }) => <div class="bg-black/10 text-white/70 text-xs line-clamp-1 font-stretch-75% z-10 py-0.5 font-extrabold rounded-md w-auto">
   {props.value}
 </div>
 
-const PublishedTime = (props: { value: string }) => <div class="bg-black/50 text-white/70 text-xs z-10 px-1 py-1 rounded-md">
-  {dt(props.value)}
+
+const PublishedTime = (props: { value: string }) => <div class="bg-black/20 text-white/80 line-clamp-1 font-stretch-75% text-xs z-10 px-1 rounded-md">
+  {formatTimeAgo(new Date(props.value))}
 </div>
 
 const Title = (props: { value: string }) =>
-  <div class="line-clamp-4">{props.value}</div>
+  <div class="font-normal leading-4 pb-1 text-shadow-black/30 text-md font-stretch-70% text-shadow-md line-clamp-3">{props.value}</div>
 
 const Byline = (props: { value: string }) =>
-  <p class="text-sm font-normal text-zinc-100/70 overflow-y-hidden line-clamp-2 text-left w-full">
+  <p class="text-xs font-normal text-zinc-100/70 overflow-y-hidden line-clamp-2 text-left w-full">
     {props.value}
   </p>
 
@@ -212,23 +203,13 @@ const ImageFor = (props: {
   // mask-[linear-gradient(to_bottom,red_0%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,red_0%,transparent_100%)]`}
 
   return props.data.image && !props.data.source.startsWith('Sydney') ?
-    <img
-      src={props.data.image /*|| "/placeholder.svg"*/}
-      alt={props.data.title}
-      class={`absolute inset-0 w-full h-full object-cover ${!props.isSelected() && props.blur ? 'blur-xs' : ''}`}
-      onError={e => {
-        const element = e.target as HTMLImageElement
-        element.src = '/the-guardian-logo.jpg'
-        element.style.opacity = '20%'
-        element.style.display = 'none'
-        // const container = element.parentElement
-        // if (container)
-        // container.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-      }}></img>
+    <CachedImage src={props.data.image} alt={props.data.title}
+      class={`absolute left-0 w-30 h-30 top-0 object-cover ${!props.isSelected() && props.blur ? 'blur-xs' : ''}`}
+    />
     : <div
       class={`absolute inset-0 ${getDeterministicGradient(props.data.guid)}`}
     />
 }
 
-export default CardStyleBasic
+export default CardStyleThin
 

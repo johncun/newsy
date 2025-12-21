@@ -68,7 +68,7 @@ export const SettingsPage = () => {
   ];
 
   const filteredGeneral = () => menuItems.filter(i => i.label.toLowerCase().includes(search().toLowerCase()));
-  const _sortedFeeds = () => [...settings.feeds].sort((a, b) => b.votes - a.votes);
+  // const _sortedFeeds = () => [...settings.feeds].sort((a, b) => b.votes - a.votes);
 
   return (
     <div class="flex flex-col h-screen max-w-md mx-auto overflow-hidden shadow-xl">

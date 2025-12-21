@@ -80,13 +80,18 @@ const fetchItems = async (): Promise<FeedResult> => {
   const data = await response.json()
   const validatedData = FeedResult.parse(data)
 
+  validatedData.items = validatedData.items.map(fr => {
+    fr.pubDate = fr.pubDate || new Date().toUTCString();
+    console.log(fr.title, fr.pubDate)
+    return fr
+  })
   return validatedData
+
 }
 
 const App: any = () => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
-  const [feed] = createResource(() => isFetching(), fetchItems)
-
+  const [feed] = createResource(isFetching, fetchItems)
   createEffect(() => {
     if (feed.error) {
       console.error('Error loading or validating API data:', feed.error)

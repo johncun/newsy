@@ -4,8 +4,8 @@ import { animate } from 'animejs'
 
 import { mode, selectedGuid, setSelectedGuid } from './signals'
 import { getAllByState, memData } from './db'
-import CardStyleBasic from './CardStyleBasic'
-import CardStyleSimple from './CardStyleSimple'
+import CardStyleLarge from './CardStyleLarge'
+import CardStyleThin from './CardStyleThin'
 
 export type Action = 'Kill' | 'Save' | 'Delete' | ''
 
@@ -127,10 +127,10 @@ const Card = (props: {
       </div>
 
       <Show when={!isSelected()}>
-        <CardStyleSimple isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
+        <CardStyleThin isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
       </Show>
       <Show when={isSelected()}>
-        <CardStyleBasic isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
+        <CardStyleLarge isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
       </Show>
 
       <div class="w-[20vw] flex items-center justify-center">

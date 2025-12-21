@@ -209,234 +209,37 @@ setInterval(() => {
   removeLiveAfterHours()
 }, 15000)
 
-//   const database = await initDB()
-//   return new Promie(s(resolve, reject) => {
-//     const transaction = database.transaction([STORE_NAME], "readwrite")
-//     const store = transaction.objectStore(STORE_NAME)
-//
-//     const record: ArticleRecord = {
-//       ...article,
-//       base64Image: base64Image || article.image,
-//       state: initialState,
-//       ...(initialState === "saved" && { savedAt: Date.now() }),
-//       ...(initialState === "deleted" && { deletedAt: Date.now() }),
-//     }
-//
-//     const request = store.put(record)
-//     request.onerror = () => reject(request.error)
-//     request.onsuccess = () => resolve()
-//   })
 
-// const DB_NAME = "NewsFeedDB"
-// const DB_VERSION = 3
-// const STORE_NAME = "articles"
-//
-// let db: IDBDatabase | null = null
-//
-// export async function initDB(): Promise<IDBDatabase> {
-//   if (db) return db
-//
-//   return new Promise((resolve, reject) => {
-//     const request = indexedDB.open(DB_NAME, DB_VERSION)
-//
-//     request.onerror = () => reject(request.error)
-//     request.onsuccess = () => {
-//       db = request.result
-//       resolve(db)
-//     }
-//
-//     request.onupgradeneeded = (event) => {
-//       const database = (event.target as IDBOpenDBRequest).result
-//
-//       if (!database.objectStoreNames.contains(STORE_NAME)) {
-//         const store = database.createObjectStore(STORE_NAME, { keyPath: "guid" })
-//         store.createIndex("state", "state", { unique: false })
-//         store.createIndex("deletedAt", "deletedAt", { unique: false })
-//       }
-//     }
-//   })
-// }
-//
-// export async function updateArticleState(guid: string, newState: ArticleState): Promise<void> {
-//   const database = await initDB()
-//   return new Promise((resolve, reject) => {
-//     const transaction = database.transaction([STORE_NAME], "readwrite")
-//     const store = transaction.objectStore(STORE_NAME)
-//
-//     const getRequest = store.get(guid)
-//     getRequest.onsuccess = () => {
-//       const article = getRequest.result
-//       if (article) {
-//         article.state = newState
-//         if (newState === "saved") {
-//           article.savedAt = Date.now()
-//         } else if (newState === "deleted") {
-//           article.deletedAt = Date.now()
-//         }
-//         const putRequest = store.put(article)
-//         putRequest.onerror = () => reject(putRequest.error)
-//         putRequest.onsuccess = () => resolve()
-//       } else {
-//         reject(new Error("Article not found"))
-//       }
-//     }
-//     getRequest.onerror = () => reject(getRequest.error)
-//   })
-// }
-//
-// export async function createOrUpdateArticle(
-//   article: FeedItem,
-//   base64Image?: string,
-//   initialState: ArticleState = "live",
-// ): Promise<void> {
-//   const database = await initDB()
-//   return new Promise((resolve, reject) => {
-//     const transaction = database.transaction([STORE_NAME], "readwrite")
-//     const store = transaction.objectStore(STORE_NAME)
-//
-//     const record: ArticleRecord = {
-//       ...article,
-//       base64Image: base64Image || article.image,
-//       state: initialState,
-//       ...(initialState === "saved" && { savedAt: Date.now() }),
-//       ...(initialState === "deleted" && { deletedAt: Date.now() }),
-//     }
-//
-//     const request = store.put(record)
-//     request.onerror = () => reject(request.error)
-//     request.onsuccess = () => resolve()
-//   })
-// }
-//
-// export async function refreshDbWithFeedItems(items: FeedItems): Promise<void> {
-//   const database = await initDB()
-//   return new Promise((resolve, reject) => {
-//     const transaction = database.transaction([STORE_NAME], "readwrite")
-//     const store = transaction.objectStore(STORE_NAME)
-//
-//     const feedIds = new Set(items.map((item) => item.guid))
-//     const currentDbArticles = store.getAll()
-//     currentDbArticles.onsuccess = (ev) => {
-//
-//       const feedIds = new Set(items.
-//         map(({ guid }) => guid))
-//       const currentDbArticles = new Set(store.getAll().map(({ guid }) => guid))
-//
-//       const dbIds = new Set(currentDbArticles.map((item) => item.guid))
-//       const newArticles = []
-//
-//       // For all in feed - check if in DB, if it isn't, add it as "live"
-//
-//
-//       request.onerror = () => reject(request.error)
-//       request.onsuccess = () => {
-//         const articles = request.result.map(({ guid, title, description, link, source, pubDate, base64Image }) => ({
-//           guid,
-//           title,
-//           description,
-//           link,
-//           source,
-//           pubDate,
-//           image: base64Image,
-//         }))
-//         resolve(articles)
-//       }
-//       items.forEach((article) => {
-//         const record: ArticleRecord = {
-//           ...article,
-//           base64Image: article.image,
-//           state: "live",
-//         }
-//         store.put(record)
-//       }
-//     const record: ArticleRecord = {
-//         ...article,
-//         base64Image: base64Image || article.image,
-//         state: initialState,
-//         ...(initialState === "saved" && { savedAt: Date.now() }),
-//         ...(initialState === "deleted" && { deletedAt: Date.now() }),
-//       }
-//
-//       const request = store.put(record)
-//       request.onerror = () => reject(request.error)
-//       request.onsuccess = () => resolve()
-//     })
-// }
-//
-//
-//
-// export async function getSavedArticles(): Promise<FeedItem[]> {
-//   const database = await initDB()
-//   return new Promise((resolve, reject) => {
-//     const transaction = database.transaction([STORE_NAME], "readonly")
-//     const store = transaction.objectStore(STORE_NAME)
-//     const index = store.index("state")
-//
-//     const request = index.getAll("saved")
-//     request.onerror = () => reject(request.error)
-//     request.onsuccess = () => {
-//       const articles = request.result.map(({ guid, title, description, link, source, pubDate, base64Image }) => ({
-//         guid,
-//         title,
-//         description,
-//         link,
-//         source,
-//         pubDate,
-//         image: base64Image,
-//       }))
-//       resolve(articles)
-//     }
-//   })
-// }
-//
-// export async function getArticleState(guid: string): Promise<ArticleState | null> {
-//   const database = await initDB()
-//   return new Promise((resolve, reject) => {
-//     const transaction = database.transaction([STORE_NAME], "readonly")
-//     const store = transaction.objectStore(STORE_NAME)
-//
-//     const request = store.get(guid)
-//     request.onerror = () => reject(request.error)
-//     request.onsuccess = () => {
-//       const article = request.result
-//       resolve(article?.state || null)
-//     }
-//   })
-// }
-//
-// export const NUMBER_DELETED_TO_KEEP = 100
-//
-// export async function cleanupOldDeletedArticles(): Promise<void> {
-//   const database = await initDB()
-//   return new Promise((resolve, reject) => {
-//     const transaction = database.transaction([STORE_NAME], "readwrite")
-//     const store = transaction.objectStore(STORE_NAME)
-//     const index = store.index("state")
-//
-//     const request = index.getAll("deleted")
-//     request.onsuccess = () => {
-//       const deletedArticles = request.result
-//       if (deletedArticles.length > 100) {
-//         // Sort by deletedAt and remove oldest
-//         const sorted = deletedArticles.sort((a, b) => (a.deletedAt || 0) - (b.deletedAt || 0))
-//         const toRemove = sorted.slice(0, deletedArticles.length - NUMBER_DELETED_TO_KEEP)
-//
-//         let deleted = 0
-//         toRemove.forEach((article) => {
-//           const deleteRequest = store.delete(article.guid)
-//           deleteRequest.onsuccess = () => {
-//             deleted++
-//             if (deleted === toRemove.length) {
-//               resolve()
-//             }
-//           }
-//           deleteRequest.onerror = () => reject(deleteRequest.error)
-//         })
-//       } else {
-//         resolve()
-//       }
-//     }
-//     request.onerror = () => reject(request.error)
-//   })
-// }
-//
+
+import { createStore } from "idb-keyval";
+import { get, set } from "idb-keyval";
+import { reduceImageSize } from './common'
+
+const imageCache = createStore("newsy-db", "images");
+
+export const ImageVault = {
+  getOrFetch: async (imageUrl: string): Promise<Blob | null> => {
+    try {
+      const cached = await get(imageUrl, imageCache);
+      if (cached instanceof Blob) return cached;
+
+      // Encode the URL to ensure special characters don't break the query string
+      const proxyUrl = `/api/proxy?url=${encodeURIComponent(imageUrl)}`;
+
+      const response = await fetch(proxyUrl);
+      if (!response.ok) throw new Error("Proxy failed");
+      const heavyBlob = await response.blob();
+
+      // Shrink it before it touches the database
+      const slimBlob = await reduceImageSize(heavyBlob, 400, 0.6);
+
+      console.log(`Reduced from ${heavyBlob.size / 1024}KB to ${slimBlob.size / 1024}KB`);
+
+      await set(imageUrl, slimBlob, imageCache);
+      return slimBlob;
+    } catch (e) {
+      console.error("Cache and Proxy both failed", e);
+      return null;
+    }
+  }
+};
