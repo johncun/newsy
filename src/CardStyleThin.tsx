@@ -69,7 +69,7 @@ const PublishedTime = (props: { value: string }) => <div class="bg-black/20 text
 </div>
 
 const Title = (props: { value: string }) =>
-  <div class="font-normal leading-4 pb-1 text-shadow-black/30 text-md font-stretch-50% font-serif text-shadow-md line-clamp-3">{props.value}</div>
+  <div class="font-normal leading-4 pb-0.5 text-shadow-black/30 text-md font-stretch-50% text-shadow-md line-clamp-3">{props.value}</div>
 
 const Byline = (props: { value: string }) =>
   <p class="text-xs font-normal text-zinc-100/70 overflow-y-hidden line-clamp-2 text-left w-full">

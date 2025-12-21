@@ -50,7 +50,10 @@ const CardStyleLarge = (props: {
           class={`absolute bottom-1 h-10 z-30 inset-x-2 flex bg-black/40 items-center rounded-2xl justify-between`}>
           <AddBtn action={props.swipeRight} isSelected={props.isSelected} />
           <div class="flex gap-4">
-            <OptionBtn action={() => setMenuGuid(props.data.guid)} isSelected={props.isSelected} />
+            <OptionBtn action={(ev: MouseEvent) => {
+              ev.stopPropagation()
+              setMenuGuid(props.data.guid)
+            }} isSelected={props.isSelected} />
             <GoBtn link={props.data.link} isSelected={props.isSelected} />
           </div>
           <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />
@@ -95,7 +98,7 @@ const AddBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) =>
   <SvgAdd fill="white" />
 </Motion.div>
 
-const OptionBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) => <Motion.div
+const OptionBtn = (props: { action: (ev?: any) => void, isSelected: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
   class="text-3xl w-8 h-8 rounded-full bg-amber-200/80 p-1 flex items-center justify-center text-black"
   onClick={props.action}
