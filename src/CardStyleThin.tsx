@@ -31,8 +31,6 @@ const CardStyleThin = (props: {
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
 
 
-      {/* <div class="absolute h-2 left-0 bottom-2 w-30 inset-shadow-gray-1000 flex flex-col items-center justify-between"> */}
-      {/* </div> */}
       <div class={`absolute left-31 mx-1 right-0  ${props.isSelected() ? 'bg-black/0' : ''}`}>
         <div class="flex justify-between absolute top-1 inset-x-0 h-5 items-center">
           <Source value={props.data.source} />

@@ -1,7 +1,7 @@
 import { createSignal, For } from "solid-js";
 import { settings, updateSetting, feedActions, SettingItem } from "@shared/settings";
+import { status } from "@src/_git_commit"
 
-// 1. Internal Component: The Input Switcher (Fixes TS2322)
 const InputRenderer = (props: { item: SettingItem }) => {
   const id = props.item.id;
 
@@ -72,6 +72,7 @@ export const SettingsPage = () => {
 
   return (
     <div class="flex flex-col h-screen max-w-md mx-auto overflow-hidden shadow-xl">
+      <div class="flex justify-around items-center text-xs text-slate-500"><div>{status.logMessage}</div><div>{new Date(+status.when).toUTCString()}</div></div>
       <div class="p-1 border-b sticky top-0 z-10 shadow-sm">
         <div class="flex justify-between items-center mb-4 h-8 gap-4">
           <input

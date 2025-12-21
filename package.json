@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "git-info": "echo export const status \"= {\\\"logMessage\\\": \\\"$(git log -1 --oneline)\\\",\\\"when\\\": \\\"$(date +%s)000\\\"}\"  > src/_git_com mit.ts",
+    "git-info": "echo export const status \"= {\\\"logMessage\\\": \\\"$(git log -1 --oneline)\\\",\\\"when\\\": \\\"$(date +%s)000\\\"}\"  > src/_git_commit.ts",
     "dcm": "pnpm run git-info && git add . && git commit -m  'dcm update' && pnpm version patch && git commit --amend --no-edit && git push && ENABLE_EXPERIMENTAL_COREPACK=1 pnpx vercel build --prod && pnpx vercel deploy --prod --prebuilt",
     "dev": "vite",
     "build": "vite build",

@@ -115,10 +115,7 @@ const Card = (props: {
     <div>Boom</div>
     : <div
       ref={elRef}
-      class={`swipe w-full bg-tranparent ${isSelected() ?
-        '__drop-shadow-[0px_3px_3px_rgba(0,0,0,0.25)] '
-        : ''
-        }`}>
+      class={`swipe w-full bg-[#242424]`}>
       <div class="w-[20vw] flex items-center justify-center">
         <div
           class={`flex items-center justify-center rounded-lg w-4/5 h-12 ${bgx(leftText(), 'bg-green-700')}`}>
