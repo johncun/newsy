@@ -19,6 +19,7 @@ import {
   createResource,
   createSignal,
   onMount,
+  Resource,
 } from 'solid-js'
 import {
   isFetching,
@@ -45,6 +46,7 @@ import { Pulse } from './Pulse'
 import Banner from './Banner'
 import { SettingsPage } from './Settings'
 import { settings } from '@shared/settings'
+import IntroScreen from './IntroScreen'
 
 function UpdateToast() {
   const {
@@ -90,15 +92,39 @@ const fetchItems = async (): Promise<FeedResult> => {
 }
 
 const App: any = () => {
-  // The type of the resource is automatically inferred as Resource<HelloData | undefined>
+  const [startup, setStartup] = createSignal(true)
   const [feed] = createResource(isFetching, fetchItems)
-  createEffect(() => {
-    if (feed.error) {
-      console.error('Error loading or validating API data:', feed.error)
-    }
-    console.log('Fetched items:', feed()?.count)
 
-    refreshDbWithFeedItems(feed()?.items || [])
+  onMount(() => {
+    setTimeout(() => setStartup(false), 40000)
+  })
+
+  return <ErrorBoundary fallback={<div>Failed to load or validate API data.</div>}>
+    <Meta name="mobile-web-app-capable" content="yes" />
+    <Meta name="apple-mobile-web-app-capable" content="yes" />
+    <Meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <Meta name="theme-color" content="#120a0a" />
+    <Meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <Show when={startup()}><IntroScreen onComplete={() => setStartup(false)} /></Show>
+    <Show when={!startup()}><MainPage feed={feed} /></Show>
+  </ErrorBoundary>
+}
+
+const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
+  // The type of the resource is automatically inferred as Resource<HelloData | undefined>
+  createEffect(() => {
+    if (props.feed.error) {
+      console.error('Error loading or validating API data:', props.feed.error)
+    }
+    console.log('Fetched items:', props.feed()?.count)
+
+    refreshDbWithFeedItems(props.feed()?.items || [])
 
     const md = memData()
 
@@ -162,8 +188,9 @@ const App: any = () => {
     })
   }
 
+
   return (
-    <ErrorBoundary fallback={<div>Failed to load or validate API data.</div>}>
+    <>
       <Meta name="mobile-web-app-capable" content="yes" />
       <Meta name="apple-mobile-web-app-capable" content="yes" />
       <Meta
@@ -243,7 +270,7 @@ const App: any = () => {
         )}
       </Presence>
       <UpdateToast />
-    </ErrorBoundary>
+    </>
   )
 }
 

@@ -1,6 +1,7 @@
 import { createSignal, For } from "solid-js";
 import { settings, updateSetting, feedActions, SettingItem } from "@shared/settings";
 import { status } from "@src/_git_commit"
+import LegalModal from "./LegalModal";
 
 const InputRenderer = (props: { item: SettingItem }) => {
   const id = props.item.id;
@@ -62,9 +63,9 @@ export const SettingsPage = () => {
   const [search, setSearch] = createSignal("");
 
   const menuItems: SettingItem[] = [
-    { id: "username", label: "Profile Name", desc: "Display name", help: "Publicly visible.", type: "text" },
-    { id: "notifications", label: "Alerts", desc: "Push notifications", help: "Requires system permission.", type: "toggle" },
-    { id: "theme", label: "Theme", desc: "App appearance", help: "Dark mode saves battery.", type: "select", options: ["Light", "Dark", "System"] },
+    // { id: "username", label: "Profile Name", desc: "Display name", help: "Publicly visible.", type: "text" },
+    // { id: "notifications", label: "Alerts", desc: "Push notifications", help: "Requires system permission.", type: "toggle" },
+    // { id: "theme", label: "Theme", desc: "App appearance", help: "Dark mode saves battery.", type: "select", options: ["Light", "Dark", "System"] },
   ];
 
   const filteredGeneral = () => menuItems.filter(i => i.label.toLowerCase().includes(search().toLowerCase()));
@@ -72,7 +73,6 @@ export const SettingsPage = () => {
 
   return (
     <div class="flex flex-col h-screen max-w-md mx-auto overflow-hidden shadow-xl">
-      <div class="flex justify-around items-center text-xs text-slate-500"><div>{status.logMessage}</div><div>{new Date(+status.when).toUTCString()}</div></div>
       <div class="p-1 border-b sticky top-0 z-10 shadow-sm">
         <div class="flex justify-between items-center mb-4 h-8 gap-4">
           <input
@@ -107,18 +107,34 @@ export const SettingsPage = () => {
                 <div class="flex items-center ">
                   <button
                     onClick={() => feedActions.update(feed.id, { votes: Math.max(0, feed.votes - 1) })}
-                    class="w-6 h-6 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
+                    class="w-6 h-6 p-1 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
                   >
-                    <div>-</div>
+                    <div><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
+                    </svg></div>
                   </button>
                   <span class="w-8 text-center text-md font-mono font-bold text-gray-100">
                     {feed.votes}
                   </span>
                   <button
                     onClick={() => feedActions.update(feed.id, { votes: feed.votes + 1 })}
-                    class="w-6 h-6 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
+                    class="w-6 h-6 p-1 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
                   >
-                    <div>+</div>
+                    <div><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg></div>
                   </button>
                 </div>
               </div>
@@ -149,7 +165,10 @@ export const SettingsPage = () => {
             </div>
 
           )}
-        </For>     </div >
+        </For>
+      </div >
+      <LegalModal />
+      <div class="flex justify-around items-center text-xs text-slate-500"><div>{status.logMessage}</div><div>{new Date(+status.when).toUTCString()}</div></div>
     </div >
   );
 };
