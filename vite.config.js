@@ -9,13 +9,19 @@ export default defineConfig({
     tailwindcss(),
     solid(),
     VitePWA({
+      strategies: 'injectManifest',
       registerType: 'autoUpdate',
+      srcDir: 'src',
+      filename: 'sw.ts',
       devOptions: {
         enabled: true, // Enable the plugin in dev mode
         type: 'module', // Required if you use ESM in your service worker
         navigateFallback: 'index.html',
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      injectManifest: {
+        swDest: 'dist/sw.js',
+      },
       manifest: {
         name: 'Newsy',
         short_name: 'Newsy',

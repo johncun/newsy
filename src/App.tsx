@@ -1,3 +1,28 @@
+import { useRegisterSW } from 'virtual:pwa-register/solid'
+import {
+  ArticleRecord,
+  ArticleRecords,
+  ArticleState,
+  FeedResult,
+} from '@shared/feed-types'
+import { settings } from '@shared/settings'
+import { Meta } from '@solidjs/meta'
+import {
+  Accessor,
+  createEffect,
+  createResource,
+  createSignal,
+  ErrorBoundary,
+  For,
+  Match,
+  onMount,
+  Resource,
+  Show,
+  Switch,
+} from 'solid-js'
+import { Motion, Presence } from 'solid-motionone'
+import Banner from './Banner'
+import Card, { Action } from './Card'
 import {
   getAllByState,
   getArticleByGuid,
@@ -8,45 +33,23 @@ import {
   updateState,
   updateStates,
 } from './db'
-import {
-  ErrorBoundary,
-  For,
-  Show,
-  Accessor,
-  Match,
-  Switch,
-  createEffect,
-  createResource,
-  createSignal,
-  onMount,
-  Resource,
-} from 'solid-js'
+import { Pulse } from './Pulse'
+import { SettingsPage } from './Settings'
 import {
   isFetching,
   menuGuid,
   mode,
+  readerPageInfo,
   setIsFetching,
   setMenuGuid,
+  setReaderPageInfo,
   setShowOptions,
   showOptions,
 } from './signals'
-import {
-  ArticleRecord,
-  ArticleRecords,
-  ArticleState,
-  FeedResult,
-} from '@shared/feed-types'
-import { useRegisterSW } from 'virtual:pwa-register/solid'
-import { Motion, Presence } from 'solid-motionone'
-import Card, { Action } from './Card'
-import { Meta } from '@solidjs/meta'
 // import FeedsForm from './FeedsForm'
 import { SvgCross } from './svgs'
-import { Pulse } from './Pulse'
-import Banner from './Banner'
-import { SettingsPage } from './Settings'
-import { settings } from '@shared/settings'
 import IntroScreen from './IntroScreen'
+// import testdata from "./testdata/linkedom.json";
 
 function UpdateToast() {
   const {
@@ -91,13 +94,61 @@ const fetchItems = async (): Promise<FeedResult> => {
 
 }
 
+const TextAndImages = (props: { content: any[] }) => {
+
+  return <For each={props.content}>{(sub) =>
+    <Switch>
+      <Match when={sub.type === "text"}><div class="font-[Noto_Serif] px-6 py-3 text-sm max-w-90 _text-justify _hyphens-auto 
+indent-2.5">{sub.value}</div></Match>
+      <Match when={sub.type === "image"}><div class="flex flex-col items-center w-[90%] border border-slate-700/30 rounded-lg p-1 "><img src={sub.url} alt={sub.alt} /><div class="text-xs text-center">{sub.alt}</div></div></Match>
+    </Switch>
+  }
+  </For>
+}
+
+export type ReaderInput = {
+  source: string,
+  items: any[]
+}
+
+const Reader = (props: { originalLink: string, value: ReaderInput }) => {
+  const parse = () => {
+    const fs = props.value.items.filter(el => el.level === "h1")
+    return fs
+  }
+
+  return (
+    <Presence exitBeforeEnter>
+      <Motion.div exit={{ x: [0, "120vw"] }} animate={{ x: ["120vw", 0] }} class="absolute inset-0 flex flex-col items-center p-4 bg-white text-zinc-800 overflow-y-auto">
+        <div class="w-8 h-8 z-50 absolute right-2 top-2 bg-white rounded-full border border-slate-700 p-1" onClick={() => setReaderPageInfo('')}>
+          <SvgCross fill="#242424" />
+        </div >
+        <div class="flex text-xs pb-2 justify-end w-full relative gap-8 items-center">
+          <div>Source: <a class={props.originalLink}>{props.value.source}</a></div><div class="w-6 h-6">
+            <SvgCross fill="#242424" />
+          </div>
+        </div>
+        <For each={parse()}>
+          {el => {
+            return <>
+              <div class="font-[Noto_Serif] text-2xl text-slate-900 text-center font-bold mb-4">{el.title!}</div>
+              <TextAndImages content={el.content} />
+            </>
+          }}
+        </For>
+      </Motion.div>
+    </Presence>
+  )
+}
+
 const App: any = () => {
   const [startup, setStartup] = createSignal(true)
   const [feed] = createResource(isFetching, fetchItems)
 
   onMount(() => {
-    setTimeout(() => setStartup(false), 40000)
+    setTimeout(() => setStartup(false), 6000)
   })
+
 
   return <ErrorBoundary fallback={<div>Failed to load or validate API data.</div>}>
     <Meta name="mobile-web-app-capable" content="yes" />
@@ -111,9 +162,16 @@ const App: any = () => {
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
-    <Show when={startup()}><IntroScreen onComplete={() => setStartup(false)} /></Show>
-    <Show when={!startup()}><MainPage feed={feed} /></Show>
-  </ErrorBoundary>
+    <Switch fallback={<MainPage feed={feed} />}>
+      <Match when={startup()}>
+        <IntroScreen onComplete={() => setStartup(false)} />
+      </Match>
+      <Match when={readerPageInfo()}>
+        <Reader value={readerPageInfo()}
+          originalLink="https://www.bbc.com/news/articles/cvgjzpglw4yo\?at_medium\=RSS\&at_campaign\=rss" />
+      </Match>
+    </Switch>
+  </ErrorBoundary >
 }
 
 const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
@@ -260,7 +318,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
               <div
                 class="absolute w-8 h-8 p-1 cursor-pointer top-2 right-2 flex items-center justify-center text-white "
                 onClick={() => setShowOptions(false)}>
-                <SvgCross fill="orange" />{' '}
+                <SvgCross fill="white" />{' '}
               </div>
               <div class="absolute inset-0 top-16 left-2 right-2 bottom-1 overflow-x-hidden px-2">
                 <SettingsPage />

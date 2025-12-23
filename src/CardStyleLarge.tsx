@@ -1,7 +1,7 @@
 import { FeedItem } from "@shared/feed-types"
 import { Accessor, Show } from "solid-js"
 import { Motion } from "solid-motionone"
-import { setSelectedGuid, setMenuGuid } from "./signals"
+import { setSelectedGuid, setMenuGuid, setReaderPageInfo, setIsFetching } from "./signals"
 import { SvgAdd, SvgTrash } from "./svgs"
 import { dt } from "./common"
 
@@ -54,7 +54,8 @@ const CardStyleLarge = (props: {
               ev.stopPropagation()
               setMenuGuid(props.data.guid)
             }} isSelected={props.isSelected} />
-            <GoBtn link={props.data.link} isSelected={props.isSelected} />
+            <GoBtnDirect link={props.data.link} isSelected={props.isSelected} />
+            <GoBtn source={props.data.source} link={props.data.link} isSelected={props.isSelected} />
           </div>
           <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />
         </Motion.div>
@@ -149,19 +150,39 @@ const OptionBtn = (props: { action: (ev?: any) => void, isSelected: Accessor<boo
   </svg>
 </Motion.div>
 
-const GoBtn = (props: { link: string, isSelected: Accessor<boolean> }) => <Motion.div
+const GoBtnDirect = (props: { link: string, isSelected: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
-  class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-green-200/80 flex items-center justify-center text-black"
-  onClick={() =>
+  class="w-16 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-green-200/80 flex items-center justify-center text-black"
+  onClick={async () => {
     window.open(
       props.link,
       '_blank',
-      'noopener,noreferrer',
-    )
+      'noopener,noreferrer')
+  }}
+  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
+  Source ➜
+</Motion.div >
+
+const GoBtn = (props: { source: string, link: string, isSelected: Accessor<boolean> }) => <Motion.div
+  press={{ scale: [1, 1.3, 1] }}
+  class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-green-400/80 flex items-center justify-center text-black"
+  onClick={async () => {
+    setIsFetching(true)
+    const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}`;
+    const res = await fetch(proxyUrl);
+    const items = await res.json()
+    setIsFetching(false)
+    setReaderPageInfo({ source: props.source, items });
+
+    // window.open(
+    // props.link,
+    // '_blank',
+    // 'noopener,noreferrer',
+  }
   }
   style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
-  Read ➜
-</Motion.div>
+  ➜
+</Motion.div >
 
 const DeleteBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}

@@ -16,10 +16,12 @@
     "animejs": "^4.2.2",
     "html-entities": "^2.6.0",
     "idb-keyval": "^6.2.2",
+    "linkedom": "^0.18.12",
     "solid-js": "^1.9.10",
     "solid-motionone": "^1.0.4",
     "tailwindcss": "^4.1.18",
     "vercel": "^50.1.2",
+    "workbox-precaching": "^7.4.0",
     "workbox-window": "^7.4.0",
     "zod": "^4.2.1"
   },

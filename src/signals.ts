@@ -9,6 +9,7 @@ export const [selectedGuid, setSelectedGuid] = createSignal('')
 
 export const [showOptions, setShowOptions] = createSignal(false)
 export const [menuGuid, setMenuGuid] = createSignal<string>('')
+export const [readerPageInfo, setReaderPageInfo] = createSignal<any>();
 
 // export const [userSources, setUserSources] =
 //   createStore<SourceRecords>(DEFAULT_FEED_URLS)

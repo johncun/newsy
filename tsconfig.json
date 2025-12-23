@@ -3,6 +3,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "strict": true,
@@ -16,7 +17,8 @@
       "@src/*": ["src/*"],
       "@api/*": ["api/*"]
     },
-    "types": ["vite/client", "vite-plugin-pwa/client", "vite-plugin-pwa/solid"]
+    "types": ["vite/client", "vite-plugin-pwa/client", "vite-plugin-pwa/solid"],
+    "lib": ["ESNext", "DOM", "WebWorker"]
   },
   "include": ["src/**/*", "api/**/*", "shared/**/*"]
 }

@@ -3,7 +3,7 @@ import { Accessor, Show } from "solid-js"
 import { Motion } from "solid-motionone"
 import { setSelectedGuid, setMenuGuid } from "./signals"
 import { SvgAdd, SvgTrash } from "./svgs"
-import { dt, formatTimeAgo } from "./common"
+import { formatTimeAgo } from "./common"
 import { CachedImage } from "./CachedImage"
 
 const AnimatedBlackFade = () =>
