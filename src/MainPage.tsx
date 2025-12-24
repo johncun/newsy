@@ -6,11 +6,12 @@ import { Presence, Motion } from "solid-motionone"
 import Banner from "./Banner"
 import { Pulse } from "./Pulse"
 import { SettingsPage } from "./Settings"
-import { setIsFetching, mode, isFetching, menuGuid, showOptions, setShowOptions } from "./signals"
+import { setIsFetching, mode, isFetching, menuGuid, showOptions, setShowOptions, readerPageInfo } from "./signals"
 import { SvgCross } from "./svgs"
 import UpdateToast from "./UpdateToast"
 import OptionMenuItems from "./OptionMenuItems"
 import List from "./List"
+import Reader from "./Reader"
 
 const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
@@ -104,6 +105,10 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
           <Pulse />
         </div>
       </Show>
+      <Show when={readerPageInfo()}>
+        <Reader value={readerPageInfo()} />
+      </Show>
+
       <div
         ref={upSentinelRef}
         class={`absolute z-30 ${isUpScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-1 flex text-2xl items-center justify-center top-18 rounded-full bg-black/20 text-cyan-100`}
@@ -150,7 +155,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
             id="menu"
             class="absolute z-50 inset-0">
             <div class="absolute inset-0 border-0 border-slate-100 bg-linear-to-b from-zinc-800 to-slate-800 text-black">
-              <div class="absolute inset-x-0 top-0 h-12 border-b border-b-slate-900 flex text-xl items-center justify-center text-white ">
+              <div class="absolute inset-x-0 top-0 h-12 border-b border-b-slate-900 flex font-bold text-xl items-center justify-center text-white ">
                 Configuration
               </div>
               <div

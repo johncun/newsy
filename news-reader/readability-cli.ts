@@ -1,7 +1,7 @@
 import { parseHTML } from 'linkedom';
 import { Readability } from '@mozilla/readability';
 
-const url = Bun.argv[2];
+const url = Bun.argv[2] || '';
 if (!url) {
   console.error("Usage: bun readability-cli.ts <url>");
   process.exit(1);

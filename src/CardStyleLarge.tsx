@@ -2,7 +2,7 @@ import { FeedItem } from "@shared/feed-types"
 import { Accessor } from "solid-js"
 import { Motion } from "solid-motionone"
 import { setSelectedGuid } from "./signals"
-import { dt } from "./common"
+import { formatTimeAgo } from "./common"
 import { CardButtons } from "./CardButtons"
 
 const AnimatedBlackFade = () =>
@@ -67,7 +67,7 @@ const Source = (props: { value: string }) => <div class="bg-black/30 text-white/
 </div>
 
 const PublishedTime = (props: { value: string }) => <div class="bg-black/50 text-white/70 text-xs z-10 px-1 py-1 rounded-md">
-  {dt(props.value)}
+  {formatTimeAgo(new Date(props.value))}
 </div>
 
 const Title = (props: { value: string }) =>

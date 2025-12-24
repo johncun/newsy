@@ -1,7 +1,8 @@
 import { For, Match, Switch } from "solid-js"
-import { Motion, Presence } from "solid-motionone"
+import { Motion } from "solid-motionone"
 import { SvgCross } from "./svgs"
-import { setReaderPageInfo } from "./signals"
+import { ReaderInput, setReaderPageInfo } from "./signals"
+import { animate } from "@motionone/dom";
 
 const TextAndImages = (props: { content: any[] }) => {
 
@@ -15,38 +16,56 @@ indent-2.5">{sub.value}</div></Match>
   </For>
 }
 
-export type ReaderInput = {
-  source: string,
-  items: any[]
-}
-
-const Reader = (props: { originalLink: string, value: ReaderInput }) => {
+const Reader = (props: { value: ReaderInput | undefined }) => {
   const parse = () => {
-    const fs = props.value.items.filter(el => el.level === "h1")
+    const fs = props.value?.items.filter(el => el.level === "h1")
     return fs
   }
 
+  let elRef!: HTMLDivElement;
+
+  const hide = () => {
+    if (!elRef) return;
+    animate(
+      elRef,
+      {
+        x: "120vw"
+      },
+      {
+        duration: 0.5,
+        easing: "ease-out"
+      }
+    );
+  }
+
+  const open = () => {
+    window.open(
+      props.value?.link,
+      '_blank',
+      'noopener,noreferrer')
+  }
+
+
   return (
-    <Presence exitBeforeEnter>
-      <Motion.div exit={{ x: [0, "120vw"] }} animate={{ x: ["120vw", 0] }} class="absolute inset-0 flex flex-col items-center p-4 bg-white text-zinc-800 overflow-y-auto">
-        <div class="w-8 h-8 z-50 absolute right-2 top-2 bg-white rounded-full border border-slate-700 p-1" onClick={() => setReaderPageInfo('')}>
+    <Motion.div ref={elRef} exit={{ x: [0, "120vw"] }} animate={{ x: ["120vw", 0] }} class="absolute inset-0 flex flex-col z-50 items-center p-4 bg-white text-zinc-800 overflow-y-auto">
+      <div class="w-8 h-8 z-50 absolute right-2 top-2 bg-white rounded-full border border-slate-700 p-1" onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
+        <SvgCross fill="#242424" />
+      </div >
+      <div class="flex text-xs pb-2 justify-end w-full relative gap-8 items-center">
+        <div onClick={open}>Source: <a class={props.value?.link}>{props.value?.source}</a></div>
+        <div class="w-6 h-6">
           <SvgCross fill="#242424" />
-        </div >
-        <div class="flex text-xs pb-2 justify-end w-full relative gap-8 items-center">
-          <div>Source: <a class={props.originalLink}>{props.value.source}</a></div><div class="w-6 h-6">
-            <SvgCross fill="#242424" />
-          </div>
         </div>
-        <For each={parse()}>
-          {el => {
-            return <>
-              <div class="font-[Noto_Serif] text-2xl text-slate-900 text-center font-bold mb-4">{el.title!}</div>
-              <TextAndImages content={el.content} />
-            </>
-          }}
-        </For>
-      </Motion.div>
-    </Presence>
+      </div>
+      <For each={parse()}>
+        {el => {
+          return <>
+            <div class="font-[Noto_Serif] text-2xl text-slate-900 text-center font-bold mb-4">{el.title!}</div>
+            <TextAndImages content={el.content} />
+          </>
+        }}
+      </For>
+    </Motion.div>
   )
 }
 

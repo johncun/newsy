@@ -2,7 +2,7 @@ import { Accessor, Show } from "solid-js"
 import { Motion } from "solid-motionone"
 import { setIsFetching, setMenuGuid, setReaderPageInfo } from "./signals"
 import { SvgAdd, SvgTrash } from "./svgs"
-import { ArticleRecord, FeedItem } from "@shared/feed-types"
+import { FeedItem } from "@shared/feed-types"
 
 export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolean>, swipeRight: () => void, swipeLeft: () => void }) => {
 
@@ -87,7 +87,8 @@ export const OptionBtn = (props: { action: (ev?: any) => void, isSelected: Acces
 export const GoBtnDirect = (props: { link: string, isSelected: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
   class="w-8 font-stretch-90% font-extrabold text-2xl h-8 p-1 rounded-full bg-white/50 flex items-center justify-center text-black"
-  onClick={async () => {
+  onClick={async (ev) => {
+    ev.stopPropagation();
     window.open(
       props.link,
       '_blank',
@@ -100,14 +101,15 @@ export const GoBtnDirect = (props: { link: string, isSelected: Accessor<boolean>
 
 export const GoBtn = (props: { source: string, link: string, isSelected: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
-  class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-sky-400/80 text-white flex items-center justify-center text-black"
-  onClick={async () => {
+  class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-sky-400/80 text-white flex items-center justify-center "
+  onClick={async (ev) => {
+    ev.stopPropagation();
     setIsFetching(true)
     const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}`;
     const res = await fetch(proxyUrl);
     const items = await res.json()
     setIsFetching(false)
-    setReaderPageInfo({ source: props.source, items });
+    setReaderPageInfo({ source: props.source, link: props.link, items });
 
     // window.open(
     // props.link,

@@ -13,10 +13,8 @@ import {
 } from 'solid-js'
 import {
   isFetching,
-  readerPageInfo,
 } from './signals'
 import IntroScreen from './IntroScreen'
-import Reader from './Reader'
 import MainPage from './MainPage'
 
 const fetchItems = async (): Promise<FeedResult> => {
@@ -69,10 +67,6 @@ const App: any = () => {
     <Switch fallback={<MainPage feed={feed} />}>
       <Match when={startup()}>
         <IntroScreen onComplete={() => setStartup(false)} />
-      </Match>
-      <Match when={readerPageInfo()}>
-        <Reader value={readerPageInfo()}
-          originalLink="https://www.bbc.com/news/articles/cvgjzpglw4yo\?at_medium\=RSS\&at_campaign\=rss" />
       </Match>
     </Switch>
   </ErrorBoundary >

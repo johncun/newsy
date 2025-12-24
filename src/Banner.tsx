@@ -11,7 +11,7 @@ const Banner = () => {
 
   return (
     <div class="flex justify-between items-center bg-linear-to-t from-black to-slate-900 h-14 absolute inset-x-0 p-2 z-20 gap-4">
-      <div class="w-20 font-normal pl-2 font-bold text-center shadow-amber-50 shadow-2xl text-xl">{modeDesc()}</div>
+      <div class="w-20 normal pl-2 font-bold text-center shadow-amber-50 shadow-2xl text-xl">{modeDesc()}</div>
       <div class="flex gap-4">
         <Motion.div
           press={{ scale: [1, 1.3] }}

@@ -24,19 +24,19 @@ const CardStyleThin = (props: {
   swipeRight: () => void
 }) => {
   return <div
-    class={`group cursor-pointer mx-0 bg-slate-700/100 rounded-lg ${!props.isSelected() ? 'h-30' : 'h-44'} relative overflow-hidden`}
+    class={`group cursor-pointer mx-0 bg-slate-700 rounded-lg ${!props.isSelected() ? 'h-30' : 'h-44'} relative overflow-hidden`}
     onClick={() => setSelectedGuid(props.data.guid)}>
     <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} isSelected={props.isSelected} />
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
 
 
-      <div class={`absolute left-31 mx-1 right-0  ${props.isSelected() ? 'bg-black/0' : ''}`}>
+      <div class={`absolute left-31 mx-1 right-0 ${props.isSelected() ? 'bg-black/0' : ''}`}>
         <div class="flex justify-between absolute top-1 inset-x-0 h-5 items-center">
           <Source value={props.data.source} />
           <PublishedTime value={props.data.pubDate} />
         </div>
-        <div class="absolute px-1 top-6 w-full flex flex-col overflow-hidden gap-0 font-[Noto_Serif]">
+        <div class="absolute p-1 top-6 w-full flex flex-col overflow-hidden gap-0 font-[Noto_Serif]">
           <Title value={props.data.title} />
           <Byline value={props.data.description} />
         </div>
@@ -59,12 +59,12 @@ const PublishedTime = (props: { value: string }) => <div class="bg-black/20 text
 </div>
 
 const Title = (props: { value: string }) =>
-  <div class="font-normal font-[Quicksand] pb-0.5 text-shadow-black/50 text-md font-stretch-10% text-shadow-md line-clamp-3">{props.value}</div>
+  <div class="font-normal leading-4 font-[Noto_Serif] pb-0.5 text-shadow-black/50 text-md font-stretch-10% text-shadow-md line-clamp-3">{props.value}</div>
 
 const Byline = (props: { value: string }) =>
-  <p class="text-xs font-normal text-zinc-100/70 overflow-y-hidden line-clamp-2 text-left w-full">
+  <div class="text-xs font-normal text-zinc-100/70 overflow-y-hidden line-clamp-3 text-left w-full">
     {props.value}
-  </p>
+  </div>
 
 const ImageFor = (props: {
   data: FeedItem

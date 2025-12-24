@@ -116,7 +116,7 @@ export const getAllByState =
     (md: ArticleRecords): ArticleRecords => {
       return md.filter(a => a.state === state)
     }
-const DELETED_MAX_ALLOWED_COUNT = 100
+const DELETED_MAX_ALLOWED_COUNT = 400
 
 export const removeOldDeletes = (_md: ArticleRecords) => {
   const ds = getAllByState('deleted')(_md)
