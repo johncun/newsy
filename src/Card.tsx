@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show } from 'solid-js'
+import { createEffect, createSignal, Match, onMount, Switch } from 'solid-js'
 import { FeedItem } from '@shared/feed-types'
 import { animate } from 'animejs'
 
@@ -6,6 +6,7 @@ import { mode, selectedGuid, setSelectedGuid } from './signals'
 import { getAllByState, memData } from './db'
 import CardStyleLarge from './CardStyleLarge'
 import CardStyleThin from './CardStyleThin'
+import { hashToBoolean } from './common'
 
 export type Action = 'Kill' | 'Save' | 'Delete' | ''
 
@@ -110,6 +111,17 @@ const Card = (props: {
 
   const isSelected = () => selectedGuid() === props.data.guid
 
+  const useThin = () => hashToBoolean(props.data.guid)
+
+  createEffect(() => {
+    if (isSelected() && elRef) {
+      elRef.scrollIntoView({
+        behavior: "smooth", // "auto" for instant jump
+        block: "nearest",   // "start", "center", "end", or "nearest"
+        inline: "nearest"
+      })
+    }
+  });
 
   return isDying() ?
     <div>Boom</div>
@@ -123,12 +135,13 @@ const Card = (props: {
         </div>
       </div>
 
-      <Show when={!isSelected()}>
-        <CardStyleThin isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
-      </Show>
-      <Show when={isSelected()}>
+      <Switch fallback={
         <CardStyleLarge isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
-      </Show>
+      }>
+        <Match when={useThin()}>
+          <CardStyleThin isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
+        </Match>
+      </Switch>
 
       <div class="w-[20vw] flex items-center justify-center">
         <div

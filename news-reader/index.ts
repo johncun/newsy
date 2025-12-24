@@ -1,5 +1,4 @@
 import { parseHTML } from 'linkedom';
-import { writeFileSync } from 'node:fs';
 
 // 1. Get arguments from CLI
 const url = Bun.argv[2];

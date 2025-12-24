@@ -51,19 +51,19 @@ const IntroScreen = (props: { onComplete?: () => void }) => {
         {/* 4. Action Button */}
         <button
           onClick={handleClose}
-          class={`mt-12 px-4 py-4 bg-white text-indigo-600 font-bold rounded-full shadow-lg hover:bg-opacity-90 transition-all active:scale-95 ${startText() ? 'opacity-100' : 'opacity-0'}`}
+          class={`mt-12 px-2 py-2 bg-white text-indigo-600 font-bold rounded-lg shadow-lg hover:bg-opacity-90 transition-all active:scale-95 ${startText() ? 'opacity-100' : 'opacity-0'}`}
           style={{ "transition-delay": "800ms" }}
         >
           Get Started
         </button>
 
         {/* Skip button for repeat users */}
-        <button
-          onClick={handleClose}
-          class="absolute top-8 right-8 text-white/50 hover:text-white text-sm font-medium tracking-widest uppercase"
-        >
-          Skip
-        </button>
+        {/* <button */}
+        {/*   onClick={handleClose} */}
+        {/*   class="absolute top-8 right-8 text-white/50 hover:text-white text-sm font-medium tracking-widest uppercase" */}
+        {/* > */}
+        {/*   Skip */}
+        {/* </button> */}
 
         {/* Scoped Animations */}
         <style>{`

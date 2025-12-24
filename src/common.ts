@@ -1,3 +1,7 @@
+import { ArticleState } from "@shared/feed-types";
+import { Action } from "./Card";
+import { killArticle, updateState } from "./db";
+
 export const dt = (dstr: string) => {
   const date = new Date(dstr)
   return (
@@ -100,3 +104,37 @@ export async function reduceImageSize(
   });
 }
 
+export type ActionToState = { [key: string]: ArticleState }
+
+const actionToState: ActionToState = {
+  Save: 'saved',
+  Delete: 'deleted',
+}
+
+export const onSwipeRight = (guid: string, action: Action) => {
+  if (action === '') return
+  if (action === 'Kill') killArticle(guid)
+
+  updateState(guid, actionToState[action])
+}
+
+export const onSwipeLeft = (guid: string, action: Action) => {
+  if (action === '') return
+  if (action === 'Kill') killArticle(guid)
+
+  updateState(guid, actionToState[action])
+}
+
+export function hashToBoolean(str: string): boolean {
+  let hash = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    // Standard djb2 hash logic: hash * 33 + charCode
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    // Convert to 32bit integer to keep numbers manageable
+    hash |= 0;
+  }
+
+  // Return true if even, false if odd
+  return hash % 2 === 0;
+}

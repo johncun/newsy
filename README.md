@@ -1,8 +1,12 @@
-- [x] Show number of lives
-- [x] Show number of saves
-- [x] Allow saved view
-- [x] Show deleted view - undelete
-- Save images as base64?
-- Undo button
-- [ ] Input news feeds and disable, keep stats on news feeds
-- [ ] Icon
+- [ ] Retry button on story which removes from kill list first
+- [ ] Better UI for going into stories with Reader etc
+- [ ] Auto detect with Reader if not good enough to open window to source
+- [ ] Allow open window on Reader Screen
+- [ ] Dark mode reader screen option and remember user settings
+- [ ] Light mode for lists + button to switch
+- [ ] Mix thin and large in listing
+- [ ] Group by source option - or filter
+- [ ] Help screen
+- [ ] Number of stories ever total
+- [ ] Auto purge history (kill list) after N days - set to 7 by default
+

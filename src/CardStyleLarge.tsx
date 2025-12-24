@@ -1,9 +1,9 @@
 import { FeedItem } from "@shared/feed-types"
-import { Accessor, Show } from "solid-js"
+import { Accessor } from "solid-js"
 import { Motion } from "solid-motionone"
-import { setSelectedGuid, setMenuGuid, setReaderPageInfo, setIsFetching } from "./signals"
-import { SvgAdd, SvgTrash } from "./svgs"
+import { setSelectedGuid } from "./signals"
 import { dt } from "./common"
+import { CardButtons } from "./CardButtons"
 
 const AnimatedBlackFade = () =>
   <Motion.div
@@ -39,27 +39,14 @@ const CardStyleLarge = (props: {
       <div
         id="title"
         class={`absolute font-bold font-[Noto_Serif] text-shadow-black/30 text-xl font-stretch-75% text-shadow-md
-        inset-x-0 mx-4 top-2 bottom-2 items-center justify-start flex flex-col gap-1 rounded-xl p-2 ${props.isSelected() ? 'bg-black/0' : ''}`}>
+        inset-x-0 mx-4 top-2 bottom-2 items-center justify-${props.isSelected() ? 'start' : 'center'} flex flex-col gap-1 rounded-xl p-2 ${props.isSelected() ? 'bg-black/0' : ''}`}>
 
         <Title value={props.data.title} />
         <Byline value={props.data.description} />
       </div>
 
-      <Show when={props.isSelected()}>
-        <Motion.div animate={{ opacity: [0, 1], scale: [0, 1] }}
-          class={`absolute bottom-1 h-10 z-30 inset-x-2 flex bg-black/40 items-center rounded-2xl justify-between`}>
-          <AddBtn action={props.swipeRight} isSelected={props.isSelected} />
-          <div class="flex gap-4">
-            <OptionBtn action={(ev: MouseEvent) => {
-              ev.stopPropagation()
-              setMenuGuid(props.data.guid)
-            }} isSelected={props.isSelected} />
-            <GoBtnDirect link={props.data.link} isSelected={props.isSelected} />
-            <GoBtn source={props.data.source} link={props.data.link} isSelected={props.isSelected} />
-          </div>
-          <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />
-        </Motion.div>
-      </Show>
+      <CardButtons data={props.data} isSelected={props.isSelected} swipeLeft={props.swipeLeft} swipeRight={props.swipeRight} />
+
       {/*      <div
         class={`absolute top-1 h-10 z-30 inset-x-2 flex ${props.isSelected() ? 'bg-black/40' : ''} items-center rounded-2xl justify-between`}>
         <AddBtn action={props.swipeRight} isSelected={props.isSelected} />
@@ -84,114 +71,12 @@ const PublishedTime = (props: { value: string }) => <div class="bg-black/50 text
 </div>
 
 const Title = (props: { value: string }) =>
-  <div class="line-clamp-4">{props.value}</div>
+  <div class="line-clamp-4 font-[Quicksand]">{props.value}</div>
 
 const Byline = (props: { value: string }) =>
   <p class="text-sm font-normal text-zinc-100/70 overflow-y-hidden line-clamp-2 text-left w-full">
     {props.value}
   </p>
-
-const AddBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) => <Motion.div
-  press={{ scale: [1, 1.3, 1] }}
-  class="p-1 w-9 h-9 rounded-full bg-green-400/80 flex items-center justify-center text-black"
-  onClick={props.action}
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
-  <SvgAdd fill="white" />
-</Motion.div>
-
-const OptionBtn = (props: { action: (ev?: any) => void, isSelected: Accessor<boolean> }) => <Motion.div
-  press={{ scale: [1, 1.3, 1] }}
-  class="text-3xl w-8 h-8 rounded-full bg-amber-200/80 p-1 flex items-center justify-center text-black"
-  onClick={props.action}
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
-  <svg viewBox="0 0 24 24" class="w-6">
-    <g
-      stroke="none"
-      stroke-width="3"
-      fill="none"
-      fill-rule="evenodd">
-      <g>
-        <rect
-          fill-rule="nonzero"
-          x="0"
-          y="0"
-          width="24"
-          height="24"
-        />
-        <line
-          x1="5"
-          y1="7"
-          x2="19"
-          y2="7"
-          id="Path"
-          stroke="#0C0310"
-          stroke-linecap="round"
-        />
-        <line
-          x1="5"
-          y1="17"
-          x2="19"
-          y2="17"
-          id="Path"
-          stroke="#0C0310"
-          stroke-linecap="round"
-        />
-        <line
-          x1="5"
-          y1="12"
-          x2="19"
-          y2="12"
-          id="Path"
-          stroke="#0C0310"
-          stroke-linecap="round"
-        />
-      </g>
-    </g>
-  </svg>
-</Motion.div>
-
-const GoBtnDirect = (props: { link: string, isSelected: Accessor<boolean> }) => <Motion.div
-  press={{ scale: [1, 1.3, 1] }}
-  class="w-16 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-green-200/80 flex items-center justify-center text-black"
-  onClick={async () => {
-    window.open(
-      props.link,
-      '_blank',
-      'noopener,noreferrer')
-  }}
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
-  Source ➜
-</Motion.div >
-
-const GoBtn = (props: { source: string, link: string, isSelected: Accessor<boolean> }) => <Motion.div
-  press={{ scale: [1, 1.3, 1] }}
-  class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-green-400/80 flex items-center justify-center text-black"
-  onClick={async () => {
-    setIsFetching(true)
-    const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}`;
-    const res = await fetch(proxyUrl);
-    const items = await res.json()
-    setIsFetching(false)
-    setReaderPageInfo({ source: props.source, items });
-
-    // window.open(
-    // props.link,
-    // '_blank',
-    // 'noopener,noreferrer',
-  }
-  }
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
-  ➜
-</Motion.div >
-
-const DeleteBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) => <Motion.div
-  press={{ scale: [1, 1.3, 1] }}
-  class="p-1 w-8 h-8 rounded-full bg-red-800/80 flex items-center justify-center text-black"
-  onClick={props.action}
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
-  <SvgTrash stroke="white" fill="" />
-</Motion.div>
-
 
 const ImageFor = (props: {
   data: FeedItem
