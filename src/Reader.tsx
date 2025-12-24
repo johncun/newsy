@@ -1,25 +1,66 @@
-import { For, Match, Switch } from "solid-js"
+import { createEffect, For, Match, Switch } from "solid-js"
 import { Motion } from "solid-motionone"
 import { SvgCross } from "./svgs"
 import { ReaderInput, setReaderPageInfo } from "./signals"
 import { animate } from "@motionone/dom";
 
-const TextAndImages = (props: { content: any[] }) => {
+export type ReaderContent = {
+  title: string;
+  level: string;
+  content: any[]
+}
 
-  return <For each={props.content}>{(sub) =>
+const TextAndImages = (props: { data: ReaderContent }) => {
+
+  return <>
     <Switch>
-      <Match when={sub.type === "text"}><div class="font-[Noto_Serif] px-6 py-3 text-sm max-w-90 _text-justify _hyphens-auto 
-indent-2.5">{sub.value}</div></Match>
-      <Match when={sub.type === "image"}><div class="flex flex-col items-center w-[90%] border border-slate-700/30 rounded-lg p-1 "><img src={sub.url} alt={sub.alt} /><div class="text-xs text-center">{sub.alt}</div></div></Match>
+      <Match when={props.data.level === 'h1'}>
+        <div class="font-[Noto_Serif] text-2xl text-slate-900 text-center font-bold mb-4">{props.data.title!}</div>
+      </Match>
+      <Match when={props.data.level === 'h2'}>
+        <div class="font-[Noto_Serif] text-xl text-slate-900 text-center w-[90%] font-bold mb-3">{props.data.title!}</div>
+      </Match>
+      <Match when={props.data.level === 'h3'}>
+        <div class="font-[Noto_Serif] text-md text-slate-900 text-center w-[80%] font-bold mb-2">{props.data.title!}</div>
+      </Match>
     </Switch>
-  }
-  </For>
+    <For each={props.data.content}>{(sub) =>
+      <Switch>
+        <Match when={sub.type === "text"}><div class="font-[Noto_Serif] px-6 py-3 text-sm max-w-90 _text-justify _hyphens-auto 
+_indent-2.5">{sub.value}</div></Match>
+        <Match when={sub.type === "image"}><div class="flex flex-col items-center w-[90%] border border-slate-700/30 rounded-lg p-1 "><img src={sub.url} alt={sub.alt} /><div class="text-xs text-center">{sub.alt}</div></div></Match>
+      </Switch>
+    }
+    </For>
+  </>
 }
 
 const Reader = (props: { value: ReaderInput | undefined }) => {
-  const parse = () => {
-    const fs = props.value?.items.filter(el => el.level === "h1")
-    return fs
+  const parse = (): ReaderContent[] | undefined => {
+    const fs = props.value?.items.filter(el => ["h1", "h2", "h3"].includes(el.level) && el.title)
+    console.log({ fs });
+
+    if (!fs) return fs;
+
+    const filterEmbeds = fs.flatMap(f => {
+
+      if (f.title.indexOf('commentcancel') >= 0) return []
+      if (f.title.indexOf('BBC is in multiple languages') >= 0) return []
+      if (f.content.length === 0) return []
+
+      f.content = f.content.filter(({ alt }: { alt: string }) => alt !== "guardian.org")
+
+      const idx = f.content.findIndex((c: { type: string, value: string }) => {
+        return (c.type === "text" && c.value.indexOf("embed this post,") >= 0)
+      })
+      if (idx === 0) return []
+      if (idx >= 0) {
+        return [{ ...f, content: f.content.splice(0, idx) }];
+      }
+      else return [f]
+    })
+    console.log({ filterEmbeds })
+    return filterEmbeds;
   }
 
   let elRef!: HTMLDivElement;
@@ -44,6 +85,14 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
       '_blank',
       'noopener,noreferrer')
   }
+  const parsedData = () => parse() || []
+
+  const noMainImageInContent = () => !parsedData().find((rc: ReaderContent) => rc.content.find(c => c.type === "image" && c.value === props.value?.backupImage))
+
+  createEffect(() => {
+    console.log({ none: noMainImageInContent(), parsed: parsedData() })
+  })
+
 
 
   return (
@@ -57,11 +106,12 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
           <SvgCross fill="#242424" />
         </div>
       </div>
-      <For each={parse()}>
-        {el => {
+      {noMainImageInContent() ? <img class="w-[80%] mb-4 p-2 border border-slate-600 rounded-md" src={props.value?.backupImage} /> : null}
+
+      <For each={parsedData()}>
+        {rc => {
           return <>
-            <div class="font-[Noto_Serif] text-2xl text-slate-900 text-center font-bold mb-4">{el.title!}</div>
-            <TextAndImages content={el.content} />
+            <TextAndImages data={rc} />
           </>
         }}
       </For>

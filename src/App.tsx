@@ -16,6 +16,7 @@ import {
 } from './signals'
 import IntroScreen from './IntroScreen'
 import MainPage from './MainPage'
+import { autoClearKills } from './db'
 
 const fetchItems = async (): Promise<FeedResult> => {
   const response = await fetch('/api/selectedFeeds', {
@@ -49,6 +50,7 @@ const App: any = () => {
 
   onMount(() => {
     setTimeout(() => setStartup(false), 6000)
+    autoClearKills()
   })
 
 

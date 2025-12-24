@@ -18,7 +18,7 @@ export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolea
         }} isSelected={props.isSelected} />
         <GoBtnDirect link={props.data.link} isSelected={props.isSelected} />
       </div>
-      <GoBtn source={props.data.source} link={props.data.link} isSelected={props.isSelected} />
+      <GoBtn source={props.data.source} backupImage={props.data.image} link={props.data.link} isSelected={props.isSelected} />
       <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />
     </Motion.div>
   </Show>
@@ -99,7 +99,7 @@ export const GoBtnDirect = (props: { link: string, isSelected: Accessor<boolean>
   {/* <img src="/favicon.svg" class="w-8" /> */}
 </Motion.div >
 
-export const GoBtn = (props: { source: string, link: string, isSelected: Accessor<boolean> }) => <Motion.div
+export const GoBtn = (props: { source: string, backupImage?: string, link: string, isSelected: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
   class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-sky-400/80 text-white flex items-center justify-center "
   onClick={async (ev) => {
@@ -109,7 +109,7 @@ export const GoBtn = (props: { source: string, link: string, isSelected: Accesso
     const res = await fetch(proxyUrl);
     const items = await res.json()
     setIsFetching(false)
-    setReaderPageInfo({ source: props.source, link: props.link, items });
+    setReaderPageInfo({ source: props.source, backupImage: props.backupImage || '', link: props.link, items });
 
     // window.open(
     // props.link,

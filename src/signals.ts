@@ -12,6 +12,7 @@ export const [menuGuid, setMenuGuid] = createSignal<string>('')
 export type ReaderInput = {
   source: string,
   link: string,
+  backupImage: string,
   items: any[]
 }
 export const [readerPageInfo, setReaderPageInfo] = createSignal<ReaderInput | undefined>();

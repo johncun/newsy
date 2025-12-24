@@ -13,9 +13,32 @@ const STORAGE_KEY = 'newsy:articles'
 const STORAGE_KILLS = 'newsy:killedlist'
 
 export const [memData, setMemData] = createSignal<ArticleRecords>([])
-export const [killedList, setKilledList] = createSignal<Set<string>>(
-  new Set([]),
-)
+export type KilledItemMap = { [link: string]: { time: number } }
+export const [killedList, setKilledList] = createSignal<KilledItemMap>({});
+
+const MS_TO_KEEP_KILLS = 3 * 24 * 50 * 60 * 1000;
+
+export const autoClearKills = () => {
+  const ks = killedList()
+  const ds = new Set()
+  const now = Date.now()
+
+  Object.keys(ks).forEach(k => {
+    if (now - ks[k].time < MS_TO_KEEP_KILLS) ds.add(k)
+    if (ds.size === 0) return;
+  })
+
+  setMemData(mds => {
+    return mds.flatMap(a => {
+      if (ds.has(a.guid)) {
+        return []
+      } else return [a]
+    })
+  })
+
+  setKilledList(ks)
+}
+
 
 export const getAllFromLocal = () => {
   const data = localStorage.getItem(STORAGE_KEY)
@@ -35,18 +58,19 @@ export const getAllFromLocal = () => {
 }
 
 export const getKillListFromLocal = () => {
-  const data = localStorage.getItem(STORAGE_KILLS)
-  if (!data) {
-    console.log('No data in localStorage')
-    setKilledList(new Set([]))
-  }
+  const data = localStorage.getItem(STORAGE_KILLS) || "{}"
+
   try {
-    const parsed: string[] = JSON.parse(data || '[]')
-    console.log('parsed', parsed.length)
-    setKilledList(new Set(parsed))
+    let ks = JSON.parse(data)
+    if (Array.isArray(ks)) {
+
+      ks = ks.map(l => ([l, Date.now() - (24 * 3600000)])).reduce((prev, [l, t]) => ({ ...prev, [l]: { time: t } }), {})
+    }
+
+    setKilledList(ks)
   } catch (e) {
     console.error('Error parsing data from localStorage:', e)
-    setKilledList(new Set([]))
+    setKilledList({})
   }
 }
 
@@ -55,11 +79,11 @@ getKillListFromLocal()
 
 export const saveAllToLocal = (
   md: ArticleRecords,
-  kills: Set<string>,
+  kills: KilledItemMap,
 ): void => {
-  console.log('saving to local', { data: md, kills: [...kills] })
+  console.log('saving to local', { data: md, kills })
   localStorage.setItem(STORAGE_KEY, JSON.stringify(md))
-  localStorage.setItem(STORAGE_KILLS, JSON.stringify([...kills]))
+  localStorage.setItem(STORAGE_KILLS, JSON.stringify(kills))
 }
 
 const FeedItemToNewRecord = (item: FeedItem): ArticleRecord => {
@@ -76,9 +100,9 @@ export const refreshDbWithFeedItems = (items: FeedItems): void => {
 
   const allGuids = new Set(memData().map(it => it.guid))
   if (killedList()) {
-    for (const a of killedList()) {
-      allGuids.add(a)
-    }
+    Object.keys(killedList()).forEach(k => {
+      allGuids.add(k)
+    })
   }
 
   const newRecords: ArticleRecord[] = items
@@ -162,12 +186,12 @@ export const removeLiveAfterHours = () => {
 export const killArticles = (guids: string[]) => {
   const toKills = new Set(guids)
 
-  const ks = killedList()
+  const ks = guids.reduce((prev, id) => ({ ...prev, [id]: { time: Date.now() } }), {} as KilledItemMap)
 
   setMemData(mds => {
     return mds.flatMap(a => {
-      if (toKills.has(a.guid)) {
-        ks.add(a.guid)
+      if (toKills.has(a.guid) && !ks[a.guid]) {
+        ks[a.guid] = { time: Date.now() }
         return []
       } else return [a]
     })
@@ -181,8 +205,8 @@ export const killArticle = (guid: string) => {
 
   setMemData(mds => {
     return mds.flatMap(a => {
-      if (a.guid === guid) {
-        ks.add(guid)
+      if (a.guid === guid && !ks[a.guid]) {
+        ks[a.guid] = { time: Date.now() }
         return []
       } else return [a]
     })

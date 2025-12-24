@@ -1,10 +1,10 @@
 - [ ] Retry button on story which removes from kill list first
-- [ ] Better UI for going into stories with Reader etc
+- [x] Better UI for going into stories with Reader etc
 - [ ] Auto detect with Reader if not good enough to open window to source
 - [ ] Allow open window on Reader Screen
 - [ ] Dark mode reader screen option and remember user settings
 - [ ] Light mode for lists + button to switch
-- [ ] Mix thin and large in listing
+- [x] Mix thin and large in listing
 - [ ] Group by source option - or filter
 - [ ] Help screen
 - [ ] Number of stories ever total

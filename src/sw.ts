@@ -7,7 +7,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 self.addEventListener('fetch', (event: any) => {
   const url = new URL(event.request.url);
-  console.log("fetch intercepted", { p: url.pathname, sp: url.searchParams });
+  // console.log("fetch intercepted", { p: url.pathname, sp: url.searchParams });
 
   if (url.pathname === '/summarize-news') {
     const targetUrl = url.searchParams.get('url');
@@ -21,7 +21,7 @@ async function handleNewsExtraction(targetUrl: string) {
   try {
 
     const summary = await summarizeNewsPage(targetUrl, '/api/proxy');
-    console.log({ summary })
+    // console.log({ summary })
     return new Response(JSON.stringify(summary, null, 2),
       {
         headers: { 'Content-Type': 'application/json' }
