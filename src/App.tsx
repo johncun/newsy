@@ -49,7 +49,7 @@ const App: any = () => {
   const [feed] = createResource(isFetching, fetchItems)
 
   onMount(() => {
-    setTimeout(() => setStartup(false), 6000)
+    setTimeout(() => setStartup(false), 2000)
     autoClearKills()
   })
 

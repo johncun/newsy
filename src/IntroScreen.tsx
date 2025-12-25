@@ -49,13 +49,6 @@ const IntroScreen = (props: { onComplete?: () => void }) => {
         </div>
 
         {/* 4. Action Button */}
-        <button
-          onClick={handleClose}
-          class={`mt-12 px-2 py-2 bg-white text-indigo-600 font-bold rounded-lg shadow-lg hover:bg-opacity-90 transition-all active:scale-95 ${startText() ? 'opacity-100' : 'opacity-0'}`}
-          style={{ "transition-delay": "800ms" }}
-        >
-          Get Started
-        </button>
 
         {/* Skip button for repeat users */}
         {/* <button */}
