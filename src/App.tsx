@@ -37,7 +37,7 @@ const fetchItems = async (): Promise<FeedResult> => {
 
   validatedData.items = validatedData.items.map(fr => {
     fr.pubDate = fr.pubDate || new Date().toUTCString();
-    console.log(fr.title, fr.pubDate)
+    {/* console.log(fr.title, fr.pubDate) */ }
     return fr
   })
   return validatedData

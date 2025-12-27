@@ -17,10 +17,9 @@ export async function summarizeNewsPage(targetUrl: string, proxy: string, option
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BunParser/1.0)' }
     });
     const htmlString = await response.text();
-
     // 2. Parse with LinkeDOM
     const { document } = parseHTML(htmlString);
-
+    console.log({ document })
     // 3. Define the extraction logic
     const selector = 'h1, h2, h3, p, img, article, section';
     const elements = document.querySelectorAll(selector);
@@ -32,6 +31,15 @@ export async function summarizeNewsPage(targetUrl: string, proxy: string, option
       const tagName = el.tagName.toLowerCase();
 
       // Heading = New Section
+      // if (tagName.match(/^section$/)) {
+      //   if (currentSection.content.length > 0) summary.push(currentSection);
+      //   currentSection = {
+      //     title: el.textContent?.trim(),
+      //     level: 'h1',
+      //     content: []
+      //   };
+      // }
+      // else 
       if (tagName.match(/^h[1-6]$/)) {
         if (currentSection.content.length > 0) summary.push(currentSection);
         currentSection = {
@@ -68,7 +76,7 @@ export async function summarizeNewsPage(targetUrl: string, proxy: string, option
 
     // Final push
     summary.push(currentSection);
-
+    console.log({ summary })
     return summary;
 
   } catch (error) {

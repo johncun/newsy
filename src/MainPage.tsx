@@ -106,7 +106,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
         </div>
       </Show>
       <Show when={readerPageInfo()}>
-        <Reader value={readerPageInfo()} />
+        {!!readerPageInfo() && <Reader input={readerPageInfo()!} />}
       </Show>
 
       <div

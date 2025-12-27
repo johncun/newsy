@@ -1,16 +1,10 @@
 import { createEffect, For, Match, Switch } from "solid-js"
 import { Motion } from "solid-motionone"
 import { SvgCross } from "./svgs"
-import { ReaderInput, setReaderPageInfo } from "./signals"
+import { ReaderContent, ReaderInput, ReaderItem, setReaderPageInfo } from "./signals"
 import { animate } from "@motionone/dom";
 
-export type ReaderContent = {
-  title: string;
-  level: string;
-  content: any[]
-}
-
-const TextAndImages = (props: { data: ReaderContent }) => {
+const TextAndImages = (props: { data: ReaderItem }) => {
 
   return <>
     <Switch>
@@ -24,58 +18,78 @@ const TextAndImages = (props: { data: ReaderContent }) => {
         <div class="font-[Noto_Serif] text-md text-slate-900 text-center w-[80%] font-bold mb-2">{props.data.title!}</div>
       </Match>
     </Switch>
-    <For each={props.data.content}>{(sub) =>
+    <For each={props.data.content}>{(sub: ReaderContent) =>
       <Switch>
         <Match when={sub.type === "text"}><div class="font-[Noto_Serif] px-6 py-3 text-sm max-w-90 _text-justify _hyphens-auto 
-_indent-2.5">{sub.value}</div></Match>
-        <Match when={sub.type === "image"}><div class="flex flex-col items-center w-[90%] border border-slate-700/30 rounded-lg p-1 "><img src={sub.url} alt={sub.alt} /><div class="text-xs text-center">{sub.alt}</div></div></Match>
+_indent-2.5">{sub.type === "text" && sub.value}</div></Match>
+        <Match when={sub.type === "image"}>
+          {sub.type === 'image' &&
+            <div class="flex flex-col items-center w-[90%] border border-slate-700/30 rounded-lg p-1 ">
+              <img src={sub.url} alt={sub.alt} />
+              <div class="text-xs text-center">{sub.alt}</div>
+            </div>}
+        </Match>
       </Switch>
     }
     </For>
   </>
 }
 
-const Reader = (props: { value: ReaderInput | undefined }) => {
+const parseFromLevel = (input: ReaderInput, startLevel: number): ReaderItem[] | undefined => {
+  let tags = input.source.toUpperCase().startsWith('BBC') ? [`h${startLevel}`] : [1, 2, 3].slice(startLevel - 1).map(l => 'h' + l)
+  console.log({ tags })
+  const fs = input.items.filter(el => tags.includes(el.level) && el.title)
+  console.log({ fs });
 
-  if (!props.value) return <div>Oops!</div>
-  const parse = (): ReaderContent[] | undefined => {
-    let fs = parseFromLevel(1)
-    if (fs) return fs;
-    fs = parseFromLevel(2)
-    if (fs) return fs;
-    fs = parseFromLevel(3)
-    if (fs) return fs;
-    return undefined
-  }
+  if (!fs) return fs;
 
-  const parseFromLevel = (startLevel: number): ReaderContent[] | undefined => {
-    const tags = props.value?.source.toUpperCase().startsWith('BBC') ? [`h${startLevel}`] : [1, 2].slice(startLevel - 1).map(l => 'h' + l)
-    console.log(tags)
-    const fs = props.value?.items.filter(el => tags.includes(el.level) && el.title)
-    console.log({ fs });
+  const filterEmbeds = fs.flatMap(ri => {
 
-    if (!fs) return fs;
+    if (ri.title.indexOf('commentcancel') >= 0) return []
+    if (ri.title.indexOf('BBC is in multiple languages') >= 0) return []
+    if (ri.title.indexOf('More Sky Sites') >= 0) return []
+    if (ri.content.length === 0) return []
 
-    const filterEmbeds = fs.flatMap(f => {
-
-      if (f.title.indexOf('commentcancel') >= 0) return []
-      if (f.title.indexOf('BBC is in multiple languages') >= 0) return []
-      if (f.content.length === 0) return []
-
-      f.content = f.content.filter(({ alt }: { alt: string }) => alt !== "guardian.org")
-
-      const idx = f.content.findIndex((c: { type: string, value: string }) => {
-        return (c.type === "text" && (c.value.indexOf("embed this post,") >= 0 || c.value.indexOf("More on this story") >= 0))
-      })
-      if (idx === 0) return []
-      if (idx >= 0) {
-        return [{ ...f, content: f.content.splice(0, idx) }];
-      }
-      else return [f]
+    ri.content = ri.content.filter((rc: ReaderContent) => !(rc.type === 'image' && rc.alt === "guardian.org"))
+    console.log({ ri })
+    let itemIdx = ri.content.findIndex((rc: ReaderContent) => {
+      return (rc.type === "text" && (
+        rc.value.indexOf("embed this post,") >= 0 ||
+        rc.value.indexOf("Courtesy of Getty") >= 0 ||
+        rc.value.indexOf("Follow our channel") >= 0 ||
+        rc.value.indexOf("More on this story") >= 0))
     })
-    console.log({ filterEmbeds })
-    return filterEmbeds;
-  }
+    if (itemIdx >= 0) {
+      console.log('truncate items')
+
+      return [{ ...ri, content: ri.content.splice(0, itemIdx) }];
+    }
+    else return [ri]
+  })
+
+  console.log({ filterEmbeds })
+  return filterEmbeds;
+}
+
+const parse = (input: ReaderInput): ReaderItem[] | undefined => {
+  console.log({ input })
+  console.log('parsing level 1')
+  let fs = parseFromLevel(input, 1)
+  if (fs) return fs;
+  console.log('parsing level 2')
+  fs = parseFromLevel(input, 2)
+  if (fs) return fs;
+  console.log('parsing level 3')
+  fs = parseFromLevel(input, 3)
+  if (fs) return fs;
+  return undefined
+}
+
+
+
+const Reader = (props: { input: ReaderInput }) => {
+
+  if (!props.input) return <div>Oops!</div>
 
   let elRef!: HTMLDivElement;
 
@@ -99,14 +113,14 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
       '_blank',
       'noopener,noreferrer')
   }
-  const parsedData = () => parse() || []
+  const parsedData = () => parse(props.input) || []
 
-  const noImageInContent = () => !parsedData().find((rc: ReaderContent) => rc.content.find(c => c.type === "image"))
+  const noImageInContent = () => !parsedData().find((rc: ReaderItem) => rc.content.find(c => c.type === "image"))
 
   createEffect(() => {
     console.log({ none: noImageInContent(), parsed: parsedData() })
     if (parsedData().length === 0) {
-      open(props?.value?.link || '')
+      open(props.input.link || '')
       setTimeout(() => setReaderPageInfo(undefined), 2000)
     }
   })
@@ -119,11 +133,11 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
         <SvgCross fill="#242424" />
       </div >
       <div class="absolute inset-x-0 top-0 h-10 text-xs w-full px-4 flex items-center ">
-        <div onClick={() => open(props?.value?.link || '')}>Source: <a class={props.value?.link}>{props.value?.source}</a></div>
+        <div onClick={() => open(props.input.link || '')}>Source: <a class={props.input.link}>{props.input.source}</a></div>
       </div>
       <div class="absolute inset-x-0 top-10 bottom-0 overflow-y-auto">
         <div class="flex flex-col items-center w-full p-4">
-          {noImageInContent() ? <img class="w-[80%] mb-4 p-2 border border-slate-600 rounded-md" src={props.value?.backupImage} /> : null}
+          {noImageInContent() ? <img class="w-[80%] mb-4 p-2 border border-slate-600 rounded-md" src={props.input.backupImage} /> : null}
           <For each={parsedData()}>
             {rc => {
               return <>

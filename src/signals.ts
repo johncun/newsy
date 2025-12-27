@@ -9,11 +9,33 @@ export const [selectedGuid, setSelectedGuid] = createSignal('')
 
 export const [showOptions, setShowOptions] = createSignal(false)
 export const [menuGuid, setMenuGuid] = createSignal<string>('')
+
+export type ReaderText = {
+  type: 'text';
+  value: string;
+}
+
+export type ReaderImage = {
+  type: 'image';
+  url: string;
+  alt: string;
+}
+
+export type ReaderItem = {
+  title: string;
+  level: string;
+  content: ReaderContent[]
+}
+
+
+export type ReaderContent = ReaderImage | ReaderText;
+
+
 export type ReaderInput = {
   source: string,
   link: string,
   backupImage: string,
-  items: any[]
+  items: ReaderItem[]
 }
 export const [readerPageInfo, setReaderPageInfo] = createSignal<ReaderInput | undefined>();
 
