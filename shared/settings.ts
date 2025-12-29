@@ -5,15 +5,15 @@ import { SourceRecord, SourceRecordSchema } from "./feed-types";
 
 
 export const SettingsSchema = z.object({
-  username: z.string().min(1),
-  notifications: z.boolean(),
+  maxFeedsPerRequest: z.enum(["10", "25", "50", "100"]),
+  maxLookbackTime: z.enum(["1", "2", "5", "8", "24", "48", "240"]),
   theme: z.enum(["Light", "Dark", "System"]),
   feeds: z.array(SourceRecordSchema),
+  temp: z.boolean()
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
 
-// UI Blueprint Type
 export type SettingItem = {
   id: keyof Settings;
   label: string;
@@ -24,13 +24,13 @@ export type SettingItem = {
 };
 
 const DEFAULTS: Settings = {
-  username: "Guest",
-  notifications: true,
+  temp: false,
   theme: "System",
+  maxFeedsPerRequest: "50",
+  maxLookbackTime: "1",
   feeds: DEFAULT_FEED_URLS
 };
 
-// 2. Store & Persistence
 const loadSettings = (): Settings => {
   const saved = localStorage.getItem(SETTINGS_KEY);
   if (!saved) return DEFAULTS;

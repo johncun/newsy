@@ -95,19 +95,22 @@ const FeedItemToNewRecord = (item: FeedItem): ArticleRecord => {
 export const getArticleByGuid = (guid: string): ArticleRecord | undefined =>
   memData().find(a => a.guid === guid) || undefined
 
-export const refreshDbWithFeedItems = (items: FeedItems): void => {
-  if (items.length === 0) return
-
-  const allGuids = new Set(memData().map(it => it.guid))
+export const allGuids = (): Set<string> => {
+  const guids = new Set(memData().map(it => it.guid))
   if (killedList()) {
     Object.keys(killedList()).forEach(k => {
-      allGuids.add(k)
+      guids.add(k)
     })
   }
+  return guids
+}
+export const refreshDbWithFeedItems = (items: FeedItems): void => {
+  if (items.length === 0) return
+  const guids = allGuids()
 
   const newRecords: ArticleRecord[] = items
     .map(FeedItemToNewRecord)
-    .filter((record: ArticleRecord) => !allGuids.has(record.guid))
+    .filter((record: ArticleRecord) => !guids.has(record.guid))
 
   if (newRecords.length === 0) return
 
@@ -190,7 +193,7 @@ export const killArticles = (guids: string[]) => {
 
   setMemData(mds => {
     return mds.flatMap(a => {
-      if (toKills.has(a.guid) && !ks[a.guid]) {
+      if (toKills.has(a.guid)) {
         ks[a.guid] = { time: Date.now() }
         return []
       } else return [a]

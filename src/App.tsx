@@ -16,7 +16,7 @@ import {
 } from './signals'
 import IntroScreen from './IntroScreen'
 import MainPage from './MainPage'
-import { autoClearKills } from './db'
+import { allGuids, autoClearKills } from './db'
 
 const fetchItems = async (): Promise<FeedResult> => {
   const response = await fetch('/api/selectedFeeds', {
@@ -26,7 +26,9 @@ const fetchItems = async (): Promise<FeedResult> => {
     },
     body: JSON.stringify({
       sources: settings.feeds,
-      maxPerRequest: 20,
+      maxPerRequest: +settings.maxFeedsPerRequest,
+      maxLookbackTime: +settings.maxLookbackTime,
+      alreadyKnown: [...allGuids()]
     }),
   })
   if (!response.ok) {
@@ -68,7 +70,7 @@ const App: any = () => {
     />
     <Switch fallback={<MainPage feed={feed} />}>
       <Match when={startup()}>
-        <IntroScreen onComplete={() => setStartup(false)} />
+        <IntroScreen />
       </Match>
     </Switch>
   </ErrorBoundary >

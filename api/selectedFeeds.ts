@@ -17,15 +17,62 @@ export default async function handler(
   }
 
   try {
-    const { sources, maxPerRequest } = FeedRequestSchema.parse(request.body)
+    const { sources, maxPerRequest, maxLookbackTime, alreadyKnown } = FeedRequestSchema.parse(request.body)
 
     const allFeeds = await Promise.all(
       sources.map(feed => parseRSSFeed(feed.url, feed.name)),
     )
 
+    const withinLookback = (a: FeedItem): boolean => {
+      if (!a.pubDate) return false;
+      const now = Date.now()
+      const pub = new Date(a.pubDate).getTime()
+      return (now - pub) < (maxLookbackTime * 3600 * 1000)
+    }
+
+    const knowns = new Set(alreadyKnown || [])
+
     const allItems: FeedItem[] = allFeeds
       .flat()
       .filter(item => item.title && item.link)
+      .filter(withinLookback)
+      .filter(f => !knowns.has(f.guid))
+
+    console.log({ knowns: knowns.size, allFeeds: allFeeds.flat().length, allItems: allItems.length })
+
+
+    let results = allItems
+
+    const cappedAmount = Math.min(maxPerRequest, allItems.length)
+
+    if (cappedAmount >= maxPerRequest) {
+      const feedsMapped = allItems.reduce(
+        (prev, it) => {
+          return { ...prev, [it.source]: [...(prev[it.source] || []), it] }
+        },
+        {} as { [key: string]: FeedItem[] },
+      )
+
+      const voting: VotingItem[] = sources.map(src => ({
+        name: src.name,
+        n: src.votes,
+      }))
+
+      const spread = distributeWeight(voting, cappedAmount)
+
+      console.log({ cappedAmount, voting, spread })
+
+      results = spread.reduce((prev, weight) => {
+        return [...prev, ...(feedsMapped[weight.name]?.slice(0, weight.n) || [])]
+      }, [] as FeedItems)
+    }
+
+    console.log({
+      results: results.map(f => ({ s: f.source })),
+    })
+    console.log('total articles returned:', results.length)
+
+    const sortedResults = results
       .sort((a, b) => {
         const dateA = new Date(a.pubDate).getTime()
         const dateB = new Date(b.pubDate).getTime()
@@ -35,32 +82,8 @@ export default async function handler(
         return dateB - dateA
       })
 
-    const feedsMapped = allItems.reduce(
-      (prev, it) => {
-        return { ...prev, [it.source]: [...(prev[it.source] || []), it] }
-      },
-      {} as { [key: string]: FeedItem[] },
-    )
-
-    const voting: VotingItem[] = sources.map(src => ({
-      name: src.name,
-      n: src.votes,
-    }))
-    const cappedAmount = Math.min(maxPerRequest, allItems.length)
-
-    const spread = distributeWeight(voting, cappedAmount)
-    console.log({ cappedAmount, voting, spread })
-
-    const results = spread.reduce((prev, weight) => {
-      return [...prev, ...(feedsMapped[weight.name]?.slice(0, weight.n) || [])]
-    }, [] as FeedItems)
-    console.log({
-      results: results.map(f => ({ s: f.source })),
-    })
-    console.log('total articles returned:', results.length)
-
     const result: FeedResult = {
-      items: results,
+      items: sortedResults,
       count: results.length,
       sources: sources.map(src => src.name),
       lastUpdated: new Date().toISOString(),

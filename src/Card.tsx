@@ -2,8 +2,7 @@ import { createEffect, createSignal, Match, onMount, Switch } from 'solid-js'
 import { FeedItem } from '@shared/feed-types'
 import { animate } from 'animejs'
 
-import { mode, selectedGuid, setSelectedGuid } from './signals'
-import { getAllByState, memData } from './db'
+import { mode, selectedGuid, } from './signals'
 import CardStyleLarge from './CardStyleLarge'
 import CardStyleThin from './CardStyleThin'
 import { hashToBoolean } from './common'
@@ -18,7 +17,7 @@ const Card = (props: {
 }) => {
   let elRef!: HTMLDivElement
 
-  const getNextGuid = getAllByState(mode())(memData())[props.index]?.guid || ''
+  {/* const getNextGuid = getAllByState(mode())(memData())[props.index]?.guid || '' */ }
 
   const leftText = (): Action => {
     return (
@@ -49,7 +48,7 @@ const Card = (props: {
       complete: () => {
         setIsDying(true)
         setTimeout(() => {
-          setSelectedGuid(getNextGuid)
+          {/* setSelectedGuid(getNextGuid) */ }
           props.onSwipeLeft(props.data.guid, rightText())
         }, 200)
       },
@@ -62,7 +61,7 @@ const Card = (props: {
       complete: () => {
         setIsDying(true)
         setTimeout(() => {
-          setSelectedGuid(getNextGuid)
+
           props.onSwipeRight(props.data.guid, leftText())
         }, 200)
       },

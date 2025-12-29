@@ -28,7 +28,7 @@ type SectionItem = {
   content: ContentItem[]
 }
 
-export async function summarizeNewsPage(targetUrl: string, proxy: string, options: ReaderOptions = DEFAULT_OPTS): Promise<SectionItem[]> {
+export async function summarizeNewsPage(targetUrl: string, proxy: string, _options: ReaderOptions = DEFAULT_OPTS): Promise<SectionItem[]> {
   console.log(`Reader fetching: ${targetUrl}...`);
   try {
     const response = await fetch(`${proxy}?url=${encodeURIComponent(targetUrl)}`, {

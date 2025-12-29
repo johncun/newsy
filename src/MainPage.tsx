@@ -1,6 +1,6 @@
 import { FeedResult } from "@shared/feed-types"
 import { createEffect, createSignal, onMount, Resource, Show } from "solid-js"
-import { getAllByState, memData, refreshDbWithFeedItems } from "./db"
+import { memData, refreshDbWithFeedItems } from "./db"
 import { Meta } from "@solidjs/meta"
 import { Presence, Motion } from "solid-motionone"
 import Banner from "./Banner"
@@ -22,16 +22,6 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
     {/* console.log('Fetched items:', props.feed()?.count) */ }
 
     refreshDbWithFeedItems(props.feed()?.items || [])
-
-    const md = memData()
-
-    {/* console.log('total items:', md.length) */ }
-    {/* console.log('total LIVE items:', getAllByState('live')(md).length) */ }
-    {/* console.log( */ }
-    {/*   getAllByState('saved')(md) */ }
-    {/*     .map(it => it.guid) */ }
-    {/*     .join(' '), */ }
-    {/* ) */ }
 
     setIsFetching(false)
   })

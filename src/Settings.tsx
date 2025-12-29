@@ -1,5 +1,5 @@
 import { createSignal, For } from "solid-js";
-import { settings, updateSetting, feedActions, SettingItem } from "@shared/settings";
+import { settings, updateSetting, feedActions, SettingItem, Settings } from "@shared/settings";
 import { status } from "@src/_git_commit"
 import LegalModal from "./LegalModal";
 
@@ -36,13 +36,12 @@ const InputRenderer = (props: { item: SettingItem }) => {
           type="text"
           value={settings[id] as string}
           class="border-b border-gray-400 text-right w-24 outline-none focus:border-blue-500 text-gray-100"
-          onInput={(e) => updateSetting(id, e.currentTarget.value)}
+          onInput={(e) => updateSetting(id, e.currentTarget.value as Settings[typeof id])}
         />
       );
   }
 };
 
-// 2. Internal Component: The Layout Row
 const SettingRow = (props: { item: SettingItem }) => (
   <div class="p-4 ">
     <div class="flex justify-between items-start">
@@ -58,13 +57,21 @@ const SettingRow = (props: { item: SettingItem }) => (
   </div>
 );
 
-// 3. Main Export
 export const SettingsPage = () => {
   const [search, setSearch] = createSignal("");
 
   const menuItems: SettingItem[] = [
-    // { id: "username", label: "Profile Name", desc: "Display name", help: "Publicly visible.", type: "text" },
-    // { id: "notifications", label: "Alerts", desc: "Push notifications", help: "Requires system permission.", type: "toggle" },
+    {
+      id: "maxFeedsPerRequest", label: "Max stories per refresh", desc: "Maximum stories to return on eaxch refresh",
+      help: "This will control how quick the response is and how many new stories are added for your viewing each time.",
+      type: "select", options: ["10", "25", "50", "100"]
+    },
+    {
+      id: "maxLookbackTime", label: "Oldest story time per refresh in hours", desc: "Will not return stories older than this",
+      help: "Helps keep your live stories manageable",
+      type: "select", options: ["1", "2", "5", "8", "24", "48", "240"]
+    },
+    // { id: "temp", label: "Alerts", desc: "Push notifications", help: "Requires system permission.", type: "toggle" },
     // { id: "theme", label: "Theme", desc: "App appearance", help: "Dark mode saves battery.", type: "select", options: ["Light", "Dark", "System"] },
   ];
 

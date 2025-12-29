@@ -48,7 +48,9 @@ export type FeedDef = z.infer<typeof FeedDef>
 
 export const FeedRequestSchema = z.object({
   sources: FeedDef,
-  maxPerRequest: z.number().int().positive().max(30),
+  maxPerRequest: z.number().int().positive().max(100),
+  maxLookbackTime: z.number().int().positive(),
+  alreadyKnown: z.array(z.string()).optional()
 })
 
 export type FeedRequestBody = z.infer<typeof FeedRequestSchema>

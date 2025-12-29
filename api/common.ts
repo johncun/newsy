@@ -130,7 +130,7 @@ export async function parseRSSFeed(
 
     const feedItems: FeedItem[] = []
 
-    for (let i = 0; i < Math.min(items.length, 20); i++) {
+    for (let i = 0; i < Math.min(items.length, 60); i++) {
       const itemText = items[i]
       const title = decode(parseXMLElement(itemText, 'title'))
       const description = decode(parseXMLElement(itemText, 'description'))
@@ -174,8 +174,59 @@ export interface VotingItem {
   name: string
   n: number
 }
-
 export function distributeWeight(list: VotingItem[], M: number): VotingItem[] {
+  const count = list.length;
+  if (count === 0) return [];
+
+  // If M is less than the number of items, we can't give everyone 1 vote.
+  // Depending on your requirements, you might throw an error or cap at M.
+  if (M < count) {
+    return list.map((item, i) => ({ ...item, n: i < M ? 1 : 0 }));
+  }
+
+  const totalWeight = list.reduce((sum, item) => sum + item.n, 0);
+
+  // If no weights are provided, distribute M as evenly as possible
+  if (totalWeight === 0) {
+    const base = Math.floor(M / count);
+    let extra = M % count;
+    return list.map((item, i) => ({
+      ...item,
+      n: i < extra ? base + 1 : base,
+    }));
+  }
+
+  // 1. Reserve 1 vote for every item
+  const remainingM = M - count;
+
+  // 2. Distribute the remaining votes proportionally
+  const shares = list.map(item => {
+    const quota = (item.n / totalWeight) * remainingM;
+    return {
+      item,
+      base: 1 + Math.floor(quota), // 1 (guaranteed) + floor of proportional share
+      remainder: quota - Math.floor(quota),
+    };
+  });
+
+  // 3. Address rounding errors by distributing leftover votes to highest remainders
+  const distributedSoFar = shares.reduce((sum, s) => sum + s.base, 0);
+  let leftover = M - distributedSoFar;
+
+  if (leftover > 0) {
+    // Sort by the fractional remainder descending
+    const sortedByRemainder = [...shares].sort((a, b) => b.remainder - a.remainder);
+    for (let i = 0; i < leftover; i++) {
+      sortedByRemainder[i].base += 1;
+    }
+  }
+
+  return shares.map(s => ({
+    ...s.item,
+    n: s.base,
+  }));
+}
+export function __old_distributeWeight(list: VotingItem[], M: number): VotingItem[] {
   if (list.length === 0) return []
   if (M < list.length) return list.map(item => ({ ...item, n: 0 }))
 
