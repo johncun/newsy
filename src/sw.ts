@@ -19,9 +19,9 @@ self.addEventListener('fetch', (event: any) => {
 
 async function handleNewsExtraction(targetUrl: string) {
   try {
-
+    console.log('handleNewsExtraction', targetUrl);
     const summary = await summarizeNewsPage(targetUrl, '/api/proxy');
-    // console.log({ summary })
+    console.log({ summary })
     return new Response(JSON.stringify(summary, null, 2),
       {
         headers: { 'Content-Type': 'application/json' }

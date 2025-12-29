@@ -19,19 +19,19 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
     if (props.feed.error) {
       console.error('Error loading or validating API data:', props.feed.error)
     }
-    console.log('Fetched items:', props.feed()?.count)
+    {/* console.log('Fetched items:', props.feed()?.count) */ }
 
     refreshDbWithFeedItems(props.feed()?.items || [])
 
     const md = memData()
 
-    console.log('total items:', md.length)
-    console.log('total LIVE items:', getAllByState('live')(md).length)
-    console.log(
-      getAllByState('saved')(md)
-        .map(it => it.guid)
-        .join(' '),
-    )
+    {/* console.log('total items:', md.length) */ }
+    {/* console.log('total LIVE items:', getAllByState('live')(md).length) */ }
+    {/* console.log( */ }
+    {/*   getAllByState('saved')(md) */ }
+    {/*     .map(it => it.guid) */ }
+    {/*     .join(' '), */ }
+    {/* ) */ }
 
     setIsFetching(false)
   })

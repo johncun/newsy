@@ -81,7 +81,7 @@ export const saveAllToLocal = (
   md: ArticleRecords,
   kills: KilledItemMap,
 ): void => {
-  console.log('saving to local', { data: md, kills })
+  // console.log('saving to local', { data: md, kills })
   localStorage.setItem(STORAGE_KEY, JSON.stringify(md))
   localStorage.setItem(STORAGE_KILLS, JSON.stringify(kills))
 }

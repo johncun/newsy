@@ -2,7 +2,7 @@ export default async function handler(req: any, res: any) {
   const { url } = req.query;
 
   if (!url) return res.status(400).send("No URL provided");
-
+  console.log('proxy', { url })
   try {
     const response = await fetch(decodeURIComponent(url));
     const contentType = response.headers.get("content-type");

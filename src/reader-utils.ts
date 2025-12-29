@@ -1,5 +1,6 @@
 import { parseHTML } from 'linkedom';
 
+
 export type ReaderOptions = {
   ignorePlaceholderImages: boolean
 }
@@ -8,16 +9,33 @@ const DEFAULT_OPTS: ReaderOptions = {
   ignorePlaceholderImages: true
 }
 
+type ContentText = {
+  type: 'text';
+  value: string;
+}
 
-export async function summarizeNewsPage(targetUrl: string, proxy: string, options: ReaderOptions = DEFAULT_OPTS) {
+type ContentImage = {
+  type: 'image';
+  url: string;
+  alt: string;
+}
+
+type ContentItem = ContentText | ContentImage;
+
+type SectionItem = {
+  title: string;
+  level: string;
+  content: ContentItem[]
+}
+
+export async function summarizeNewsPage(targetUrl: string, proxy: string, options: ReaderOptions = DEFAULT_OPTS): Promise<SectionItem[]> {
   console.log(`Reader fetching: ${targetUrl}...`);
-
   try {
     const response = await fetch(`${proxy}?url=${encodeURIComponent(targetUrl)}`, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BunParser/1.0)' }
     });
     const htmlString = await response.text();
-
+    console.log(htmlString)
     // 2. Parse with LinkeDOM
     const { document } = parseHTML(htmlString);
 
@@ -25,37 +43,60 @@ export async function summarizeNewsPage(targetUrl: string, proxy: string, option
     const selector = 'h1, h2, h3, p, img, article, section';
     const elements = document.querySelectorAll(selector);
 
-    const summary: any[] = [];
-    let currentSection: any = { title: 'Lead', content: [] };
+    const summary: SectionItem[] = [];
+    let currentSection: SectionItem = { title: '', level: '', content: [] }
 
     elements.forEach((el: any) => {
       const tagName = el.tagName.toLowerCase();
+      console.log({ tagName })
 
       // Heading = New Section
       if (tagName.match(/^h[1-6]$/)) {
-        if (currentSection.content.length > 0) summary.push(currentSection);
-        currentSection = {
-          title: el.textContent?.trim(),
-          level: tagName,
-          content: []
-        };
+
+        const title = el.textContent?.trim() || ''
+        const lctitle = title.toLowerCase()
+        console.log(`----------- section found  tagName=${tagName} title=${el.textContent}`)
+        if (!currentSection.title) {
+          currentSection.title = title
+          currentSection.level = tagName
+        }
+        else {
+          if (!lctitle.startsWith('sign up ') &&
+            !lctitle.startsWith('contact ') &&
+            !lctitle.startsWith('follow ')) {
+          }
+          summary.push(currentSection)
+          console.log('----------- section ENDED')
+
+          currentSection = {
+            title,
+            level: tagName,
+            content: []
+          };
+        }
+
       }
-      // Text
       else if (tagName === 'p') {
         const text = el.textContent?.trim();
-        if (text && text.length > 30) {
+        console.log({ tag: 'p', text, currentSection })
+        if (currentSection.title && text && text.length > 3) {
+          console.log(`            <p>    ${text}`)
           currentSection.content.push({ type: 'text', value: text });
+          console.log(`currentSection "${currentSection.level}" has content length ${currentSection.content.length}`);
         }
       }
-      // Images (converting relative to absolute)
       else if (tagName === 'img') {
         const src = el.getAttribute('src');
+        console.log(`            <img>  ${src}`)
         if (src) {
-          const absoluteUrl = new URL(src, targetUrl).href;
-          if (options.ignorePlaceholderImages && src.indexOf('placeholder') >= 0) {
+          if (src.indexOf('placeholder') >= 0
+            || src.indexOf('advert') >= 0
+          ) {
             console.log(`skipping ${src} as placeholder likely`);
           }
           else {
+            const absoluteUrl = new URL(src, targetUrl).href;
+            console.log(`                alt=${el.getAttribute('alt')}`)
             currentSection.content.push({
               type: 'image',
               url: absoluteUrl,
@@ -67,12 +108,15 @@ export async function summarizeNewsPage(targetUrl: string, proxy: string, option
     });
 
     // Final push
-    summary.push(currentSection);
-
+    if (currentSection.title && currentSection.content.length > 0) {
+      console.log('----------- section ENDED')
+      summary.push(currentSection)
+    }
     return summary;
 
   } catch (error) {
     console.error("Failed to parse page:", error);
+    throw error;
   }
 }
 

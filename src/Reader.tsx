@@ -11,6 +11,36 @@ export type ReaderContent = {
 }
 
 const TextAndImages = (props: { data: ReaderContent }) => {
+  const okImageSrc = (url: string, alt: string) => {
+    if (url.endsWith('jpg') && !url.includes('rte.ie')) return false
+    if (url.endsWith('jpeg')) return false
+    if (url.endsWith('svg')) return false
+    if (url.endsWith('png')) return false
+    if (alt === "sky news logo") return false
+    if (alt === "") return false
+    if (url.indexOf('rte.ie/djs') >= 0) return false
+    return true
+
+
+  }
+
+  const okTitle = () => {
+    const t = props.data.title
+    if (t.toLowerCase().startsWith("more on ")) return false;
+    if (t.toLowerCase().startsWith("related topics")) return false;
+    if (t.toLowerCase().startsWith("more sky sites")) return false;
+    return true
+  }
+
+  if (!okTitle()) return null
+
+  const okText = (sub: any) => {
+    if (sub.type === 'text' && sub.value.toLowerCase() === 'our apps') return false
+    if (sub.type === 'text' && sub.value.includes('©')) return false
+    if (sub.type === 'text' && sub.value.toLowerCase().includes('read more from')) return false
+    if (sub.type === 'text' && sub.value.toLowerCase().includes('images courtesy')) return false
+    return true
+  }
 
   return <>
     <Switch>
@@ -24,13 +54,20 @@ const TextAndImages = (props: { data: ReaderContent }) => {
         <div class="font-[Noto_Serif] text-md text-slate-900 text-center w-[80%] font-bold mb-2">{props.data.title!}</div>
       </Match>
     </Switch>
-    <For each={props.data.content}>{(sub) =>
-      <Switch>
-        <Match when={sub.type === "text"}><div class="font-[Noto_Serif] px-6 py-3 text-sm max-w-90 _text-justify _hyphens-auto 
-_indent-2.5">{sub.value}</div></Match>
-        <Match when={sub.type === "image"}><div class="flex flex-col items-center w-[90%] border border-slate-700/30 rounded-lg p-1 "><img src={sub.url} alt={sub.alt} /><div class="text-xs text-center">{sub.alt}</div></div></Match>
-      </Switch>
-    }
+    <For each={props.data.content}>{(sub) => {
+      return okText(sub) &&
+        <Switch>
+          <Match when={sub.type === "text"}>
+            <div class="font-[Noto_Serif] px-6 py-3 text-sm max-w-90 _text-justify _hyphens-auto _indent-2.5">{sub.value}</div>
+          </Match>
+          <Match when={sub.type === "image" && okImageSrc(sub.url, sub.alt)}>
+            <div class="flex flex-col items-center w-[90%] border border-slate-700/30 rounded-lg p-1 ">
+              <img src={sub.url} alt={sub.alt} />
+              {/* <div class="text-xs text-center">{sub.alt}</div> */}
+            </div>
+          </Match>
+        </Switch>
+    }}
     </For>
   </>
 }
@@ -49,7 +86,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
   }
 
   const parseFromLevel = (startLevel: number): ReaderContent[] | undefined => {
-    const tags = props.value?.source.toUpperCase().startsWith('BBC') ? [`h${startLevel}`] : [1, 2].slice(startLevel - 1).map(l => 'h' + l)
+    const tags = props.value?.source.toUpperCase().startsWith('BBC') ? [`h${startLevel}`] : [1, 2, 3].slice(startLevel - 1).map(l => 'h' + l)
     console.log(tags)
     const fs = props.value?.items.filter(el => tags.includes(el.level) && el.title)
     console.log({ fs });
@@ -69,7 +106,8 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
       })
       if (idx === 0) return []
       if (idx >= 0) {
-        return [{ ...f, content: f.content.splice(0, idx) }];
+        console.log('found embed...', { idx });
+        return [{ ...f, content: f.content.slice(0, idx) }];
       }
       else return [f]
     })
