@@ -12,6 +12,7 @@ import UpdateToast from "./UpdateToast"
 import OptionMenuItems from "./OptionMenuItems"
 import List from "./List"
 import Reader from "./Reader"
+import { useOrientationDetector } from "./OrientationDetector"
 
 const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
@@ -56,12 +57,15 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
     }
   })
 
+  const [isLandscape] = useOrientationDetector()
+
   createEffect(() => {
     if (mode() && scrollRef) {
       scrollRef.scrollTop = 0
     }
   })
 
+  createEffect(() => console.log(`isLandscape: ${isLandscape()}`))
   const toTop = () => {
     if (!scrollRef) return
     scrollRef.scrollTo({ top: 0, behavior: 'smooth' })
@@ -87,7 +91,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
   })
 
   return (
-    <>
+    <Show when={isLandscape() === true || isLandscape() === false}>
       <Meta name="mobile-web-app-capable" content="yes" />
       <Meta name="apple-mobile-web-app-capable" content="yes" />
       <Meta
@@ -172,7 +176,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
         )}
       </Presence>
       <UpdateToast />
-    </>
+    </Show>
   )
 }
 
