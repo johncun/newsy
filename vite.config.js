@@ -26,20 +26,27 @@ export default defineConfig({
         name: 'Cuisle',
         short_name: 'Cuisle',
         description: 'Modern news reader',
-        icons: [
-          {
-            src: 'android-chrome-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable',
-          },
-          {
-            src: 'android-chrome-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable',
-          },
-        ],
+        icons:
+          [
+            {
+              "purpose": "maskable",
+              "sizes": "640x640",
+              "src": "maskable_icon.png",
+              "type": "image/png"
+            },
+            {
+              "purpose": "maskable",
+              "sizes": "192x192",
+              "src": "maskable_icon_x192.png",
+              "type": "image/png"
+            },
+            {
+              "purpose": "maskable",
+              "sizes": "512x512",
+              "src": "maskable_icon_x512.png",
+              "type": "image/png"
+            }
+          ],
         display: 'standalone',
         theme_color: '#120a0a',
         background_color: '#120a0a',
