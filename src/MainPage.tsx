@@ -90,6 +90,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
     }
   })
 
+
   return (
     <Show when={isLandscape() === true || isLandscape() === false}>
       <Meta name="mobile-web-app-capable" content="yes" />
