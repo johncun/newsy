@@ -45,25 +45,26 @@ const TextAndImages = (props: { data: ReaderContent }) => {
   return <>
     <Switch>
       <Match when={props.data.level === 'h1'}>
-        <div class="font-[Noto_Serif] text-2xl text-slate-900 text-center font-bold mb-4">{props.data.title!}</div>
+        <div class="font-[Noto_Serif] font-normal text-[#7180a4] text-2xl text-center mb-4">{props.data.title!}</div>
       </Match>
       <Match when={props.data.level === 'h2'}>
-        <div class="font-[Noto_Serif] text-xl text-slate-900 text-center w-[90%] font-bold mb-3">{props.data.title!}</div>
+        <div class="font-[Noto_Serif] font-normal border-t border-t-slate-500 text-[#7180a4] text-lg text-center w-[80%] mt-3">{props.data.title!}</div>
       </Match>
       <Match when={props.data.level === 'h3'}>
-        <div class="font-[Noto_Serif] text-md text-slate-900 text-center w-[80%] font-bold mb-2">{props.data.title!}</div>
+        <div class="font-[Noto_Serif] font-normal text-md text-[#7180a4] text-center w-[70%] mb-2">{props.data.title!}</div>
       </Match>
     </Switch>
     <For each={props.data.content}>{(sub) => {
       return okText(sub) &&
         <Switch>
           <Match when={sub.type === "text"}>
-            <div class="font-[Noto_Serif] px-6 py-3 text-sm max-w-90 _text-justify _hyphens-auto _indent-2.5">{sub.value}</div>
+            <div class={`font-[Nunito_Sans] first:border-t first:border-t-slate-500 ${sub.value.length < 30 ? 'font-bold' : 'font-light'} 
+                px-6 py-3 text-sm max-w-90 _text-justify _hyphens-auto _indent-2.5`}>{sub.value}</div>
           </Match>
           <Match when={sub.type === "image" && okImageSrc(sub.url, sub.alt)}>
-            <div class="flex flex-col items-center w-[90%] border border-slate-700/30 rounded-lg p-1 ">
+            <div class="flex flex-col items-center w-[90%] border border-slate-700/10 rounded-lg p-3">
               <img src={sub.url} alt={sub.alt} />
-              {/* <div class="text-xs text-center">{sub.alt}</div> */}
+              <div class="text-xs text-center">{sub.alt}</div>
             </div>
           </Match>
         </Switch>
@@ -95,7 +96,9 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
     const filterEmbeds = fs.flatMap(f => {
 
+      if (f.title.indexOf('Report: ') >= 0) return []
       if (f.title.indexOf('commentcancel') >= 0) return []
+      if (f.title.indexOf('@') >= 0) return []
       if (f.title.indexOf('BBC is in multiple languages') >= 0) return []
       if (f.content.length === 0) return []
 
@@ -112,7 +115,18 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
       else return [f]
     })
     console.log({ filterEmbeds })
-    return filterEmbeds;
+
+    const tidx = filterEmbeds.findIndex(({ title }) => {
+      const lt = title.toLowerCase()
+      return lt.includes("embed this post,") || lt.includes("more on this story") || lt.startsWith("more by ")
+    })
+
+    if (tidx >= 0) {
+      console.log('found embed in titles...', { tidx });
+      return filterEmbeds.slice(0, tidx);
+    }
+    else
+      return filterEmbeds;
   }
 
   let elRef!: HTMLDivElement;
@@ -152,7 +166,8 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
 
   return (
-    <Motion.div ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.8, easing: "ease-in-out" }} class="absolute inset-0 flex flex-col z-50 items-center opacity-0 p-4 bg-white text-zinc-800 overflow-hidden" >
+    <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
+      class="absolute inset-0 flex flex-col z-50 items-center opacity-0 p-4 bg-linear-to-br from-white via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden" >
       <div class="w-8 h-8 z-50 absolute right-2 top-2 bg-white rounded-full border border-slate-700 p-1" onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
         <SvgCross fill="#242424" />
       </div >

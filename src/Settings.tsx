@@ -1,4 +1,4 @@
-import { createSignal, For } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import { settings, updateSetting, feedActions, SettingItem, Settings } from "@shared/settings";
 import { status } from "@src/_git_commit"
 import LegalModal from "./LegalModal";
@@ -107,75 +107,76 @@ export const SettingsPage = () => {
 
         <For each={settings.feeds}>
           {(feed) => (
-            <div class="p-4 mb-4 border-b border-gray-100/20 w-full animate-fade-in flex flex-col items-start gap-1">
-              <div class="flex justify-between w-full gap-4">
+            <Show when={!search() || feed.name.toLowerCase().includes(search().toLowerCase())}>
+              <div class="p-4 mb-4 border-b border-gray-100/20 w-full animate-fade-in flex flex-col items-start gap-1">
+                <div class="flex justify-between w-full gap-4">
+                  <input
+                    class="border-b border-gray-400 flex-1 text-left outline-none focus:border-blue-500 text-gray-100"
+
+                    value={feed.name}
+                    onInput={(e) => feedActions.update(feed.id, { name: e.currentTarget.value })}
+                  />
+
+                  <div class="flex items-center ">
+                    <button
+                      onClick={() => feedActions.update(feed.id, { votes: Math.max(0, feed.votes - 1) })}
+                      class="w-6 h-6 p-1 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
+                    >
+                      <div><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
+                      </svg></div>
+                    </button>
+                    <span class="w-8 text-center text-md font-mono font-bold text-gray-100">
+                      {feed.votes}
+                    </span>
+                    <button
+                      onClick={() => feedActions.update(feed.id, { votes: feed.votes + 1 })}
+                      class="w-6 h-6 p-1 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
+                    >
+                      <div><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      </svg></div>
+                    </button>
+                  </div>
+                </div>
+
                 <input
-                  class="border-b border-gray-400 flex-1 text-left outline-none focus:border-blue-500 text-gray-100"
-
-                  value={feed.name}
-                  onInput={(e) => feedActions.update(feed.id, { name: e.currentTarget.value })}
+                  class="flex-1 w-full my-2 border-b border-gray-400 text-left outline-none focus:border-blue-500 text-gray-400 bg-transparent truncate"
+                  value={feed.url}
+                  onInput={(e) => feedActions.update(feed.id, { url: e.currentTarget.value })}
                 />
-
-                <div class="flex items-center ">
+                <div class="flex w-full gap-4 justify-between items-center">
                   <button
-                    onClick={() => feedActions.update(feed.id, { votes: Math.max(0, feed.votes - 1) })}
-                    class="w-6 h-6 p-1 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
+                    onClick={() => feedActions.test(feed.id, feed.url)}
+                    disabled={feed.status === "loading"}
+                    class={`rounded-md px-2 text-green-600 transition-all h-8 border ${feed.status === "success" ? "bg-green-50 border-green-200 text-green-600" :
+                      feed.status === "error" ? "bg-red-50 border-red-200 text-red-600" :
+                        "bg-gray-50 border-gray-200 text-gray-400 active:bg-gray-200"
+                      }`}
                   >
-                    <div><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
-                    </svg></div>
+                    {feed.status === "loading" ? "..." : feed.status === "success" ? "✓" : "Test"}
                   </button>
-                  <span class="w-8 text-center text-md font-mono font-bold text-gray-100">
-                    {feed.votes}
-                  </span>
                   <button
-                    onClick={() => feedActions.update(feed.id, { votes: feed.votes + 1 })}
-                    class="w-6 h-6 p-1 flex rounded-full border-gray-200 border items-center justify-center text-gray-200 font-bold active:bg-gray-200 "
+                    onClick={() => confirm("Delete feed?") && feedActions.remove(feed.id)}
+                    class="text-gray-300 rounded-full bg-red-600 w-8 h-8 p-2"
                   >
-                    <div><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg></div>
+                    <TrashIcon />
                   </button>
                 </div>
               </div>
-
-              <input
-                class="flex-1 w-full my-2 border-b border-gray-400 text-left outline-none focus:border-blue-500 text-gray-400 bg-transparent truncate"
-                value={feed.url}
-                onInput={(e) => feedActions.update(feed.id, { url: e.currentTarget.value })}
-              />
-              <div class="flex w-full gap-4 justify-between items-center">
-                <button
-                  onClick={() => feedActions.test(feed.id, feed.url)}
-                  disabled={feed.status === "loading"}
-                  class={`rounded-md px-2 text-green-600 transition-all h-8 border ${feed.status === "success" ? "bg-green-50 border-green-200 text-green-600" :
-                    feed.status === "error" ? "bg-red-50 border-red-200 text-red-600" :
-                      "bg-gray-50 border-gray-200 text-gray-400 active:bg-gray-200"
-                    }`}
-                >
-                  {feed.status === "loading" ? "..." : feed.status === "success" ? "✓" : "Test"}
-                </button>
-                <button
-                  onClick={() => confirm("Delete feed?") && feedActions.remove(feed.id)}
-                  class="text-gray-300 rounded-full bg-red-600 w-8 h-8 p-2"
-                >
-                  <TrashIcon />
-                </button>
-              </div>
-            </div>
-
+            </Show>
           )}
         </For>
       </div >

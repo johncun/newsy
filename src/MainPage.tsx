@@ -80,7 +80,9 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
       lastFetchTime = Date.now()
     }
     else {
-      if (Date.now() - lastFetchTime < 2000 && !readerPageInfo()) toTop()
+      setTimeout(() => {
+        if (Date.now() - lastFetchTime < 2000 && !readerPageInfo()) toTop()
+      }, 1000)
     }
   })
 
