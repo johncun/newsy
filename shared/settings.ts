@@ -9,7 +9,7 @@ export const SettingsSchema = z.object({
   maxLookbackTime: z.enum(["1", "2", "5", "8", "24", "48", "240"]),
   theme: z.enum(["Light", "Dark", "System"]),
   feeds: z.array(SourceRecordSchema),
-  temp: z.boolean()
+  fullMode: z.boolean()
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -24,7 +24,7 @@ export type SettingItem = {
 };
 
 const DEFAULTS: Settings = {
-  temp: false,
+  fullMode: false,
   theme: "System",
   maxFeedsPerRequest: "50",
   maxLookbackTime: "1",

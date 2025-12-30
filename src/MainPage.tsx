@@ -74,7 +74,15 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
       behavior: 'smooth',
     })
   }
-
+  let lastFetchTime = 0
+  createEffect(() => {
+    if (isFetching()) {
+      lastFetchTime = Date.now()
+    }
+    else {
+      if (Date.now() - lastFetchTime < 2000) toTop()
+    }
+  })
 
   return (
     <>
@@ -113,12 +121,12 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
       </div>
       <div
         ref={scrollRef}
-        class="absolute top-14 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll">
-        <div class="relative flex flex-col pt-2 pb-8 gap-4 items-center py-4">
-          <div ref={upSentinelRef} class="h-1 w-1"></div>
-          <List as={memData} mode={mode} />
-          <div ref={dnSentinelRef} class="h-1 w-1"></div>
-        </div>
+        class="absolute top-14 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll snap-y">
+        {/* <div class="relative flex flex-col pt-2 pb-8 gap-4 items-center py-4"> */}
+        <div ref={upSentinelRef} class="h-1 w-1"></div>
+        <List as={memData} mode={mode} />
+        <div ref={dnSentinelRef} class="h-1 w-1"></div>
+        {/* </div> */}
       </div>
       <Presence exitBeforeEnter>
         {menuGuid() && (

@@ -1,4 +1,4 @@
-import { createEffect, createSignal, Match, onMount, Switch } from 'solid-js'
+import { createEffect, createSignal, Match, onMount, Show, Switch } from 'solid-js'
 import { FeedItem } from '@shared/feed-types'
 import { animate } from 'animejs'
 
@@ -6,6 +6,8 @@ import { mode, selectedGuid, } from './signals'
 import CardStyleLarge from './CardStyleLarge'
 import CardStyleThin from './CardStyleThin'
 import { hashToBoolean } from './common'
+import { settings } from '@shared/settings'
+import CardStyleThreeQuarter from './CardStyleThreeQuarter'
 
 export type Action = 'Kill' | 'Save' | 'Delete' | ''
 
@@ -116,8 +118,8 @@ const Card = (props: {
     if (isSelected() && elRef) {
       elRef.scrollIntoView({
         behavior: "smooth", // "auto" for instant jump
-        block: "nearest",   // "start", "center", "end", or "nearest"
-        inline: "nearest"
+        block: "end",   // "start", "center", "end", or "nearest"
+        inline: "end"
       })
     }
   });
@@ -126,21 +128,27 @@ const Card = (props: {
     <div>Boom</div>
     : <div
       ref={elRef}
-      class={`swipe w-full bg-[#242424]`}>
-      <div class="w-[20vw] flex items-center justify-center">
+      class={`swipe w-full bg-[#242424] py-2 snap-start snap-always`}>
+      <div class="w-[20vw] flex items-center justify-center ">
         <div
           class={`flex items-center justify-center rounded-lg w-4/5 h-12 ${bgx(leftText(), 'bg-green-700')}`}>
           {leftText()}
         </div>
       </div>
 
-      <Switch fallback={
-        <CardStyleLarge isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
-      }>
-        <Match when={useThin()}>
-          <CardStyleThin isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
-        </Match>
-      </Switch>
+      <Show when={settings.fullMode}>
+        <CardStyleThreeQuarter isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
+      </Show>
+
+      <Show when={!settings.fullMode}>
+        <Switch fallback={
+          <CardStyleLarge isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
+        }>
+          <Match when={useThin()}>
+            <CardStyleThin isSelected={isSelected} data={props.data} index={props.index} swipeLeft={swipeLeft} swipeRight={swipeRight} />
+          </Match>
+        </Switch>
+      </Show>
 
       <div class="w-[20vw] flex items-center justify-center">
         <div

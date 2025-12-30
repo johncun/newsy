@@ -17,6 +17,7 @@ export type ReaderInput = {
 }
 export const [readerPageInfo, setReaderPageInfo] = createSignal<ReaderInput | undefined>();
 
+export const [tick, setTick] = createSignal(1)
 
 
 // export const [userSources, setUserSources] =

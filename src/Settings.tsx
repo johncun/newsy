@@ -71,6 +71,11 @@ export const SettingsPage = () => {
       help: "Helps keep your live stories manageable",
       type: "select", options: ["1", "2", "5", "8", "24", "48", "240"]
     },
+    {
+      id: "fullMode", label: "Shows news stories in 3/4 page mode", desc: "Allows swiping up to get to next story",
+      help: "",
+      type: "toggle"
+    },
     // { id: "temp", label: "Alerts", desc: "Push notifications", help: "Requires system permission.", type: "toggle" },
     // { id: "theme", label: "Theme", desc: "App appearance", help: "Dark mode saves battery.", type: "select", options: ["Light", "Dark", "System"] },
   ];

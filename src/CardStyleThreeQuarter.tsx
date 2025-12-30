@@ -15,7 +15,7 @@ const AnimatedBlackFade = () =>
 
 const Darken = () => <div class="absolute inset-0 bg-black/40" />
 
-const CardStyleLarge = (props: {
+const CardStyleThreeQuarter = (props: {
   isSelected: Accessor<boolean>,
   data: FeedItem
   index: number
@@ -23,10 +23,10 @@ const CardStyleLarge = (props: {
   swipeRight: () => void
 }) => {
   return <div
-    class="flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-lg p-2 min-h-60 relative overflow-hidden"
+    class="flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-lg p-2 min-h-[60vh] relative overflow-hidden"
     onClick={() => setSelectedGuid(props.isSelected() ? '' : props.data.guid)}>
     <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
-      <ImageFor data={props.data} isSelected={props.isSelected} />
+      <ImageFor data={props.data} isSelected={props.isSelected} blur={true} />
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
       <Darken />
 
@@ -39,7 +39,7 @@ const CardStyleLarge = (props: {
       <div
         id="title"
         class={`absolute font-bold font-[Noto_Serif] text-shadow-black/30 text-xl font-stretch-75% text-shadow-md
-        inset-x-0 mx-4 top-2 bottom-2 items-center justify-${props.isSelected() ? 'start' : 'center'} flex flex-col gap-1 rounded-xl p-2 ${props.isSelected() ? 'bg-black/0' : ''}`}>
+        inset-x-0 mx-4 top-2 bottom-2 items-center justify-${props.isSelected() ? 'center' : 'end'} flex flex-col gap-1 rounded-xl p-2 ${props.isSelected() ? 'bg-black/0' : ''}`}>
 
         <Title value={props.data.title} />
         <Byline value={props.data.description} />
@@ -72,10 +72,10 @@ const PublishedTime = (props: { value: string, tick: Accessor<number> }) =>
   </div>
 
 const Title = (props: { value: string }) =>
-  <div class="line-clamp-4 font-[Quicksand]">{props.value}</div>
+  <div class="font-[Quicksand]">{props.value}</div>
 
 const Byline = (props: { value: string }) =>
-  <p class="text-sm font-normal text-zinc-100/70 overflow-y-hidden line-clamp-2 text-left w-full">
+  <p class="text-sm font-normal text-zinc-100/70 overflow-y-hidden text-left w-full">
     {props.value}
   </p>
 
@@ -125,7 +125,7 @@ const ImageFor = (props: {
     <img
       src={props.data.image /*|| "/placeholder.svg"*/}
       alt={props.data.title}
-      class={`absolute inset-0 w-full h-full object-cover ${!props.isSelected() && props.blur ? 'blur-xs' : ''}`}
+      class={`absolute inset-0 w-full h-full object-cover ${props.blur ? 'blur-[4px]' : ''}`}
       onError={e => {
         const element = e.target as HTMLImageElement
         element.src = '/the-guardian-logo.jpg'
@@ -140,5 +140,5 @@ const ImageFor = (props: {
     />
 }
 
-export default CardStyleLarge
+export default CardStyleThreeQuarter
 

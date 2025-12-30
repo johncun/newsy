@@ -10,7 +10,7 @@ const List = (props: {
   mode: Accessor<ArticleState>
 }) => {
   const as = () =>
-    getAllByState(mode())(props.as())
+    [...getAllByState(mode())(props.as())]
       .sort((a, b) => {
         const dateA = new Date(a.pubDate).getTime()
         const dateB = new Date(b.pubDate).getTime()
@@ -30,15 +30,15 @@ const List = (props: {
   const swipeLeftAndSelect = (guid: string, action: Action) => {
 
     const nxg = getNextGuidInList(guid)
-    setSelectedGuid(nxg);
     onSwipeLeft(guid, action)
+    setTimeout(() => setSelectedGuid(nxg), 0)
   }
 
   const swipeRightAndSelect = (guid: string, action: Action) => {
 
     const nxg = getNextGuidInList(guid)
-    setSelectedGuid(nxg);
     onSwipeRight(guid, action)
+    setTimeout(() => setSelectedGuid(nxg), 0)
   }
 
   return <Switch fallback={

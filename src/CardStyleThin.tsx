@@ -1,7 +1,7 @@
 import { FeedItem } from "@shared/feed-types"
 import { Accessor } from "solid-js"
 import { Motion } from "solid-motionone"
-import { setSelectedGuid } from "./signals"
+import { setSelectedGuid, tick } from "./signals"
 import { formatTimeAgo } from "./common"
 import { CachedImage } from "./CachedImage"
 import { CardButtons } from "./CardButtons"
@@ -34,7 +34,7 @@ const CardStyleThin = (props: {
       <div class={`absolute left-31 mx-1 right-0 ${props.isSelected() ? 'bg-black/0' : ''}`}>
         <div class="flex justify-between absolute top-1 inset-x-0 h-5 items-center">
           <Source value={props.data.source} />
-          <PublishedTime value={props.data.pubDate} />
+          <PublishedTime value={props.data.pubDate} tick={tick} />
         </div>
         <div class="absolute p-1 top-6 w-full flex flex-col overflow-hidden gap-0 font-[Noto_Serif]">
           <Title value={props.data.title} />
@@ -54,9 +54,10 @@ const Source = (props: { value: string }) => <div class="bg-black/10 text-white/
 </div>
 
 
-const PublishedTime = (props: { value: string }) => <div class="bg-black/20 text-white/80 line-clamp-1 font-stretch-75% text-xs z-10 px-1 rounded-md">
-  {formatTimeAgo(new Date(props.value))}
-</div>
+const PublishedTime = (props: { value: string, tick: Accessor<number> }) =>
+  <div class="bg-black/20 text-white/80 line-clamp-1 font-stretch-75% text-xs z-10 px-1 rounded-md">
+    {props.tick() && formatTimeAgo(new Date(props.value))}
+  </div>
 
 const Title = (props: { value: string }) =>
   <div class="font-normal leading-4 font-[Noto_Serif] pb-0.5 text-shadow-black/50 text-md font-stretch-10% text-shadow-md line-clamp-3">{props.value}</div>

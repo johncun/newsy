@@ -28,6 +28,7 @@ const fetchItems = async (): Promise<FeedResult> => {
       sources: settings.feeds,
       maxPerRequest: +settings.maxFeedsPerRequest,
       maxLookbackTime: +settings.maxLookbackTime,
+      fullMode: settings.fullMode,
       alreadyKnown: [...allGuids()]
     }),
   })

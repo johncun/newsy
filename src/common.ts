@@ -1,6 +1,7 @@
 import { ArticleState } from "@shared/feed-types";
 import { Action } from "./Card";
 import { killArticle, updateState } from "./db";
+import { setTick, tick } from "./signals";
 
 export const dt = (dstr: string) => {
   const date = new Date(dstr)
@@ -18,6 +19,10 @@ export const dt = (dstr: string) => {
     })
   )
 }
+
+
+setInterval(() => setTick(t => t + 1), 60000)
+
 
 export function formatTimeAgo(dateInput: Date | string | number | undefined): string {
   // 1. Safety Check: Handle missing or invalid dates
