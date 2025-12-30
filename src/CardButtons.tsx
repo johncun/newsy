@@ -108,8 +108,8 @@ export const GoBtn = (props: { source: string, backupImage?: string, link: strin
     const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}`;
     const res = await fetch(proxyUrl);
     const items = await res.json()
-    setIsFetching(false)
     setReaderPageInfo({ source: props.source, backupImage: props.backupImage || '', link: props.link, items });
+    setIsFetching(false)
 
     // window.open(
     // props.link,
