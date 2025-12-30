@@ -1,0 +1,43 @@
+import { Show } from 'solid-js'
+import { SvgCross } from './svgs';
+import { createSignal, onMount } from "solid-js";
+import { registerSW } from "virtual:pwa-register";
+
+function usePWAUpdate() {
+  const [updateAvailable, setUpdateAvailable] = createSignal(false);
+  let updateFunction: (reloadPage?: boolean) => Promise<void>
+
+  onMount(() => {
+    // registerSW returns a function to trigger the update
+    updateFunction = registerSW({
+      onNeedRefresh() {
+        setUpdateAvailable(true);
+      },
+      onOfflineReady() {
+        console.log("Cuisle is ready for offline use.");
+      },
+    });
+  });
+
+  const downloadUpdate = () => {
+    if (updateFunction) updateFunction(true); // true = reload page after update
+  };
+
+  return [updateAvailable, downloadUpdate];
+}
+
+export function UpdateApplicationToast() {
+  const [updateAvailable, downloadUpdate] = usePWAUpdate();
+
+  return (
+    <Show when={updateAvailable()}>
+      <div class="fixed left-4 Vbottom-4 right-4 bg-white p-4 rounded-lg border text-slate-600 z-50 bg-linear-to-br from-orange-500 to-orange-700">
+        <div>New content available, click on reload button to update.</div>
+        <div class="flex justify-around pt-2">
+          <button class="border border-white rounded-md bg-green-500 p-2 text-black" onClick={() => downloadUpdate()}>Reload</button>
+          <button class="border border-slate-700 rounded-md " onClick={() => downloadUpdate()}>
+            <div class="h-8 w-8"><SvgCross fill="black" /></div></button></div>
+      </div>
+    </Show>
+  );
+}

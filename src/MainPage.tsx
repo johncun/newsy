@@ -8,11 +8,11 @@ import { Pulse } from "./Pulse"
 import { SettingsPage } from "./Settings"
 import { setIsFetching, mode, isFetching, menuGuid, showOptions, setShowOptions, readerPageInfo } from "./signals"
 import { SvgCross } from "./svgs"
-import UpdateToast from "./UpdateToast"
 import OptionMenuItems from "./OptionMenuItems"
 import List from "./List"
 import Reader from "./Reader"
 import { useOrientationDetector } from "./OrientationDetector"
+import { UpdateApplicationToast } from "./UpdateApplicationToast"
 
 const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
@@ -177,7 +177,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
         )}
       </Presence>
 
-      <UpdateToast />
+      <UpdateApplicationToast />
     </Show>
   )
 }
