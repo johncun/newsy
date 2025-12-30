@@ -32,13 +32,11 @@ const IntroScreen = () => {
       </div>
 
       {/* 3. Animated Text Description */}
-      <div class={`text-center px-6 transition-all duration-1000 transform ${startText() ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
-          <span class="text-transparent bg-clip-text bg-linear-to-r from-yellow-200 to-white">Cuisle</span>
-        </h1>
-        <p class="text-lg md:text-xl text-white/80 max-w-md mx-auto leading-relaxed">
+      <div class={`text-center px-6 transition-all duration-1000 flex flex-col items-center transform ${startText() ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div class="w-[50vw] "><img src="/cuisle-text.svg" /></div>
+        <div class="text-lg md:text-xl text-white/80 max-w-md mx-auto leading-relaxed">
           Taking the pulse of the news
-        </p>
+        </div>
       </div>
 
       {/* 4. Action Button */}
