@@ -24,7 +24,7 @@ const IntroScreen = () => {
         {/* The Main Image/Logo */}
         <div class="relative w-40 h-40 rounded-full flex items-center justify-center overflow-hidden transform transition-transform hover:scale-110 duration-500">
           <img
-            src="/android-chrome-512x512.png"
+            src="/maskable_icon_x512.png"
             alt="Brand Logo"
             class="object-contain"
           />
