@@ -175,6 +175,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
           </Motion.div>
         )}
       </Presence>
+
       <UpdateToast />
     </Show>
   )
