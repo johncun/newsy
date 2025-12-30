@@ -104,7 +104,7 @@ export const GoBtn = (props: { source: string, backupImage?: string, link: strin
   class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-sky-400/80 text-white flex items-center justify-center "
   onClick={async (ev) => {
     ev.stopPropagation();
-    setTimeout(() => setIsFetching(true), 500)
+    setTimeout(() => setIsFetching(true), 50)
     const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}`;
     const res = await fetch(proxyUrl);
     const items = await res.json()

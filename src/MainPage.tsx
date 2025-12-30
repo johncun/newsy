@@ -103,6 +103,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
           <Pulse />
         </div>
       </Show>
+
       <Show when={readerPageInfo()}>
         <Reader value={readerPageInfo()} />
       </Show>
