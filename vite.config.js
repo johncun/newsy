@@ -10,7 +10,7 @@ export default defineConfig({
     solid(),
     VitePWA({
       strategies: 'injectManifest',
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       srcDir: 'src',
       filename: 'sw.ts',
       devOptions: {
