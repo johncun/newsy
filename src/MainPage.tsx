@@ -91,7 +91,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
 
   return (
     <Show when={isLandscape() === true || isLandscape() === false}>
-      <div class="absolute left-[env(safe-area-inset-left)] right-[env(safe-area-inset-right)] top-[env(safe-area-inset-top)] bottom-[env(safe-area-inset-bottom)]">
+      <div class="absolute z-0 left-[env(safe-area-inset-left)] right-[env(safe-area-inset-right)] top-[env(safe-area-inset-top)] bottom-[env(safe-area-inset-bottom)]">
         <Banner />
         <Show when={isFetchingFeeds() || isFetchingStory()}>
           <div class="absolute inset-0 flex items-center justify-center bg-black/70 z-50">

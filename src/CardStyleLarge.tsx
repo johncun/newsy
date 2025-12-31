@@ -30,16 +30,14 @@ const CardStyleLarge = (props: {
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
       <Darken />
 
-      {!props.isSelected() &&
-        <div class="absolute top-2 left-2 right-2 inset-shadow-gray-1000 flex items-center justify-between">
-          <Source value={props.data.source} />
-          <PublishedTime value={props.data.pubDate} />
-        </div>
-      }
+      <div class="absolute top-2 left-2 right-2 inset-shadow-gray-1000 flex items-center justify-between">
+        <Source value={props.data.source} />
+        <PublishedTime value={props.data.pubDate} />
+      </div>
       <div
         id="title"
         class={`absolute font-bold font-[Noto_Serif] text-shadow-black/30 text-xl font-stretch-75% text-shadow-md
-        inset-x-0 mx-4 top-2 bottom-2 items-center justify-${props.isSelected() ? 'start' : 'center'} flex flex-col gap-1 rounded-xl p-2 ${props.isSelected() ? 'bg-black/0' : ''}`}>
+        inset-x-0 mx-4 top-2 bottom-2 items-center justify-${props.isSelected() ? 'center' : 'center'} flex flex-col gap-1 rounded-xl p-2 ${props.isSelected() ? 'bg-black/0' : ''}`}>
 
         <Title value={props.data.title} />
         <Byline value={props.data.description} />
@@ -47,17 +45,8 @@ const CardStyleLarge = (props: {
 
       <CardButtons data={props.data} isSelected={props.isSelected} swipeLeft={props.swipeLeft} swipeRight={props.swipeRight} />
 
-      {/*      <div
-        class={`absolute top-1 h-10 z-30 inset-x-2 flex ${props.isSelected() ? 'bg-black/40' : ''} items-center rounded-2xl justify-between`}>
-        <AddBtn action={props.swipeRight} isSelected={props.isSelected} />
-        <div class="flex gap-4">
-          <OptionBtn action={() => setMenuGuid(props.data.guid)} isSelected={props.isSelected} />
-          <GoBtn link={props.data.link} isSelected={props.isSelected} />
-        </div>
-        <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />
-      </div> */}
     </Motion.div >
-  </div>
+  </div >
 
 }
 

@@ -9,7 +9,7 @@ export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolea
   return <Show when={props.isSelected()}>
 
     <Motion.div animate={{ opacity: [0, 1], scale: [.7, 1] }}
-      class={`absolute bottom-1 h-10 z-30 inset-x-2 flex bg-white/10 items-center rounded-e-full rounded-s-full px-2 justify-between`}>
+      class={`absolute bottom-1 h-10 z-40 inset-x-2 flex bg-white/10 items-center rounded-e-full rounded-s-full px-2 justify-between`}>
       <AddBtn action={props.swipeRight} isSelected={props.isSelected} />
       <div class="flex gap-4">
         <OptionBtn action={(ev: MouseEvent) => {
@@ -28,7 +28,7 @@ export const AddBtn = (props: { action: () => void, isSelected: Accessor<boolean
   press={{ scale: [1, 1.3, 1] }}
   class="p-1 w-9 h-9 rounded-full bg-green-400/80 flex items-center justify-center text-black"
   onClick={props.action}
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
+  style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
   <SvgAdd fill="white" />
 </Motion.div>
 
@@ -36,7 +36,7 @@ export const OptionBtn = (props: { action: (ev?: any) => void, isSelected: Acces
   press={{ scale: [1, 1.3, 1] }}
   class="text-3xl w-8 h-8 rounded-full bg-amber-200/80 p-1 flex items-center justify-center text-black"
   onClick={props.action}
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
+  style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
   <svg viewBox="0 0 24 24" class="w-6">
     <g
       stroke="none"
@@ -94,7 +94,7 @@ export const GoBtnDirect = (props: { link: string, isSelected: Accessor<boolean>
       '_blank',
       'noopener,noreferrer')
   }}
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
+  style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
   🌍
   {/* <img src="/favicon.svg" class="w-8" /> */}
 </Motion.div >
@@ -126,7 +126,7 @@ export const DeleteBtn = (props: { action: () => void, isSelected: Accessor<bool
   press={{ scale: [1, 1.3, 1] }}
   class="p-1 w-8 h-8 rounded-full bg-red-800/80 flex items-center justify-center text-black"
   onClick={props.action}
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
+  style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
   <SvgTrash stroke="white" fill="" />
 </Motion.div>
 

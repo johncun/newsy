@@ -73,7 +73,7 @@ button:focus-visible {
   grid-template-columns: auto 1fr auto;
   overflow-x: auto;
   --border-block: 1px #666 solid;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x ;
   --container-type: inline-size;
   scrollbar-width: none;
 

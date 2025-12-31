@@ -118,8 +118,8 @@ const Card = (props: {
     if (isSelected() && elRef) {
       elRef.scrollIntoView({
         behavior: "smooth", // "auto" for instant jump
-        block: "end",   // "start", "center", "end", or "nearest"
-        inline: "end"
+        block: "nearest",   // "start", "center", "end", or "nearest"
+        inline: "nearest"
       })
     }
   });

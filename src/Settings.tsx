@@ -113,8 +113,8 @@ export const SettingsPage = () => {
   // const _sortedFeeds = () => [...settings.feeds].sort((a, b) => b.votes - a.votes);
 
   return (
-    <div class="flex flex-col h-screen max-w-md mx-auto overflow-hidden">
-      <div class="p-1 border-b sticky top-0 z-10 shadow-sm">
+    <div class="absolute inset-0 max-w-md overflow-hidden">
+      <div class="absolute p-1 border-b h-16 top-0 z-10 shadow-sm">
         <div class="flex justify-between items-center mb-4 h-8 gap-4">
           <input
             type="text"
@@ -126,7 +126,7 @@ export const SettingsPage = () => {
         </div>
       </div>
 
-      <div class="flex-1 overflow-y-auto pb-20">
+      <div class="absolute inset-x-0 top-16 bottom-0 overflow-y-auto pb-2">
         <For each={filteredGeneral()}>{(item) => <SettingRow item={item} />}</For>
 
         <div class="p-4 flex justify-between items-center mt-4">
@@ -208,9 +208,9 @@ export const SettingsPage = () => {
             </Show>
           )}
         </For>
+        <LegalModal />
+        <div class="flex justify-around items-center text-xs py-2 text-slate-500"><div>{status.logMessage}</div><div>{new Date(+status.when).toUTCString()}</div></div>
       </div >
-      <LegalModal />
-      <div class="flex justify-around items-center text-xs py-2 text-slate-500"><div>{status.logMessage}</div><div>{new Date(+status.when).toUTCString()}</div></div>
     </div >
   );
 };

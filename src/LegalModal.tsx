@@ -5,7 +5,7 @@ const LegalModal = () => {
   const [isOpen, setIsOpen] = createSignal(false);
 
   return (
-    <div class="flex justify-center p-2">
+    <div class="z-50 flex justify-center p-2">
       {/* Trigger Button - Place this in your Footer or Settings */}
       <button
         onClick={() => setIsOpen(true)}
