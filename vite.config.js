@@ -48,8 +48,9 @@ export default defineConfig({
             }
           ],
         display: 'standalone',
-        theme_color: '#120a0a',
-        background_color: '#120a0a',
+        theme_color: '#242424',
+        background_color: '#242424',
+        orientation: "portrait"
       },
     }),
   ],

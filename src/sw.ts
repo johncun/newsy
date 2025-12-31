@@ -1,13 +1,26 @@
 import { precacheAndRoute } from 'workbox-precaching';
 import { summarizeNewsPage } from './reader-utils';
 
+console.log("Cuisle SW: Booting up...");
+
 declare let self: ServiceWorkerGlobalScope;
 
 precacheAndRoute(self.__WB_MANIFEST);
 
-self.addEventListener('fetch', (event: any) => {
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim()); // Crucial for Safari to intercept on first load
+});
+
+self.addEventListener('fetch', (event: FetchEvent) => {
+  // Debugging: This will show up in the Safari Service Worker Inspector window
+  console.log(`[Cuisle SW] Fetching: ${event.request.url}`);
+
   const url = new URL(event.request.url);
-  // console.log("fetch intercepted", { p: url.pathname, sp: url.searchParams });
+  console.log("fetch intercepted", { p: url.pathname, sp: url.searchParams });
 
   if (url.pathname === '/summarize-news') {
     const targetUrl = url.searchParams.get('url');

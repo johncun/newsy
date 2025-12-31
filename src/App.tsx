@@ -58,16 +58,16 @@ const App: any = () => {
 
 
   return <ErrorBoundary fallback={<div>Failed to load or validate API data.</div>}>
-    <Meta name="mobile-web-app-capable" content="yes" />
+    <Meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <Meta name="apple-mobile-web-app-capable" content="yes" />
     <Meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
-    <Meta name="theme-color" content="#120a0a" />
+    <Meta name="theme-color" content="#242424" />
     <Meta
       name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
     <Switch fallback={<MainPage feed={feed} />}>
       <Match when={startup()}>

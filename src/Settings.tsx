@@ -84,7 +84,7 @@ export const SettingsPage = () => {
   // const _sortedFeeds = () => [...settings.feeds].sort((a, b) => b.votes - a.votes);
 
   return (
-    <div class="flex flex-col h-screen max-w-md mx-auto overflow-hidden shadow-xl">
+    <div class="flex flex-col h-screen max-w-md mx-auto overflow-hidden">
       <div class="p-1 border-b sticky top-0 z-10 shadow-sm">
         <div class="flex justify-between items-center mb-4 h-8 gap-4">
           <input
@@ -181,7 +181,7 @@ export const SettingsPage = () => {
         </For>
       </div >
       <LegalModal />
-      <div class="flex justify-around items-center text-xs text-slate-500"><div>{status.logMessage}</div><div>{new Date(+status.when).toUTCString()}</div></div>
+      <div class="flex justify-around items-center text-xs py-2 text-slate-500"><div>{status.logMessage}</div><div>{new Date(+status.when).toUTCString()}</div></div>
     </div >
   );
 };

@@ -167,8 +167,8 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
   return (
     <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
-      class="absolute inset-0 flex flex-col z-50 items-center opacity-0 p-4 bg-linear-to-br from-white via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden" >
-      <div class="w-8 h-8 z-50 absolute right-2 top-2 bg-white rounded-full border border-slate-700 p-1" onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
+      class="absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 bg-linear-to-br from-white via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden" >
+      <div class="w-8 h-8 absolute z-50 right-2 top-2 bg-white rounded-full border border-slate-700 p-1" onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
         <SvgCross fill="#242424" />
       </div >
       <div class="absolute inset-x-0 top-0 h-10 text-xs w-full px-4 flex items-center ">

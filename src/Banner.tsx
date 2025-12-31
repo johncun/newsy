@@ -2,7 +2,7 @@ import { Motion } from 'solid-motionone'
 
 import { mode, setIsFetching, setMode, setShowOptions } from './signals'
 import { getAllByState, memData } from './db'
-import { SvgOptions } from './svgs'
+import { SvgAdd, SvgOptions } from './svgs'
 
 const Banner = () => {
   const modeDesc = (): string => {
@@ -12,7 +12,7 @@ const Banner = () => {
   return (
     <div class="flex justify-between items-center bg-linear-to-t from-black to-slate-900 h-14 absolute inset-x-0 p-2 z-20 gap-4">
       <div class="w-20 normal pl-2 font-bold text-center shadow-amber-50 shadow-2xl text-xl">{modeDesc()}</div>
-      <div class="flex gap-4">
+      <div class="flex items-center gap-4">
         <Motion.div
           press={{ scale: [1, 1.3] }}
           onClick={() => setMode('live')}
@@ -35,20 +35,20 @@ const Banner = () => {
         </Motion.div>
       </div>
       <Motion.div
-        press={{ scale: 1.3 }}
+        press={{ scale: [1, 1.3] }}
         onClick={() => {
           setMode('live')
           setIsFetching(true)
         }}
-        class="font-bold text-3xl px-1">
-        ↻
+        class="w-10 h-10 px-1 flex items-center justify-center">
+        <SvgAdd fill="white" />
       </Motion.div>
       <Motion.div
-        press={{ scale: 1.3 }}
+        press={{ scale: [1, 1.3] }}
         onClick={() => {
           setShowOptions(true)
         }}
-        class="font-bold text-2xl px-2 w-10 h-10 flex items-center justify-center">
+        class=" px-2 w-10 h-10 flex items-center justify-center">
         <SvgOptions fill="white" />
       </Motion.div>
     </div>

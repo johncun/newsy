@@ -93,75 +93,60 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
 
   return (
     <Show when={isLandscape() === true || isLandscape() === false}>
-      <Meta name="mobile-web-app-capable" content="yes" />
-      <Meta name="apple-mobile-web-app-capable" content="yes" />
-      <Meta
-        name="apple-mobile-web-app-status-bar-style"
-        content="black-translucent"
-      />
-      <Meta name="theme-color" content="#120a0a" />
-      <Meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-      />
-      <Banner />
-      <Show when={isFetching()}>
-        <div class="absolute inset-0 flex items-center justify-center bg-black/70 z-50">
-          <Pulse />
+      <div class="absolute left-[env(safe-area-inset-left)] right-[env(safe-area-inset-right)] top-[env(safe-area-inset-top)] bottom-[env(safe-area-inset-bottom)]">
+        <Banner />
+        <Show when={isFetching()}>
+          <div class="absolute inset-0 flex items-center justify-center bg-black/70 z-50">
+            <Pulse />
+          </div>
+        </Show>
+
+        <div
+          ref={upSentinelRef}
+          class={`absolute z-30 ${isUpScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-1 flex text-2xl items-center justify-center top-18 rounded-full bg-black/20 text-cyan-100`}
+          onClick={toTop}>
+          ⇡
         </div>
-      </Show>
-
-      <Show when={readerPageInfo()}>
-        <Reader value={readerPageInfo()} />
-      </Show>
-
-      <div
-        ref={upSentinelRef}
-        class={`absolute z-30 ${isUpScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-1 flex text-2xl items-center justify-center top-18 rounded-full bg-black/20 text-cyan-100`}
-        onClick={toTop}>
-        ⇡
-      </div>
-      <div
-        ref={dnSentinelRef}
-        class={`absolute z-30 ${!isDnScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-1 flex text-2xl items-center justify-center bottom-4 rounded-full bg-black/20 text-cyan-100`}
-        onClick={toBottom}>
-        ⇣
-      </div>
-      <div
-        ref={scrollRef}
-        class="absolute top-14 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll snap-y">
-        {/* <div class="relative flex flex-col pt-2 pb-8 gap-4 items-center py-4"> */}
-        <div ref={upSentinelRef} class="h-1 w-1"></div>
-        <List as={memData} mode={mode} />
-        <div ref={dnSentinelRef} class="h-1 w-1"></div>
-        {/* </div> */}
-      </div>
-      <Presence exitBeforeEnter>
-        {menuGuid() && (
-          <Motion.div
-            exit={{ scale: 0 }}
-            transition={{ duration: 0.2 }}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            id="menu"
-            class="absolute z-50 inset-0 bg-slate-800/50">
-            <div class="absolute rounded-xl inset-8 border border-slate-400 bg-linear-to-b from-slate-700 to-[#242424] text-black">
-              <OptionMenuItems />
-            </div>
-          </Motion.div>
-        )}
-      </Presence>
-      <Presence exitBeforeEnter>
-        {showOptions() && (
-          <Motion.div
-            exit={{ y: '100%' }}
-            transition={{ duration: 0.2 }}
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            id="menu"
-            class="absolute z-50 inset-0">
-            <div class="absolute inset-0 border-0 border-slate-100 bg-linear-to-b from-zinc-800 to-slate-800 text-black">
-              <div class="absolute inset-x-0 top-0 h-12 border-b border-b-slate-900 flex font-bold text-xl items-center justify-center text-white ">
+        <div
+          ref={dnSentinelRef}
+          class={`absolute z-30 ${!isDnScrolled() ? 'opacity-100' : 'opacity-0'} h-8 w-8 right-1 flex text-2xl items-center justify-center bottom-4 rounded-full bg-black/20 text-cyan-100`}
+          onClick={toBottom}>
+          ⇣
+        </div>
+        <div
+          ref={scrollRef}
+          class="absolute top-14 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll snap-y">
+          {/* <div class="relative flex flex-col pt-2 pb-8 gap-4 items-center py-4"> */}
+          <div ref={upSentinelRef} class="h-1 w-1"></div>
+          <List as={memData} mode={mode} />
+          <div ref={dnSentinelRef} class="h-1 w-1"></div>
+          {/* </div> */}
+        </div>
+        <Presence exitBeforeEnter>
+          {menuGuid() && (
+            <Motion.div
+              exit={{ scale: 0 }}
+              transition={{ duration: 0.2 }}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              id="menu"
+              class="absolute z-50 inset-0 bg-slate-800/50">
+              <div class="absolute rounded-xl inset-8 border border-slate-400 bg-linear-to-b from-slate-700 to-[#242424] text-black">
+                <OptionMenuItems />
+              </div>
+            </Motion.div>
+          )}
+        </Presence>
+        <Presence exitBeforeEnter>
+          {showOptions() && (
+            <Motion.div
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.2 }}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              id="menu"
+              class="absolute z-50 inset-0 border-0 border-slate-100 bg-linear-to-b flex flex-col from-zinc-800 to-slate-800 text-black">
+              <div class="xabsolute inset-x-0 top-0 h-12 border-b border-b-slate-900 flex font-bold text-xl items-center justify-center text-white ">
                 Configuration
               </div>
               <div
@@ -169,15 +154,19 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
                 onClick={() => setShowOptions(false)}>
                 <SvgCross fill="white" />{' '}
               </div>
-              <div class="absolute inset-0 top-16 left-2 right-2 bottom-1 overflow-x-hidden px-2">
+              <div class="absolute inset-x-2 top-12 bottom-0 overflow-x-hidden px-2">
                 <SettingsPage />
               </div>
-            </div>
-          </Motion.div>
-        )}
-      </Presence>
+            </Motion.div>
+          )}
+        </Presence>
+        <Show when={readerPageInfo()}>
+          <Reader value={readerPageInfo()} />
+        </Show>
 
-      <UpdateApplicationToast />
+
+        <UpdateApplicationToast />
+      </div>
     </Show>
   )
 }
