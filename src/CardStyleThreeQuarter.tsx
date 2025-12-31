@@ -13,7 +13,7 @@ const AnimatedBlackFade = () =>
     class="absolute inset-0 bg-black/20"
   />
 
-const Darken = () => <div class="absolute inset-0 bg-black/40" />
+const Darken = () => <div class="absolute inset-0 bg-black/20" />
 
 const CardStyleThreeQuarter = (props: {
   isSelected: Accessor<boolean>,
@@ -28,12 +28,12 @@ const CardStyleThreeQuarter = (props: {
     <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} isSelected={props.isSelected} blur={true} />
       {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
-      <Darken />
+      {/* <Darken /> */}
 
       {!props.isSelected() &&
         <div class="absolute top-2 left-2 right-2 inset-shadow-gray-1000 flex items-center justify-between">
           <Source value={props.data.source} />
-          <PublishedTime value={props.data.pubDate} tick={tick} />
+          <PublishedTime value={props.data.pubDate} />
         </div>
       }
       <div
@@ -66,10 +66,13 @@ const Source = (props: { value: string }) => <div class="bg-black/30 text-white/
   {props.value}
 </div>
 
-const PublishedTime = (props: { value: string, tick: Accessor<number> }) =>
-  <div class="bg-black/50 text-white/70 text-xs z-10 px-1 py-1 rounded-md">
-    {props.tick() && formatTimeAgo(new Date(props.value))}
+const PublishedTime = (props: { value: string }) => {
+  const ds = () => tick() && formatTimeAgo(new Date(props.value))
+  return <div class="bg-black/50 text-white/70 text-xs z-10 px-1 py-1 rounded-md">
+    {ds()}
   </div>
+}
+
 
 const Title = (props: { value: string }) =>
   <div class="font-[Quicksand]">{props.value}</div>
@@ -125,7 +128,7 @@ const ImageFor = (props: {
     <img
       src={props.data.image /*|| "/placeholder.svg"*/}
       alt={props.data.title}
-      class={`absolute inset-0 w-full h-full object-cover ${props.blur ? 'blur-[4px]' : ''}`}
+      class={`absolute inset-0 w-full h-full object-cover ${props.blur ? 'blur-[5px]' : ''}`}
       onError={e => {
         const element = e.target as HTMLImageElement
         element.src = '/the-guardian-logo.jpg'

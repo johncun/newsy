@@ -1,6 +1,6 @@
 import { Accessor, Show } from "solid-js"
 import { Motion } from "solid-motionone"
-import { setIsFetching, setMenuGuid, setReaderPageInfo } from "./signals"
+import { setIsFetchingStory, setMenuGuid, setReaderPageInfo } from "./signals"
 import { SvgAdd, SvgTrash } from "./svgs"
 import { FeedItem } from "@shared/feed-types"
 
@@ -104,13 +104,13 @@ export const GoBtn = (props: { source: string, backupImage?: string, link: strin
   class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-sky-400/80 text-white flex items-center justify-center "
   onClick={async (ev) => {
     ev.stopPropagation();
-    setTimeout(() => setIsFetching(true), 50)
+    setTimeout(() => setIsFetchingStory(true), 50)
     const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}`;
     const res = await fetch(proxyUrl);
     const items = await res.json()
     {/* console.log({ items }) */ }
     setReaderPageInfo({ source: props.source, backupImage: props.backupImage || '', link: props.link, items });
-    setIsFetching(false)
+    setIsFetchingStory(false)
 
     // window.open(
     // props.link,

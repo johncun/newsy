@@ -35,7 +35,7 @@ const IntroScreen = () => {
       <div class={`text-center px-6 transition-all duration-1000 flex flex-col items-center transform ${startText() ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
         <div class="w-[50vw] "><img src="/cuisle-text.svg" /></div>
         <div class="text-lg md:text-xl text-white/80 max-w-md mx-auto leading-relaxed">
-          Taking the pulse of the news
+          The pulse of the news, less of the junk
         </div>
       </div>
 

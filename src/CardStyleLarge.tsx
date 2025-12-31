@@ -33,7 +33,7 @@ const CardStyleLarge = (props: {
       {!props.isSelected() &&
         <div class="absolute top-2 left-2 right-2 inset-shadow-gray-1000 flex items-center justify-between">
           <Source value={props.data.source} />
-          <PublishedTime value={props.data.pubDate} tick={tick} />
+          <PublishedTime value={props.data.pubDate} />
         </div>
       }
       <div
@@ -66,10 +66,12 @@ const Source = (props: { value: string }) => <div class="bg-black/30 text-white/
   {props.value}
 </div>
 
-const PublishedTime = (props: { value: string, tick: Accessor<number> }) =>
-  <div class="bg-black/50 text-white/70 text-xs z-10 px-1 py-1 rounded-md">
-    {props.tick() && formatTimeAgo(new Date(props.value))}
+const PublishedTime = (props: { value: string }) => {
+  const ds = () => tick() && formatTimeAgo(new Date(props.value))
+  return <div class="bg-black/50 text-white/70 text-xs z-10 px-1 py-1 rounded-md">
+    {ds()}
   </div>
+}
 
 const Title = (props: { value: string }) =>
   <div class="line-clamp-4 font-[Quicksand]">{props.value}</div>

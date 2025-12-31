@@ -4,7 +4,9 @@ import {
 import { createSignal } from 'solid-js'
 
 export const [mode, setMode] = createSignal<ArticleState>('live')
-export const [isFetching, setIsFetching] = createSignal<boolean | null>(null)
+export const [performFetchFeedsTrigger, setPerformFetchFeedsTrigger] = createSignal(0)
+export const [isFetchingFeeds, setIsFetchingFeeds] = createSignal<boolean>(false)
+export const [isFetchingStory, setIsFetchingStory] = createSignal<boolean>(false)
 export const [selectedGuid, setSelectedGuid] = createSignal('')
 
 export const [showOptions, setShowOptions] = createSignal(false)
@@ -20,30 +22,3 @@ export const [readerPageInfo, setReaderPageInfo] = createSignal<ReaderInput | un
 export const [tick, setTick] = createSignal(1)
 
 
-// export const [userSources, setUserSources] =
-//   createStore<SourceRecords>(DEFAULT_FEED_URLS)
-//
-// export const loadSourcesFromStorage = () => {
-//   const fromLocal = localStorage.getItem('newsy:sources')
-//   if (!fromLocal) {
-//     setUserSources(DEFAULT_FEED_URLS)
-//     return
-//   }
-//
-//   try {
-//     console.log({ fromLocal })
-//     setUserSources(SourceRecords.parse(JSON.parse(fromLocal)))
-//   } catch (e) {
-//     console.error(e)
-//   }
-// }
-//
-// loadSourcesFromStorage()
-//
-// export const saveSourcesToStorage = () => {
-//   console.log({ userSources })
-//   const data = reconcile(userSources)
-//   console.log({ data: data(userSources) })
-//
-//   localStorage.setItem('newsy:sources', JSON.stringify(data(userSources)))
-// }

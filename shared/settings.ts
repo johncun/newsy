@@ -2,6 +2,12 @@ import { createStore } from "solid-js/store";
 import { z } from "zod";
 import { DEFAULT_FEED_URLS, SETTINGS_KEY } from "@shared/constants";
 import { SourceRecord, SourceRecordSchema } from "./feed-types";
+import { setPerformFetchFeedsTrigger, setTick, tick } from "@src/signals";
+import { untrack } from "solid-js";
+import { lastFeedFetchedTime } from "@src/common";
+
+export const ALLOWABLE_REFRESH_TIMES = [0, 1, 2, 5, 10, 20, 30, 60, 180]
+export const MAX_ALLOWABLE_STORIES_IN_LIVE = [10, 20, 30, 50, 100]
 
 
 export const SettingsSchema = z.object({
@@ -9,7 +15,11 @@ export const SettingsSchema = z.object({
   maxLookbackTime: z.enum(["1", "2", "5", "8", "24", "48", "240"]),
   theme: z.enum(["Light", "Dark", "System"]),
   feeds: z.array(SourceRecordSchema),
-  fullMode: z.boolean()
+  fullMode: z.boolean(),
+  showFigureCaptions: z.boolean(),
+  gotoTopAfterRefresh: z.boolean(),
+  autoRefreshTime: z.union(ALLOWABLE_REFRESH_TIMES.map(n => z.literal(n))),
+  maxLiveCount: z.union(MAX_ALLOWABLE_STORIES_IN_LIVE.map(n => z.literal(n))),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -19,16 +29,20 @@ export type SettingItem = {
   label: string;
   desc: string;
   help: string;
-  type: "text" | "toggle" | "select";
+  type: "text" | "toggle" | "select" | "selectnum";
   options?: string[];
 };
 
 const DEFAULTS: Settings = {
   fullMode: false,
+  showFigureCaptions: false,
   theme: "System",
   maxFeedsPerRequest: "50",
   maxLookbackTime: "1",
-  feeds: DEFAULT_FEED_URLS
+  feeds: DEFAULT_FEED_URLS,
+  autoRefreshTime: 0,
+  maxLiveCount: 50,
+  gotoTopAfterRefresh: false
 };
 
 const loadSettings = (): Settings => {
@@ -80,3 +94,17 @@ export const feedActions = {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings, null, 2))
   }
 };
+const MS_MINUTE = 1000 * 60;
+
+setInterval(() => {
+  setTick(t => t + 1);
+  console.log({ tick: tick() })
+  untrack(() => {
+    if (settings.autoRefreshTime > 0 && Date.now() - lastFeedFetchedTime > (settings.autoRefreshTime * MS_MINUTE)) {
+      console.log('auto fetch', { lastFeedFetchedTime, diff: Date.now() - lastFeedFetchedTime, period: settings.autoRefreshTime * MS_MINUTE })
+      setPerformFetchFeedsTrigger(Date.now())
+    }
+  })
+}, ~~(MS_MINUTE / 3))
+
+

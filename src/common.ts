@@ -1,7 +1,6 @@
-import { ArticleState } from "@shared/feed-types";
+import { ArticleRecord, ArticleState } from "@shared/feed-types";
 import { Action } from "./Card";
 import { killArticle, updateState } from "./db";
-import { setTick, tick } from "./signals";
 
 export const dt = (dstr: string) => {
   const date = new Date(dstr)
@@ -20,14 +19,17 @@ export const dt = (dstr: string) => {
   )
 }
 
-
-setInterval(() => setTick(t => t + 1), 60000)
+export const sorterPubDate = (a: ArticleRecord, b: ArticleRecord) => {
+  const dateA = new Date(a.pubDate).getTime()
+  const dateB = new Date(b.pubDate).getTime()
+  if (isNaN(dateA) || isNaN(dateB)) {
+    return 0
+  }
+  return dateB - dateA
+}
 
 
 export function formatTimeAgo(dateInput: Date | string | number | undefined): string {
-  // 1. Safety Check: Handle missing or invalid dates
-
-  // console.log({ dateInput })
 
   if (!dateInput) return "Never";
 
@@ -37,7 +39,6 @@ export function formatTimeAgo(dateInput: Date | string | number | undefined): st
   const now = new Date();
   const diffInSeconds = Math.floor((date.getTime() - now.getTime()) / 1000);
 
-  // 2. Safety Check: Ensure we aren't passing NaN or Infinity to the formatter
   if (!Number.isFinite(diffInSeconds)) return "Just now";
 
   const units: { unit: Intl.RelativeTimeFormatUnit; seconds: number }[] = [
@@ -142,4 +143,8 @@ export function hashToBoolean(str: string): boolean {
 
   // Return true if even, false if odd
   return hash % 2 === 0;
+
 }
+
+export let lastFeedFetchedTime = 0
+export const timestampFetch = () => lastFeedFetchedTime = Date.now()

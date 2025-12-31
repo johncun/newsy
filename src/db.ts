@@ -107,14 +107,32 @@ export const allGuids = (): Set<string> => {
 export const refreshDbWithFeedItems = (items: FeedItems): void => {
   if (items.length === 0) return
   const guids = allGuids()
+  console.log({ guids: guids.size })
 
   const newRecords: ArticleRecord[] = items
     .map(FeedItemToNewRecord)
     .filter((record: ArticleRecord) => !guids.has(record.guid))
 
+  console.log({ newRecords: newRecords.length })
   if (newRecords.length === 0) return
 
-  setMemData([...newRecords, ...memData()])
+  const amalgamated = [...newRecords, ...memData()]
+  console.log({ amalgamated: amalgamated.length })
+
+  const extractedLive = amalgamated.filter(a => a.state === 'live')
+  console.log({ extractedLive: extractedLive.length })
+
+  if (extractedLive.length <= settings.maxLiveCount) {
+
+    setMemData(amalgamated);
+    console.log('setMemData with amalgamated');
+  }
+  else {
+    const sorted = extractedLive.sort(sorterPubDate).slice(0, settings.maxLiveCount)
+    console.log({ sorted: sorted.length })
+    setMemData([...sorted, ...amalgamated.filter(a => a.state !== 'live')])
+    console.log('setMemData with sorted + amalgamated');
+  }
 }
 
 export const updateState = (guid: string, newState: ArticleState) => {
@@ -240,7 +258,8 @@ setInterval(() => {
 
 import { createStore } from "idb-keyval";
 import { get, set } from "idb-keyval";
-import { reduceImageSize } from './common'
+import { reduceImageSize, sorterPubDate } from './common'
+import { settings } from '@shared/settings'
 
 const imageCache = createStore("newsy-db", "images");
 

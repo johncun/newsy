@@ -1,18 +1,19 @@
 import { FeedResult } from "@shared/feed-types"
-import { createEffect, createSignal, onMount, Resource, Show } from "solid-js"
+import { createEffect, createSignal, onMount, Resource, Show, untrack } from "solid-js"
 import { memData, refreshDbWithFeedItems } from "./db"
-import { Meta } from "@solidjs/meta"
 import { Presence, Motion } from "solid-motionone"
 import Banner from "./Banner"
 import { Pulse } from "./Pulse"
 import { SettingsPage } from "./Settings"
-import { setIsFetching, mode, isFetching, menuGuid, showOptions, setShowOptions, readerPageInfo } from "./signals"
+import { mode, isFetchingFeeds, menuGuid, showOptions, setShowOptions, readerPageInfo, isFetchingStory } from "./signals"
 import { SvgCross } from "./svgs"
 import OptionMenuItems from "./OptionMenuItems"
 import List from "./List"
 import Reader from "./Reader"
 import { useOrientationDetector } from "./OrientationDetector"
 import { UpdateApplicationToast } from "./UpdateApplicationToast"
+import { settings } from "@shared/settings"
+import { timestampFetch } from "./common"
 
 const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
@@ -20,11 +21,11 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
     if (props.feed.error) {
       console.error('Error loading or validating API data:', props.feed.error)
     }
-    {/* console.log('Fetched items:', props.feed()?.count) */ }
+    untrack(() => {
+      console.log('refresh DB: Fetched items:', props.feed()?.count)
 
-    refreshDbWithFeedItems(props.feed()?.items || [])
-
-    setIsFetching(false)
+      refreshDbWithFeedItems(props.feed()?.items || [])
+    });
   })
 
   const [isUpScrolled, setIsUpScrolled] = createSignal(false)
@@ -68,25 +69,22 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
   createEffect(() => console.log(`isLandscape: ${isLandscape()}`))
   const toTop = () => {
     if (!scrollRef) return
-    scrollRef.scrollTo({ top: 0, behavior: 'smooth' })
+    scrollRef.scrollTo({ top: 0, behavior: 'instant' })
   }
 
   const toBottom = () => {
     if (!scrollRef) return
     scrollRef.scrollTo({
-      top: 100000, //scrollRef.scrollHeight,
-      behavior: 'smooth',
+      top: scrollRef.scrollHeight,
+      behavior: 'instant',
     })
   }
-  let lastFetchTime = 0
   createEffect(() => {
-    if (isFetching()) {
-      lastFetchTime = Date.now()
-    }
-    else {
-      setTimeout(() => {
-        if (Date.now() - lastFetchTime < 2000 && !readerPageInfo()) toTop()
-      }, 1000)
+    if (!isFetchingFeeds() && settings.gotoTopAfterRefresh && !readerPageInfo()) {
+      setTimeout(() =>
+        toTop()
+        , 100)
+
     }
   })
 
@@ -95,7 +93,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
     <Show when={isLandscape() === true || isLandscape() === false}>
       <div class="absolute left-[env(safe-area-inset-left)] right-[env(safe-area-inset-right)] top-[env(safe-area-inset-top)] bottom-[env(safe-area-inset-bottom)]">
         <Banner />
-        <Show when={isFetching()}>
+        <Show when={isFetchingFeeds() || isFetchingStory()}>
           <div class="absolute inset-0 flex items-center justify-center bg-black/70 z-50">
             <Pulse />
           </div>

@@ -1,8 +1,8 @@
 import { Motion } from 'solid-motionone'
 
-import { mode, setIsFetching, setMode, setShowOptions } from './signals'
+import { mode, setMode, setPerformFetchFeedsTrigger, setShowOptions } from './signals'
 import { getAllByState, memData } from './db'
-import { SvgAdd, SvgOptions } from './svgs'
+import { SvgOptions, SvgPlus } from './svgs'
 
 const Banner = () => {
   const modeDesc = (): string => {
@@ -38,10 +38,10 @@ const Banner = () => {
         press={{ scale: [1, 1.3] }}
         onClick={() => {
           setMode('live')
-          setIsFetching(true)
+          setPerformFetchFeedsTrigger(Date.now())
         }}
         class="w-10 h-10 px-1 flex items-center justify-center">
-        <SvgAdd fill="white" />
+        <SvgPlus fill="orange" />
       </Motion.div>
       <Motion.div
         press={{ scale: [1, 1.3] }}

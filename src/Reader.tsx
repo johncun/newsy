@@ -1,8 +1,9 @@
 import { createEffect, For, Match, Switch } from "solid-js"
 import { Motion } from "solid-motionone"
 import { SvgCross } from "./svgs"
-import { ReaderInput, setReaderPageInfo } from "./signals"
+import { ReaderInput, setIsFetchingStory, setReaderPageInfo } from "./signals"
 import { animate } from "@motionone/dom";
+import { settings } from "@shared/settings";
 
 export type ReaderContent = {
   title: string;
@@ -17,7 +18,7 @@ const TextAndImages = (props: { data: ReaderContent }) => {
     if (url.endsWith('svg')) return false
     if (url.endsWith('png')) return false
     if (alt === "sky news logo") return false
-    if (alt === "") return false
+    if (url.endsWith("width=56")) return false
     if (url.indexOf('rte.ie/djs') >= 0) return false
     return true
 
@@ -59,12 +60,12 @@ const TextAndImages = (props: { data: ReaderContent }) => {
         <Switch>
           <Match when={sub.type === "text"}>
             <div class={`font-[Nunito_Sans] first:border-t first:border-t-slate-500 ${sub.value.length < 30 ? 'font-bold' : 'font-light'} 
-                px-6 py-3 text-sm max-w-90 _text-justify _hyphens-auto _indent-2.5`}>{sub.value}</div>
+                px-6 py-3 text-md max-w-90 _text-justify _hyphens-auto _indent-2.5`}>{sub.value}</div>
           </Match>
           <Match when={sub.type === "image" && okImageSrc(sub.url, sub.alt)}>
-            <div class="flex flex-col items-center w-[90%] border border-slate-700/10 rounded-lg p-3">
-              <img src={sub.url} alt={sub.alt} />
-              <div class="text-xs text-center">{sub.alt}</div>
+            <div class="flex flex-col items-center w-full border border-slate-700/10 rounded-lg p-3">
+              <img class="rounded-lg" src={sub.url} alt={sub.alt} />
+              {settings.showFigureCaptions && <div class="text-xs text-center">{sub.alt}</div>}
             </div>
           </Match>
         </Switch>
@@ -132,6 +133,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
   let elRef!: HTMLDivElement;
 
   const hide = () => {
+    setIsFetchingStory(false)
     if (!elRef) return;
     animate(
       elRef,
@@ -168,11 +170,12 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
   return (
     <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
       class="absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 bg-linear-to-br from-white via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden" >
-      <div class="w-8 h-8 absolute z-50 right-2 top-2 bg-white rounded-full border border-slate-700 p-1" onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
+      <div class="w-8 h-8 absolute z-50 right-2 top-2 bg-white rounded-full border border-slate-700 p-1"
+        onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
         <SvgCross fill="#242424" />
       </div >
       <div class="absolute inset-x-0 top-0 h-10 text-xs w-full px-4 flex items-center ">
-        <div onClick={() => open(props?.value?.link || '')}>Source: <a class={props.value?.link}>{props.value?.source}</a></div>
+        <div onClick={() => { hide(); open(props?.value?.link || '') }}>Source: <a class={props.value?.link}>{props.value?.source}</a></div>
       </div>
       <div class="absolute inset-x-0 top-10 bottom-0 overflow-y-auto">
         <div class="flex flex-col items-center w-full p-4">

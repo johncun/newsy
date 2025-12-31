@@ -3,7 +3,7 @@ import { Accessor, Switch, For, Match } from "solid-js"
 import Card, { Action } from "./Card"
 import { getAllByState } from "./db"
 import { mode, setSelectedGuid } from "./signals"
-import { onSwipeLeft, onSwipeRight } from "./common"
+import { onSwipeLeft, onSwipeRight, sorterPubDate } from "./common"
 
 const List = (props: {
   as: Accessor<ArticleRecords>
@@ -11,14 +11,7 @@ const List = (props: {
 }) => {
   const as = () =>
     [...getAllByState(mode())(props.as())]
-      .sort((a, b) => {
-        const dateA = new Date(a.pubDate).getTime()
-        const dateB = new Date(b.pubDate).getTime()
-        if (isNaN(dateA) || isNaN(dateB)) {
-          return 0
-        }
-        return dateB - dateA
-      })
+      .sort(sorterPubDate)
 
   const getNextGuidInList = (guid: string): string => {
 

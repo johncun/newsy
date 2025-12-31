@@ -1,5 +1,5 @@
 import { createSignal, For, Show } from "solid-js";
-import { settings, updateSetting, feedActions, SettingItem, Settings } from "@shared/settings";
+import { settings, updateSetting, feedActions, SettingItem, Settings, ALLOWABLE_REFRESH_TIMES, MAX_ALLOWABLE_STORIES_IN_LIVE } from "@shared/settings";
 import { status } from "@src/_git_commit"
 import LegalModal from "./LegalModal";
 
@@ -19,6 +19,16 @@ const InputRenderer = (props: { item: SettingItem }) => {
           />
           <span class="slider"></span>
         </label>
+      );
+    case "selectnum":
+      return (
+        <select
+          value={settings[id] as string}
+          class="text-gray-100 bg-transparent font-semibold outline-none"
+          onChange={(e) => updateSetting(id, +(e.currentTarget.value))}
+        >
+          <For each={props.item.options}>{(opt) => <option value={opt}>{opt}</option>}</For>
+        </select>
       );
     case "select":
       return (
@@ -71,13 +81,32 @@ export const SettingsPage = () => {
       help: "Helps keep your live stories manageable",
       type: "select", options: ["1", "2", "5", "8", "24", "48", "240"]
     },
+
     {
       id: "fullMode", label: "Shows news stories in 3/4 page mode", desc: "Allows swiping up to get to next story",
       help: "",
       type: "toggle"
     },
-    // { id: "temp", label: "Alerts", desc: "Push notifications", help: "Requires system permission.", type: "toggle" },
-    // { id: "theme", label: "Theme", desc: "App appearance", help: "Dark mode saves battery.", type: "select", options: ["Light", "Dark", "System"] },
+    {
+      id: "showFigureCaptions", label: "Displays captions under all images in news reader", desc: "Sometimes the captions are very verbose, this will remove them",
+      help: "",
+      type: "toggle"
+    },
+    {
+      id: "autoRefreshTime", label: "Will automatically fetch stories after this number of minutes since last fetch", desc: "Useful is you want your view to contains the latest feeds without any action",
+      help: "",
+      type: "selectnum", options: ALLOWABLE_REFRESH_TIMES.map(String)
+    },
+    {
+      id: "maxLiveCount", label: "Keeps the live feed to this length, removing the oldest stories", desc: "Removes any live storires replacing them with the latest from your feeds",
+      help: "",
+      type: "selectnum", options: MAX_ALLOWABLE_STORIES_IN_LIVE.map(String)
+    },
+    {
+      id: "gotoTopAfterRefresh", label: "Go to top of list if the stories are refreshed", desc: "Can be a pain if you are saving items, but better to see latest storries as they come in",
+      help: "",
+      type: "toggle"
+    },
   ];
 
   const filteredGeneral = () => menuItems.filter(i => i.label.toLowerCase().includes(search().toLowerCase()));

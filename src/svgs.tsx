@@ -67,3 +67,24 @@ export const SvgCross = (props: { fill: string }) => {
     </svg>
   )
 }
+export const SvgPlus = (props: { fill: string }) => {
+  return (
+    <svg viewBox="0 0 24 24" fill="none">
+      <path
+        d="M6 12H18"
+        stroke={props.fill}
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12 6V18"
+        stroke={props.fill}
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
+
