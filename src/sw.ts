@@ -24,16 +24,18 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 
   if (url.pathname === '/summarize-news') {
     const targetUrl = url.searchParams.get('url');
+    const ignoreWords = url.searchParams.get('ignoreWords') || '';
+    console.log({ ignoreWords })
     if (targetUrl) {
-      event.respondWith(handleNewsExtraction(targetUrl));
+      event.respondWith(handleNewsExtraction(targetUrl, ignoreWords));
     }
   }
 });
 
-async function handleNewsExtraction(targetUrl: string) {
+async function handleNewsExtraction(targetUrl: string, ignoreWords: string) {
   try {
     console.log('handleNewsExtraction', targetUrl);
-    const summary = await summarizeNewsPage(targetUrl, '/api/proxy');
+    const summary = await summarizeNewsPage(targetUrl, '/api/proxy', { ignoreWords });
     console.log({ summary })
     return new Response(JSON.stringify(summary, null, 2),
       {

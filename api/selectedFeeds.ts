@@ -17,7 +17,7 @@ export default async function handler(
   }
 
   try {
-    const { sources, maxPerRequest, maxLookbackTime, alreadyKnown } = FeedRequestSchema.parse(request.body)
+    const { sources, ignoreWords, maxPerRequest, maxLookbackTime, alreadyKnown } = FeedRequestSchema.parse(request.body)
 
     const allFeeds = await Promise.all(
       sources.map(feed => parseRSSFeed(feed.url, feed.name)),
@@ -29,6 +29,18 @@ export default async function handler(
       const pub = new Date(a.pubDate).getTime()
       return (now - pub) < (maxLookbackTime * 3600 * 1000)
     }
+    const ws = convertStringToWordStruct(ignoreWords)
+    const check = hasIgnoreWord(ws)
+
+    const findNoIgnoredWords = (a: FeedItem): boolean => {
+      if (!ignoreWords) return true;
+
+      const res = !check(a.title) && !check(a.description)
+      if (!res) {
+        console.log(`IGNORE!! found words ${ignoreWords} in title ${a.title} or description ${a.description}`)
+      }
+      return res;
+    }
 
     const knowns = new Set(alreadyKnown || [])
 
@@ -36,6 +48,7 @@ export default async function handler(
       .flat()
       .filter(item => item.title && item.link)
       .filter(withinLookback)
+      .filter(findNoIgnoredWords)
       .filter(f => !knowns.has(f.guid))
 
     console.log({ knowns: knowns.size, allFeeds: allFeeds.flat().length, allItems: allItems.length })
@@ -66,6 +79,9 @@ export default async function handler(
         return [...prev, ...(feedsMapped[weight.name]?.slice(0, weight.n) || [])]
       }, [] as FeedItems)
     }
+
+
+
 
     console.log({
       results: results.map(f => ({ s: f.source })),
@@ -101,3 +117,26 @@ export default async function handler(
     return response.status(500).json({ error: 'Internal Server Error' })
   }
 }
+
+type WordStruct = string[][]
+
+const convertStringToWordStruct = (s: string): WordStruct => {
+  const x = s.trim().toLowerCase()
+  if (!x) return []
+
+  return x.split(' ').map(s => {
+    const ss = s.trim()
+    const ors = ss.split('+').map(i => i.trim())
+    return ors
+  })
+}
+
+const hasIgnoreWord = (ws: WordStruct) => (s: string): boolean => {
+
+  const x = s.toLowerCase()
+  if (!s) return false;
+  return !!ws.find(ora => {
+    return ora.every(z => x.includes(z))
+  })
+}
+

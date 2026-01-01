@@ -20,6 +20,7 @@ export const SettingsSchema = z.object({
   gotoTopAfterRefresh: z.boolean(),
   autoRefreshTime: z.union(ALLOWABLE_REFRESH_TIMES.map(n => z.literal(n))),
   maxLiveCount: z.union(MAX_ALLOWABLE_STORIES_IN_LIVE.map(n => z.literal(n))),
+  ignoreWords: z.string()
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -29,7 +30,7 @@ export type SettingItem = {
   label: string;
   desc: string;
   help: string;
-  type: "text" | "toggle" | "select" | "selectnum";
+  type: "text" | "toggle" | "select" | "selectnum" | "multitext";
   options?: string[];
 };
 
@@ -42,7 +43,9 @@ const DEFAULTS: Settings = {
   feeds: DEFAULT_FEED_URLS,
   autoRefreshTime: 0,
   maxLiveCount: 50,
-  gotoTopAfterRefresh: false
+  gotoTopAfterRefresh: false,
+  ignoreWords: ''
+
 };
 
 const loadSettings = (): Settings => {

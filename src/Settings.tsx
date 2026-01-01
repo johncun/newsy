@@ -40,6 +40,14 @@ const InputRenderer = (props: { item: SettingItem }) => {
           <For each={props.item.options}>{(opt) => <option value={opt}>{opt}</option>}</For>
         </select>
       );
+    case "multitext":
+      return (
+        <textarea
+          value={settings[id] as string}
+          class="border-b border-gray-400 w-full outline-none focus:border-blue-500 text-gray-100"
+          onInput={(e) => updateSetting(id, e.currentTarget.value as Settings[typeof id])}
+        />
+      );
     default:
       return (
         <input
@@ -59,10 +67,14 @@ const SettingRow = (props: { item: SettingItem }) => (
         <h3 class="text-gray-300 font-medium">{props.item.label}</h3>
         <p class="text-sm text-gray-500 leading-tight">{props.item.desc}</p>
       </div>
+      {props.item.type !== "multitext" && <div class="shrink-0 pt-1">
+        <InputRenderer item={props.item} />
+      </div>}
+    </div>
+    {props.item.type === "multitext" &&
       <div class="shrink-0 pt-1">
         <InputRenderer item={props.item} />
-      </div>
-    </div>
+      </div>}
     <p class="text-xs text-gray-400 mt-2 italic">{props.item.help}</p>
   </div>
 );
@@ -106,6 +118,11 @@ export const SettingsPage = () => {
       id: "gotoTopAfterRefresh", label: "Go to top of list if the stories are refreshed", desc: "Can be a pain if you are saving items, but better to see latest storries as they come in",
       help: "",
       type: "toggle"
+    },
+    {
+      id: "ignoreWords", label: "Ignore articles that contain the following words", desc: "This will ignore stories that contain any of the following words, more than one word then separate with a '+'. For example: 'red fox black+cat' would ignore any that contain the word 'red' or 'fox', or 'black' and 'cat' in the same story",
+      help: "",
+      type: "multitext"
     },
   ];
 

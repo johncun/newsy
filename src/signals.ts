@@ -21,4 +21,5 @@ export const [readerPageInfo, setReaderPageInfo] = createSignal<ReaderInput | un
 
 export const [tick, setTick] = createSignal(1)
 
+export const [networkIssue, setNetworkIssue] = createSignal(false)
 

@@ -1,6 +1,6 @@
 import { Motion } from 'solid-motionone'
 
-import { mode, setMode, setPerformFetchFeedsTrigger, setShowOptions } from './signals'
+import { mode, setIsFetchingFeeds, setMode, setPerformFetchFeedsTrigger, setShowOptions } from './signals'
 import { getAllByState, memData } from './db'
 import { SvgOptions, SvgPlus } from './svgs'
 
@@ -38,6 +38,7 @@ const Banner = () => {
         press={{ scale: [1, 1.3] }}
         onClick={() => {
           setMode('live')
+          setIsFetchingFeeds(true)
           setPerformFetchFeedsTrigger(Date.now())
         }}
         class="w-10 h-10 px-1 flex items-center justify-center">

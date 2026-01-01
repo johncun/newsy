@@ -3,6 +3,7 @@ import { Motion } from "solid-motionone"
 import { setIsFetchingStory, setMenuGuid, setReaderPageInfo } from "./signals"
 import { SvgAdd, SvgTrash } from "./svgs"
 import { FeedItem } from "@shared/feed-types"
+import { settings } from "@shared/settings"
 
 export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolean>, swipeRight: () => void, swipeLeft: () => void }) => {
 
@@ -105,7 +106,7 @@ export const GoBtn = (props: { source: string, backupImage?: string, link: strin
   onClick={async (ev) => {
     ev.stopPropagation();
     setTimeout(() => setIsFetchingStory(true), 50)
-    const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}`;
+    const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}&ignoreWords=${encodeURIComponent(settings.ignoreWords)}`;
     const res = await fetch(proxyUrl);
     const items = await res.json()
     {/* console.log({ items }) */ }

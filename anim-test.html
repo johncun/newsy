@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SVG Swipe Actions</title>
+    <style>
+        :root {
+            --row-height: 80px;
+            --action-size: 80px;
+            --offset: 0px;
+            --abs-offset: 10px;
+            --icon-scale: 0; 
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f0f2f5;
+            padding: 40px 0;
+        }
+
+        .swipe-item {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            height: var(--row-height);
+            background: #f0f2f5; /* Match body to hide edges */
+            overflow: hidden;
+            touch-action: pan-y;
+            user-select: none;
+        }
+
+        .actions-bg {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1;
+            padding: 0 4px; /* Slight gap for the radius to breathe */
+        }
+
+        .action-box {
+            width: clamp(0px, var(--abs-offset), var(--action-size));
+            height: calc(var(--row-height) - 8px); /* Padding adjustment */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 16px; /* Your requested radius */
+            flex-shrink: 0;
+            transition: width 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.2);
+        }
+
+        #boxLeft { background-color: #2e7d32; }
+        #boxRight { background-color: #d32f2f; }
+
+        .icon-svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+            transform: scale(var(--icon-scale));
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .is-dragging .action-box,
+        .is-dragging .content,
+        .is-dragging .icon-svg {
+            transition: none !important;
+        }
+
+        .content {
+            position: absolute;
+            inset: 0;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 2;
+            transform: translateX(var(--offset));
+            border-bottom: 1px solid #eee;
+            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.2);
+        }
+
+        .text-group strong { display: block; color: #333; }
+        .text-group p { margin: 4px 0 0; color: #666; font-size: 0.85rem; }
+
+        .removed {
+            max-height: 0;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="swipe-item" id="swipeRow">
+        <div class="actions-bg">
+            <div class="action-box" id="boxLeft">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                    <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.01 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.49-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5l-4 4-4-4H10V10h4v3.5h3z"/>
+                </svg>
+            </div>
+            
+            <div class="action-box" id="boxRight">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="text-group">
+                <strong>Modern SVG Swipe</strong>
+                <p>Pull to reveal the rounded action cards.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const row = document.getElementById('swipeRow');
+        const boxL = document.getElementById('boxLeft');
+        const boxR = document.getElementById('boxRight');
+        
+        let startX = 0;
+        let isDragging = false;
+        const limit = 80;
+
+        row.addEventListener('pointerdown', (e) => {
+            startX = e.clientX;
+            isDragging = true;
+            row.classList.add('is-dragging');
+            row.setPointerCapture(e.pointerId);
+        });
+
+        row.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            
+            let x = e.clientX - startX;
+            let absX = Math.abs(x);
+
+            if (absX > limit) {
+                const over = absX - limit;
+                x = x > 0 ? limit + (over * 0.2) : -limit - (over * 0.2);
+                absX = limit + (over * 0.2);
+            }
+
+            let scale = (absX - 30) / 40;
+            scale = Math.min(Math.max(scale, 0), 1);
+
+            row.style.setProperty('--offset', `${x}px`);
+            row.style.setProperty('--abs-offset', `${absX+10}px`);
+            row.style.setProperty('--icon-scale', scale);
+
+            boxL.style.visibility = x > 0 ? 'visible' : 'hidden';
+            boxR.style.visibility = x < 0 ? 'visible' : 'hidden';
+        });
+
+        row.addEventListener('pointerup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            row.classList.remove('is-dragging');
+
+            const currentX = parseFloat(getComputedStyle(row).getPropertyValue('--offset'));
+
+            if (Math.abs(currentX) >= (limit - 10)) {
+                row.style.setProperty('--offset', currentX > 0 ? '100%' : '-100%');
+                row.style.setProperty('--abs-offset', '100%');
+                row.style.setProperty('--icon-scale', '1');
+                setTimeout(() => row.classList.add('removed'), 200);
+            } else {
+                row.style.setProperty('--offset', '0px');
+                row.style.setProperty('--abs-offset', '0px');
+                row.style.setProperty('--icon-scale', '0');
+                
+                setTimeout(() => {
+                    if (!isDragging) {
+                        boxL.style.visibility = 'hidden';
+                        boxR.style.visibility = 'hidden';
+                    }
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>

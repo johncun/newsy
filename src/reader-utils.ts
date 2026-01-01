@@ -2,11 +2,13 @@ import { parseHTML } from 'linkedom';
 
 
 export type ReaderOptions = {
-  ignorePlaceholderImages: boolean
+  ignorePlaceholderImages?: boolean
+  ignoreWords?: string
 }
 
 const DEFAULT_OPTS: ReaderOptions = {
-  ignorePlaceholderImages: true
+  ignorePlaceholderImages: true,
+  ignoreWords: ''
 }
 
 type ContentText = {
@@ -28,7 +30,7 @@ type SectionItem = {
   content: ContentItem[]
 }
 
-export async function summarizeNewsPage(targetUrl: string, proxy: string, _options: ReaderOptions = DEFAULT_OPTS): Promise<SectionItem[]> {
+export async function summarizeNewsPage(targetUrl: string, proxy: string, options: ReaderOptions = DEFAULT_OPTS): Promise<SectionItem[]> {
   console.log(`Reader fetching: ${targetUrl}...`);
   try {
     const response = await fetch(`${proxy}?url=${encodeURIComponent(targetUrl)}`, {
@@ -112,6 +114,8 @@ export async function summarizeNewsPage(targetUrl: string, proxy: string, _optio
       console.log('----------- section ENDED')
       summary.push(currentSection)
     }
+
+
     return summary;
 
   } catch (error) {

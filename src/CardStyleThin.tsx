@@ -38,10 +38,10 @@ const CardStyleThin = (props: {
         </div>
         <div class="absolute p-1 top-6 w-full flex flex-col overflow-hidden gap-0 font-[Noto_Serif]">
           <Title value={props.data.title} />
-          <Byline value={props.data.description} />
+          <Byline value={props.data.description} isSelected={props.isSelected} />
         </div>
       </div>
-
+      <Fade />
       <CardButtons data={props.data} isSelected={props.isSelected} swipeLeft={props.swipeLeft} swipeRight={props.swipeRight} />
     </Motion.div >
   </div >
@@ -61,11 +61,14 @@ const PublishedTime = (props: { value: string }) => {
   </div >
 }
 
-const Title = (props: { value: string }) =>
-  <div class="font-normal leading-4 font-[Noto_Serif] pb-0.5 text-shadow-black/50 text-md font-stretch-10% text-shadow-md line-clamp-3">{props.value}</div>
+const Fade = () =>
+  <div class="absolute inset-x-0 bottom-0 h-12 bg-linear-to-b from-transparent to-gray-900"></div>
 
-const Byline = (props: { value: string }) =>
-  <div class="text-xs font-normal text-zinc-100/70 overflow-y-hidden line-clamp-3 text-left w-full">
+const Title = (props: { value: string }) =>
+  <div class="font-normal leading-4 font-[Quicksand] pb-0.5 text-shadow-black/50 text-md font-stretch-125% text-shadow-md line-clamp-3">{props.value}</div>
+
+const Byline = (props: { value: string, isSelected: Accessor<boolean> }) =>
+  <div class={`text-sm leading-3.5 font-normal font-[Noto_Sans] text-zinc-100/70 overflow-y-hidden line-clamp-${props.isSelected() ? '5' : '3'} text-left w-full`}>
     {props.value}
   </div>
 
@@ -111,7 +114,7 @@ const ImageFor = (props: {
 
   return props.data.image && !props.data.source.startsWith('Sydney') ?
     <CachedImage src={props.data.image} alt={props.data.title}
-      class={`absolute left-0 w-30 h-30 top-0 object-cover ${!props.isSelected() && props.blur ? 'blur-xs' : ''}`}
+      class={`absolute left-0 w-30 h-full top-0 object-cover ${!props.isSelected() && props.blur ? 'blur-xs' : ''}`}
     />
     : <div
       class={`absolute inset-0 ${getDeterministicGradient(props.data.guid)}`}
