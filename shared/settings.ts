@@ -5,6 +5,8 @@ import { SourceRecord, SourceRecordSchema } from "./feed-types";
 import { setPerformFetchFeedsTrigger, setTick, tick } from "@src/signals";
 import { untrack } from "solid-js";
 import { lastFeedFetchedTime } from "@src/common";
+import { ImageVault } from "@src/db";
+import { argv0 } from "node:process";
 
 export const ALLOWABLE_REFRESH_TIMES = [0, 1, 2, 5, 10, 20, 30, 60, 180]
 export const MAX_ALLOWABLE_STORIES_IN_LIVE = [10, 20, 30, 50, 100]
@@ -48,11 +50,28 @@ const DEFAULTS: Settings = {
 
 };
 
+function isValidUrl(feed: SourceRecord): boolean {
+  try {
+    if (feed.url.trim().length < 7 || feed.name.trim().length === 0) return false
+    const url = new URL(feed.url);
+    return (url.protocol === "http:" || url.protocol === "https:") && !!url.pathname;
+  } catch (e) {
+    return false;
+  }
+}
+
+export const sanitizeSettings = () => {
+  setSettings('feeds', settings.feeds.filter(isValidUrl))
+}
+
 const loadSettings = (): Settings => {
   const saved = localStorage.getItem(SETTINGS_KEY);
   if (!saved) return DEFAULTS;
   try {
-    return SettingsSchema.parse(JSON.parse(saved));
+    const ss = SettingsSchema.parse(JSON.parse(saved));
+    ss.feeds = ss.feeds.filter(isValidUrl)
+    return ss;
+
   } catch {
     return DEFAULTS;
   }
@@ -70,8 +89,8 @@ export const updateSetting = <K extends keyof Settings>(key: K, value: Settings[
 
 export const feedActions = {
   add: () => {
-    const newFeed: SourceRecord = { id: crypto.randomUUID(), name: "Enter Name", url: "https://", votes: 1 };
-    setSettings("feeds", (f) => [...f, newFeed]);
+    const newFeed: SourceRecord = { id: crypto.randomUUID(), name: "", url: "https://", votes: 1 };
+    setSettings("feeds", (f) => [newFeed, ...f]);
     persist();
   },
   remove: (id: string) => {
@@ -98,7 +117,7 @@ export const feedActions = {
   }
 };
 const MS_MINUTE = 1000 * 60;
-
+let lastPurgedTime = 0
 setInterval(() => {
   setTick(t => t + 1);
   console.log({ tick: tick() })
@@ -107,6 +126,12 @@ setInterval(() => {
       console.log('auto fetch', { lastFeedFetchedTime, diff: Date.now() - lastFeedFetchedTime, period: settings.autoRefreshTime * MS_MINUTE })
       setPerformFetchFeedsTrigger(Date.now())
     }
+
+    if (Date.now() - lastPurgedTime > MS_MINUTE * 57) {
+      ImageVault.purge()
+      lastPurgedTime = Date.now()
+    }
+
   })
 }, ~~(MS_MINUTE / 3))
 

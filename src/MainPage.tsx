@@ -5,15 +5,14 @@ import { Presence, Motion } from "solid-motionone"
 import Banner from "./Banner"
 import { Pulse } from "./Pulse"
 import { SettingsPage } from "./Settings"
-import { mode, isFetchingFeeds, menuGuid, showOptions, setShowOptions, readerPageInfo, isFetchingStory, networkIssue, setNetworkIssue } from "./signals"
+import { mode, isFetchingFeeds, menuGuid, showOptions, setShowOptions, readerPageInfo, isFetchingStory, networkIssue, } from "./signals"
 import { SvgCross } from "./svgs"
 import OptionMenuItems from "./OptionMenuItems"
 import List from "./List"
 import Reader from "./Reader"
 import { useOrientationDetector } from "./OrientationDetector"
 import { UpdateApplicationToast } from "./UpdateApplicationToast"
-import { settings } from "@shared/settings"
-import { timestampFetch } from "./common"
+import { sanitizeSettings, settings } from "@shared/settings"
 
 const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
@@ -150,8 +149,11 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
                 </div>
                 <div
                   class="absolute w-8 h-8 p-1 cursor-pointer top-2 right-2 flex items-center justify-center text-white "
-                  onClick={() => setShowOptions(false)}>
-                  <SvgCross fill="white" />{' '}
+                  onClick={() => {
+                    sanitizeSettings()
+                    setShowOptions(false)
+                  }}>
+                  <SvgCross fill="white" />
                 </div>
                 <div class="absolute inset-x-2 top-12 bottom-0 overflow-x-hidden px-2">
                   <SettingsPage />

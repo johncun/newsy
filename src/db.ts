@@ -256,7 +256,7 @@ setInterval(() => {
 
 
 
-import { createStore } from "idb-keyval";
+import { createStore, delMany, entries, values } from "idb-keyval";
 import { get, set } from "idb-keyval";
 import { reduceImageSize, sorterPubDate } from './common'
 import { settings } from '@shared/settings'
@@ -267,7 +267,10 @@ export const ImageVault = {
   getOrFetch: async (imageUrl: string): Promise<Blob | null> => {
     try {
       const cached = await get(imageUrl, imageCache);
-      if (cached instanceof Blob) return cached;
+      if (cached instanceof Blob) {
+        await set(imageUrl, { cached, when: Date.now() }, imageCache);
+        return cached;
+      }
 
       // Encode the URL to ensure special characters don't break the query string
       const proxyUrl = `/api/proxy?url=${encodeURIComponent(imageUrl)}`;
@@ -281,11 +284,28 @@ export const ImageVault = {
 
       console.log(`Reduced from ${heavyBlob.size / 1024}KB to ${slimBlob.size / 1024}KB`);
 
-      await set(imageUrl, slimBlob, imageCache);
+      await set(imageUrl, { slimBlob, when: Date.now() }, imageCache);
       return slimBlob;
     } catch (e) {
       console.error("Cache and Proxy both failed", e);
       return null;
     }
+  },
+  purge: async (): Promise<void> => {
+
+    const all = await entries(imageCache)
+    if (all.length === 0) return
+
+    const toPurge = all.flatMap(([k, v]: [IDBValidKey, Blob | { slimBlob: Blob; when: number }]) => {
+      if (v instanceof Blob)
+        return [k]
+      if (v.when && (Date.now() - v.when) > (1000 * 3600 * 72)) return [k];
+      else {
+        return [] as IDBValidKey
+      }
+    })
+    if (toPurge.length === 0) return
+    await delMany(toPurge, imageCache)
+
   }
 };

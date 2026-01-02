@@ -1,6 +1,6 @@
 import { Accessor, Show } from "solid-js"
 import { Motion } from "solid-motionone"
-import { setIsFetchingStory, setMenuGuid, setReaderPageInfo } from "./signals"
+import { setIsFetchingStory, setMenuGuid, setNetworkIssue, setReaderPageInfo } from "./signals"
 import { SvgAdd, SvgTrash } from "./svgs"
 import { FeedItem } from "@shared/feed-types"
 import { settings } from "@shared/settings"
@@ -107,16 +107,22 @@ export const GoBtn = (props: { source: string, backupImage?: string, link: strin
     ev.stopPropagation();
     setTimeout(() => setIsFetchingStory(true), 50)
     const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}&ignoreWords=${encodeURIComponent(settings.ignoreWords)}`;
-    const res = await fetch(proxyUrl);
-    const items = await res.json()
-    {/* console.log({ items }) */ }
-    setReaderPageInfo({ source: props.source, backupImage: props.backupImage || '', link: props.link, items });
-    setIsFetchingStory(false)
+    try {
+      const res = await fetch(proxyUrl);
+      if (!res.ok) throw "Network error"
+      const items = await res.json()
+      if (items.error) throw items.error
+      console.log({ items })
 
-    // window.open(
-    // props.link,
-    // '_blank',
-    // 'noopener,noreferrer',
+      setReaderPageInfo({ source: props.source, backupImage: props.backupImage || '', link: props.link, items });
+      setIsFetchingStory(false)
+    }
+    catch (err) {
+      console.error(err)
+      setNetworkIssue(true)
+      setIsFetchingStory(false)
+      setTimeout(() => setNetworkIssue(false), 2000)
+    }
   }
   }
   style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
