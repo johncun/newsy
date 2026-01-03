@@ -1,6 +1,6 @@
 import { ArticleRecord, ArticleState } from "@shared/feed-types";
-import { Action } from "./Card";
 import { killArticle, updateState } from "./db";
+export type Action = 'Kill' | 'Save' | 'Delete' | ''
 
 export const dt = (dstr: string) => {
   const date = new Date(dstr)
@@ -148,3 +148,28 @@ export function hashToBoolean(str: string): boolean {
 
 export let lastFeedFetchedTime = 0
 export const timestampFetch = () => lastFeedFetchedTime = Date.now()
+
+export async function copyToClipboard(text: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(text);
+    console.log('Text copied to clipboard');
+  } catch (err) {
+    console.error('Failed to copy: ', err);
+  }
+}
+export const encodeUnicode = (str: string): string => {
+  return btoa(new TextEncoder().encode(str).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+};
+
+export const decodeUnicode = (base64: string): string => {
+  const binaryString = atob(base64);
+
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return new TextDecoder().decode(bytes);
+}
+
+

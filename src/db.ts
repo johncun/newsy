@@ -39,6 +39,11 @@ export const autoClearKills = () => {
   setKilledList(ks)
 }
 
+export const lastPubTime = (): number => {
+  const sorted = [...memData()].sort(sorterPubDate).slice(0, settings.maxLiveCount)
+  if (sorted.length === 0) return 0;
+  return new Date(sorted[0].pubDate).getTime()
+}
 
 export const getAllFromLocal = () => {
   const data = localStorage.getItem(STORAGE_KEY)
@@ -256,7 +261,7 @@ setInterval(() => {
 
 
 
-import { createStore, delMany, entries, values } from "idb-keyval";
+import { createStore, delMany, entries } from "idb-keyval";
 import { get, set } from "idb-keyval";
 import { reduceImageSize, sorterPubDate } from './common'
 import { settings } from '@shared/settings'

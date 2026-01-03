@@ -106,7 +106,11 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
       f.content = f.content.filter(({ alt }: { alt: string }) => alt !== "guardian.org")
 
       const idx = f.content.findIndex((c: { type: string, value: string }) => {
-        return (c.type === "text" && (c.value.indexOf("embed this post,") >= 0 || c.value.indexOf("More on this story") >= 0))
+        return (c.type === "text" &&
+          (c.value.indexOf("embed this post,") >= 0
+            || c.value.indexOf("More on this story") >= 0
+            || c.value.indexOf("You must confirm your public display name") >= 0
+            || c.value.indexOf("Follow TechRadar") >= 0))
       })
       if (idx === 0) return []
       if (idx >= 0) {

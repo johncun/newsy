@@ -1,5 +1,5 @@
 import {
-  FeedResult,
+  FeedResult, FeedRequestBody
 } from '@shared/feed-types'
 import { settings } from '@shared/settings'
 import { Meta } from '@solidjs/meta'
@@ -18,24 +18,27 @@ import {
 } from './signals'
 import IntroScreen from './IntroScreen'
 import MainPage from './MainPage'
-import { allGuids, autoClearKills } from './db'
+import { allGuids, autoClearKills, lastPubTime } from './db'
 import { timestampFetch } from './common'
 
 const fetchItems = async (): Promise<FeedResult | null> => {
   try {
+
+    const bodyObj: FeedRequestBody = {
+      sources: settings.feeds,
+      maxPerRequest: +settings.maxFeedsPerRequest,
+      maxLookbackTimeHrs: +settings.maxLookbackTime,
+      lastPubTimeMs: lastPubTime(),
+      alreadyKnown: [...allGuids()],
+      ignoreWords: settings.ignoreWords
+    }
+
     const response = await fetch('/api/selectedFeeds', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        sources: settings.feeds,
-        maxPerRequest: +settings.maxFeedsPerRequest,
-        maxLookbackTime: +settings.maxLookbackTime,
-        fullMode: settings.fullMode,
-        alreadyKnown: [...allGuids()],
-        ignoreWords: settings.ignoreWords
-      }),
+      body: JSON.stringify(bodyObj),
     })
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`)
@@ -46,7 +49,7 @@ const fetchItems = async (): Promise<FeedResult | null> => {
     const validatedData = FeedResult.parse(data)
     validatedData.items = validatedData.items.map(fr => {
       fr.pubDate = fr.pubDate || new Date().toUTCString();
-      {/* console.log({ title: fr.title, d: fr.pubDate }) */ }
+      console.log({ title: fr.title, d: fr.pubDate })
       return fr
     })
 

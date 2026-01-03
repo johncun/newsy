@@ -1,5 +1,5 @@
 import { createSignal, For, Show } from "solid-js";
-import { settings, updateSetting, feedActions, SettingItem, Settings, ALLOWABLE_REFRESH_TIMES, MAX_ALLOWABLE_STORIES_IN_LIVE } from "@shared/settings";
+import { settings, updateSetting, feedActions, SettingItem, Settings, ALLOWABLE_REFRESH_TIMES, MAX_ALLOWABLE_STORIES_IN_LIVE, MAX_LOOKBACK_TIMES } from "@shared/settings";
 import { status } from "@src/_git_commit"
 import LegalModal from "./LegalModal";
 
@@ -90,8 +90,8 @@ export const SettingsPage = () => {
     },
     {
       id: "maxLookbackTime", label: "Oldest story time per refresh in hours", desc: "Will not return stories older than this",
-      help: "Helps keep your live stories manageable",
-      type: "select", options: ["1", "2", "5", "8", "24", "48", "240"]
+      help: "Helps keep your live stories manageable, is set to 0 then will only fetch those after latest story published time",
+      type: "selectnum", options: MAX_LOOKBACK_TIMES.map(String)
     },
 
     {

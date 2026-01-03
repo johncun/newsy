@@ -17,7 +17,7 @@ export default async function handler(
   }
 
   try {
-    const { sources, ignoreWords, maxPerRequest, maxLookbackTime, alreadyKnown } = FeedRequestSchema.parse(request.body)
+    const { sources, ignoreWords, maxPerRequest, lastPubTimeMs, maxLookbackTimeHrs, alreadyKnown } = FeedRequestSchema.parse(request.body)
 
     const allFeeds = await Promise.all(
       sources.map(feed => parseRSSFeed(feed.url, feed.name)),
@@ -25,9 +25,14 @@ export default async function handler(
 
     const withinLookback = (a: FeedItem): boolean => {
       if (!a.pubDate) return false;
-      const now = Date.now()
       const pub = new Date(a.pubDate).getTime()
-      return (now - pub) < (maxLookbackTime * 3600 * 1000)
+
+      if (maxLookbackTimeHrs === 0) {
+        return pub >= lastPubTimeMs
+      }
+
+      const now = Date.now()
+      return (now - pub) < (maxLookbackTimeHrs * 3600 * 1000)
     }
     const ws = convertStringToWordStruct(ignoreWords)
     const check = hasIgnoreWord(ws)
@@ -46,10 +51,10 @@ export default async function handler(
 
     const allItems: FeedItem[] = allFeeds
       .flat()
-      .filter(item => item.title && item.link)
-      .filter(withinLookback)
+      .filter(fi => fi.title && fi.link)
+      .filter(fi => !knowns.has(fi.guid))
       .filter(findNoIgnoredWords)
-      .filter(f => !knowns.has(f.guid))
+      .filter(withinLookback)
 
     console.log({ knowns: knowns.size, allFeeds: allFeeds.flat().length, allItems: allItems.length })
 

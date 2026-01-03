@@ -1,15 +1,15 @@
 import { ArticleRecord, ArticleRecords, ArticleState } from "@shared/feed-types"
 import { Accessor, Switch, For, Match, Show } from "solid-js"
-import Card, { Action } from "./Card"
 import { getAllByState } from "./db"
 import { mode, selectedGuid, setSelectedGuid } from "./signals"
-import { hashToBoolean, onSwipeLeft, onSwipeRight, sorterPubDate } from "./common"
+import { Action, hashToBoolean, onSwipeLeft, onSwipeRight, sorterPubDate } from "./common"
 import Swipeable from "./Swipeable"
 import CardStyleThin from "./CardStyleThin"
-import { SvgAdd, SvgPlus, SvgTrash } from "./svgs"
+import { SvgPlus, SvgTrash } from "./svgs"
 import CardStyleLarge from "./CardStyleLarge"
 import CardStyleThreeQuarter from "./CardStyleThreeQuarter"
 import { settings } from "@shared/settings"
+
 
 const List = (props: {
   as: Accessor<ArticleRecords>
@@ -40,7 +40,6 @@ const List = (props: {
     setTimeout(() => setSelectedGuid(nxg), 0)
   }
 
-  const ht = () => 'h-30'
   const isSelected = (a: ArticleRecord) => () => selectedGuid() === a.guid
   const useThin = (a: ArticleRecord) => hashToBoolean(a.guid)
   const rightAction = (): Action => {

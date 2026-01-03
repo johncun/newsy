@@ -1,9 +1,10 @@
 import { Accessor, Show } from "solid-js"
 import { Motion } from "solid-motionone"
 import { setIsFetchingStory, setMenuGuid, setNetworkIssue, setReaderPageInfo } from "./signals"
-import { SvgAdd, SvgTrash } from "./svgs"
+import { SvgAdd, SvgShare, SvgTrash } from "./svgs"
 import { FeedItem } from "@shared/feed-types"
 import { settings } from "@shared/settings"
+import { encodeUnicode, copyToClipboard } from "./common"
 
 export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolean>, swipeRight?: () => void, swipeLeft?: () => void }) => {
 
@@ -18,11 +19,31 @@ export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolea
           setMenuGuid(props.data.guid)
         }} isSelected={props.isSelected} />
         <GoBtnDirect link={props.data.link} isSelected={props.isSelected} />
+        <ShareBtn link={props.data.link} source={props.data.source} isSelected={props.isSelected} />
       </div>
       <GoBtn source={props.data.source} backupImage={props.data.image} link={props.data.link} isSelected={props.isSelected} />
       {props.swipeLeft && <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />}
     </Motion.div>
   </Show>
+}
+
+export const ShareBtn = (props: { link: string, source: string, isSelected: Accessor<boolean> }) => {
+  const shareToClipboard = (ev: { stopPropagation: () => void }) => {
+    ev.stopPropagation()
+    const sharedlink = `${window.location.origin}?goto=${encodeUnicode(props.link)}&source=${encodeUnicode(props.source)}`
+
+
+    copyToClipboard(sharedlink)
+    console.log('share encoded link to clipboard:  ' + sharedlink)
+  }
+
+  return <Motion.div
+    press={{ scale: [1, 1.3, 1] }}
+    class="p-1 w-8 h-8 rounded-full bg-slate-200/40 flex items-center justify-center text-black"
+    onClick={shareToClipboard}
+    style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
+    <SvgShare fill="#808080" />
+  </Motion.div>
 }
 
 export const AddBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) => <Motion.div
@@ -106,7 +127,7 @@ export const GoBtn = (props: { source: string, backupImage?: string, link: strin
   onClick={async (ev) => {
     ev.stopPropagation();
     setTimeout(() => setIsFetchingStory(true), 50)
-    const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}&ignoreWords=${encodeURIComponent(settings.ignoreWords)}`;
+    const proxyUrl = `/ summarize - news ? url = ${encodeURIComponent(props.link)}& ignoreWords=${encodeURIComponent(settings.ignoreWords)} `;
     try {
       const res = await fetch(proxyUrl);
       if (!res.ok) throw "Network error"

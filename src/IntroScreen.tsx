@@ -1,12 +1,47 @@
 import { createSignal, onMount } from "solid-js";
+import { decodeUnicode } from "./common";
+import { settings } from "cluster";
+import { setIsFetchingStory, setReaderPageInfo, setNetworkIssue } from "./signals";
 
 const IntroScreen = () => {
   const [startText, setStartText] = createSignal(false);
 
+  const gotoStory = (link: string, source: string) => {
+
+    setTimeout(async () => {
+      setIsFetchingStory(true)
+      const proxyUrl = `/summarize-news?url=${encodeURIComponent(link)}`;
+      try {
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw "Network error"
+        const items = await res.json()
+        if (items.error) throw items.error
+        console.log({ items })
+
+        setReaderPageInfo({ source, backupImage: '', link, items });
+        setIsFetchingStory(false)
+      }
+      catch (err) {
+        console.error(err)
+        setNetworkIssue(true)
+        setIsFetchingStory(false)
+        setTimeout(() => setNetworkIssue(false), 2000)
+      }
+    }, 50)
+  }
   onMount(() => {
     // Start text animation slightly after background loads
     setTimeout(() => setStartText(true), 500);
-  });
+    const params = new URLSearchParams(window.location.search);
+    const to = params.get('goto');
+    const source = params.get('source');
+
+    if (to && source) {
+      console.log({ to: decodeUnicode(to) })
+      gotoStory(decodeUnicode(to), decodeUnicode((source)))
+    }
+
+  })
 
   return (
     <div class="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden text-white">

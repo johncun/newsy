@@ -1,4 +1,4 @@
-import { Accessor, JSXElement, onCleanup } from "solid-js";
+import { JSXElement } from "solid-js";
 
 const Swipeable = (props: {
   children: JSXElement | JSXElement[],
@@ -32,6 +32,8 @@ const Swipeable = (props: {
     let x = e.clientX - startX;
     let absX = Math.abs(x);
 
+    if (absX < 20) return; // stop jitter
+
     // Rubber-banding
     if (absX > limit) {
       const over = absX - limit;
@@ -52,7 +54,7 @@ const Swipeable = (props: {
     if (boxRRef) boxRRef.style.visibility = x < 0 ? "visible" : "hidden";
   };
 
-  const onPointerUp = (e: PointerEvent) => {
+  const onPointerUp = (_e: PointerEvent) => {
     if (!isDragging) return;
     isDragging = false;
     delete containerRef.dataset.dragging;

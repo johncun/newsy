@@ -6,15 +6,14 @@ import { setPerformFetchFeedsTrigger, setTick, tick } from "@src/signals";
 import { untrack } from "solid-js";
 import { lastFeedFetchedTime } from "@src/common";
 import { ImageVault } from "@src/db";
-import { argv0 } from "node:process";
 
 export const ALLOWABLE_REFRESH_TIMES = [0, 1, 2, 5, 10, 20, 30, 60, 180]
 export const MAX_ALLOWABLE_STORIES_IN_LIVE = [10, 20, 30, 50, 100]
-
+export const MAX_LOOKBACK_TIMES = [0, 1, 2, 5, 8, 24, 48, 240]
 
 export const SettingsSchema = z.object({
   maxFeedsPerRequest: z.enum(["10", "25", "50", "100"]),
-  maxLookbackTime: z.enum(["1", "2", "5", "8", "24", "48", "240"]),
+  maxLookbackTime: z.union(MAX_LOOKBACK_TIMES.map(n => z.literal(n))),
   theme: z.enum(["Light", "Dark", "System"]),
   feeds: z.array(SourceRecordSchema),
   fullMode: z.boolean(),
@@ -41,7 +40,7 @@ const DEFAULTS: Settings = {
   showFigureCaptions: false,
   theme: "System",
   maxFeedsPerRequest: "50",
-  maxLookbackTime: "1",
+  maxLookbackTime: 1,
   feeds: DEFAULT_FEED_URLS,
   autoRefreshTime: 0,
   maxLiveCount: 50,
