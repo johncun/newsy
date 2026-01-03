@@ -127,7 +127,7 @@ export const GoBtn = (props: { source: string, backupImage?: string, link: strin
   onClick={async (ev) => {
     ev.stopPropagation();
     setTimeout(() => setIsFetchingStory(true), 50)
-    const proxyUrl = `/ summarize - news ? url = ${encodeURIComponent(props.link)}& ignoreWords=${encodeURIComponent(settings.ignoreWords)} `;
+    const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}&ignoreWords=${encodeURIComponent(settings.ignoreWords)}`;
     try {
       const res = await fetch(proxyUrl);
       if (!res.ok) throw "Network error"
