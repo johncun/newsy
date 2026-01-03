@@ -267,9 +267,14 @@ export const ImageVault = {
   getOrFetch: async (imageUrl: string): Promise<Blob | null> => {
     try {
       const cached = await get(imageUrl, imageCache);
-      if (cached instanceof Blob) {
-        await set(imageUrl, { cached, when: Date.now() }, imageCache);
-        return cached;
+      if (!!cached) {
+        if (cached instanceof Blob) {
+          await set(imageUrl, { cached, when: Date.now() }, imageCache);
+          return cached;
+        }
+        else {
+          return cached.slimBlob
+        }
       }
 
       // Encode the URL to ensure special characters don't break the query string

@@ -19,11 +19,9 @@ const CardStyleThreeQuarter = (props: {
   isSelected: Accessor<boolean>,
   data: FeedItem
   index: number
-  swipeLeft: () => void
-  swipeRight: () => void
 }) => {
   return <div
-    class="flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-lg p-2 min-h-[60vh] relative overflow-hidden"
+    class="w-full flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-lg p-2 min-h-[60vh] relative overflow-hidden"
     onClick={() => setSelectedGuid(props.isSelected() ? '' : props.data.guid)}>
     <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} isSelected={props.isSelected} blur={true} />
@@ -45,17 +43,8 @@ const CardStyleThreeQuarter = (props: {
         <Byline value={props.data.description} />
       </div>
 
-      <CardButtons data={props.data} isSelected={props.isSelected} swipeLeft={props.swipeLeft} swipeRight={props.swipeRight} />
+      <CardButtons data={props.data} isSelected={props.isSelected} />
 
-      {/*      <div
-        class={`absolute top-1 h-10 z-30 inset-x-2 flex ${props.isSelected() ? 'bg-black/40' : ''} items-center rounded-2xl justify-between`}>
-        <AddBtn action={props.swipeRight} isSelected={props.isSelected} />
-        <div class="flex gap-4">
-          <OptionBtn action={() => setMenuGuid(props.data.guid)} isSelected={props.isSelected} />
-          <GoBtn link={props.data.link} isSelected={props.isSelected} />
-        </div>
-        <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />
-      </div> */}
     </Motion.div >
   </div>
 

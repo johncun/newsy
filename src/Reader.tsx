@@ -59,7 +59,7 @@ const TextAndImages = (props: { data: ReaderContent }) => {
       return okText(sub) &&
         <Switch>
           <Match when={sub.type === "text"}>
-            <div class={`font-[Nunito_Sans] first:border-t first:border-t-slate-500 ${sub.value.length < 30 ? 'font-bold' : 'font-light'} 
+            <div class={`self-start font-[Nunito_Sans] first:border-t first:border-t-slate-500 ${sub.value.length < 30 ? 'font-bold' : 'font-light'} 
                 px-6 py-3 text-md max-w-90 _text-justify _hyphens-auto _indent-2.5`}>{sub.value}</div>
           </Match>
           <Match when={sub.type === "image" && okImageSrc(sub.url, sub.alt)}>

@@ -20,11 +20,9 @@ const CardStyleThin = (props: {
   isSelected: Accessor<boolean>,
   data: FeedItem
   index: number
-  swipeLeft: () => void
-  swipeRight: () => void
 }) => {
   return <div
-    class={`group cursor-pointer mx-0 bg-slate-700 rounded-lg ${!props.isSelected() ? 'h-30' : 'h-44'} relative overflow-hidden`}
+    class={`group cursor-pointer mx-0 rounded-lg ${!props.isSelected() ? 'h-30' : 'h-44'} relative overflow-hidden`}
     onClick={() => setSelectedGuid(props.data.guid)}>
     <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} isSelected={props.isSelected} />
@@ -42,7 +40,7 @@ const CardStyleThin = (props: {
         </div>
       </div>
       <Fade />
-      <CardButtons data={props.data} isSelected={props.isSelected} swipeLeft={props.swipeLeft} swipeRight={props.swipeRight} />
+      <CardButtons data={props.data} isSelected={props.isSelected} />
     </Motion.div >
   </div >
 

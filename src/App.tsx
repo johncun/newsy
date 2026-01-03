@@ -82,7 +82,7 @@ const App: any = () => {
 
   return <ErrorBoundary fallback={<div>Failed to load or validate API data.</div>}>
     <Meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <Meta name="apple-mobile-web-app-capable" content="yes" />
+    <Meta name="mobile-web-app-capable" content="yes" />
     <Meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"

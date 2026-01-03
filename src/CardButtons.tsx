@@ -5,13 +5,13 @@ import { SvgAdd, SvgTrash } from "./svgs"
 import { FeedItem } from "@shared/feed-types"
 import { settings } from "@shared/settings"
 
-export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolean>, swipeRight: () => void, swipeLeft: () => void }) => {
+export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolean>, swipeRight?: () => void, swipeLeft?: () => void }) => {
 
   return <Show when={props.isSelected()}>
 
     <Motion.div animate={{ opacity: [0, 1], scale: [.7, 1] }}
       class={`absolute bottom-1 h-10 z-40 inset-x-2 flex bg-white/10 items-center rounded-e-full rounded-s-full px-2 justify-between`}>
-      <AddBtn action={props.swipeRight} isSelected={props.isSelected} />
+      {props.swipeRight && <AddBtn action={props.swipeRight} isSelected={props.isSelected} />}
       <div class="flex gap-4">
         <OptionBtn action={(ev: MouseEvent) => {
           ev.stopPropagation()
@@ -20,7 +20,7 @@ export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolea
         <GoBtnDirect link={props.data.link} isSelected={props.isSelected} />
       </div>
       <GoBtn source={props.data.source} backupImage={props.data.image} link={props.data.link} isSelected={props.isSelected} />
-      <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />
+      {props.swipeLeft && <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />}
     </Motion.div>
   </Show>
 }

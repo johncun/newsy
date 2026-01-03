@@ -30,7 +30,7 @@ type SectionItem = {
   content: ContentItem[]
 }
 
-export async function summarizeNewsPage(targetUrl: string, proxy: string, options: ReaderOptions = DEFAULT_OPTS): Promise<SectionItem[]> {
+export async function summarizeNewsPage(targetUrl: string, proxy: string, _options: ReaderOptions = DEFAULT_OPTS): Promise<SectionItem[]> {
   console.log(`Reader fetching: ${targetUrl}...`);
   try {
     const response = await fetch(`${proxy}?url=${encodeURIComponent(targetUrl)}`, {
@@ -81,7 +81,7 @@ export async function summarizeNewsPage(targetUrl: string, proxy: string, option
       else if (tagName === 'p') {
         const text = el.textContent?.trim();
         console.log({ tag: 'p', text, currentSection })
-        if (currentSection.title && text && text.length > 3) {
+        if (currentSection.title && text && text.length > 3 && !text.toLowerCase().includes('stock photo')) {
           console.log(`            <p>    ${text}`)
           currentSection.content.push({ type: 'text', value: text });
           console.log(`currentSection "${currentSection.level}" has content length ${currentSection.content.length}`);
@@ -93,6 +93,7 @@ export async function summarizeNewsPage(targetUrl: string, proxy: string, option
         if (src) {
           if (src.indexOf('placeholder') >= 0
             || src.indexOf('advert') >= 0
+            || src.indexOf('https://i.guim.co.uk/img/uploads/') >= 0
           ) {
             console.log(`skipping ${src} as placeholder likely`);
           }

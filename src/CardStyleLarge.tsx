@@ -19,8 +19,6 @@ const CardStyleLarge = (props: {
   isSelected: Accessor<boolean>,
   data: FeedItem
   index: number
-  swipeLeft: () => void
-  swipeRight: () => void
 }) => {
   return <div
     class="flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-lg p-2 min-h-60 relative overflow-hidden"
@@ -43,7 +41,7 @@ const CardStyleLarge = (props: {
         <Byline value={props.data.description} />
       </div>
 
-      <CardButtons data={props.data} isSelected={props.isSelected} swipeLeft={props.swipeLeft} swipeRight={props.swipeRight} />
+      <CardButtons data={props.data} isSelected={props.isSelected} />
 
     </Motion.div >
   </div >
