@@ -62,7 +62,7 @@ const Swipeable = (props: {
 
     const currentX = parseFloat(getComputedStyle(containerRef).getPropertyValue("--offset"));
 
-    if (Math.abs(currentX) >= limit * 1.3) {
+    if (Math.abs(currentX) >= limit * 1.2) {
       const isRight = currentX > 0;
       setTimeout(() => isRight ? props.onSwipeRight?.() : props.onSwipeLeft?.(), 200);
       containerRef.style.setProperty("--offset", `${isRight ? '' : '-'}100%`);

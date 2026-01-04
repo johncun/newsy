@@ -55,7 +55,7 @@ export const getAllFromLocal = () => {
     console.log({ data })
     const parsed = ArticleRecords.parse(JSON.parse(data || '[]'))
     console.log('parsed', parsed.length)
-    setMemData(parsed)
+    setMemData(deduplicateByGiud(parsed))
   } catch (e) {
     console.error('Error parsing data from localStorage:', e)
     setMemData([])
@@ -109,6 +109,18 @@ export const allGuids = (): Set<string> => {
   }
   return guids
 }
+
+const deduplicateByGiud = (as: ArticleRecords): ArticleRecords => {
+  const soFar = new Set<String>()
+  return as.flatMap(a => {
+    if (!soFar.has(a.guid)) {
+      soFar.add(a.guid);
+      return [a]
+    }
+    return []
+  })
+}
+
 export const refreshDbWithFeedItems = (items: FeedItems): void => {
   if (items.length === 0) return
   const guids = allGuids()
@@ -129,7 +141,8 @@ export const refreshDbWithFeedItems = (items: FeedItems): void => {
 
   if (extractedLive.length <= settings.maxLiveCount) {
 
-    setMemData(amalgamated);
+    const deduped = deduplicateByGiud(amalgamated)
+    setMemData(deduped);
     console.log('setMemData with amalgamated');
   }
   else {
