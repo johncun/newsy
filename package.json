@@ -2,7 +2,6 @@
   "name": "cuisle",
   "private": true,
   "version": "0.0.39",
-  "packageManager": "pnpm@10.24.0",
   "type": "module",
   "scripts": {
     "git-info": "echo export const status \"= {\\\"logMessage\\\": \\\"$(git log -1 --oneline)\\\",\\\"when\\\": \\\"$(date +%s)000\\\"}\"  > src/_git_commit.ts",
@@ -10,6 +9,9 @@
     "dev": "vite",
     "build": "ENABLE_EXPERIMENTAL_COREPACK=1 vite build",
     "preview": "vite preview"
+  },
+  "engines": {
+    "pnpm": ">=10.24.0"
   },
   "dependencies": {
     "@solidjs/meta": "^0.29.4",
