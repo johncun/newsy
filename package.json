@@ -2,6 +2,7 @@
   "name": "cuisle",
   "private": true,
   "version": "0.0.38",
+  "packageManager": "pnpm@10.24.0",
   "type": "module",
   "scripts": {
     "git-info": "echo export const status \"= {\\\"logMessage\\\": \\\"$(git log -1 --oneline)\\\",\\\"when\\\": \\\"$(date +%s)000\\\"}\"  > src/_git_commit.ts",
