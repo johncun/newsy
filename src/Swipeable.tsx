@@ -32,7 +32,7 @@ const Swipeable = (props: {
     let x = e.clientX - startX;
     let absX = Math.abs(x);
 
-    if (absX < 20) return; // stop jitter
+    if (absX < 6) return; // stop jitter
 
     // Rubber-banding
     if (absX > limit) {
@@ -44,6 +44,7 @@ const Swipeable = (props: {
     // Direct DOM updates for 60fps performance
     containerRef.style.setProperty("--offset", `${x}px`);
     containerRef.style.setProperty("--abs-offset", `${absX}px`);
+    containerRef.style.setProperty("--iconx", `0px`);
 
     // Icon Scaling Math (0 to 1)
     let scale = Math.min(Math.max(.2 + absX / limit, 0.2), 1);
@@ -61,17 +62,21 @@ const Swipeable = (props: {
 
     const currentX = parseFloat(getComputedStyle(containerRef).getPropertyValue("--offset"));
 
-    if (Math.abs(currentX) >= limit) {
+    if (Math.abs(currentX) >= limit * 1.3) {
       const isRight = currentX > 0;
       setTimeout(() => isRight ? props.onSwipeRight?.() : props.onSwipeLeft?.(), 200);
-      containerRef.style.setProperty("--offset", "0px");
-      containerRef.style.setProperty("--abs-offset", "0px");
-      containerRef.style.setProperty("--icon-scale", "0");
+      containerRef.style.setProperty("--offset", `${isRight ? '' : '-'}100%`);
+      containerRef.style.setProperty("--abs-offset", `${isRight ? '' : '-'}100%`);
+      containerRef.style.setProperty("--iconx", `${isRight ? '' : '-'}500px`);
+      {/* containerRef.style.setProperty("--icon-scale", "0"); */ }
+      {/* containerRef.style.setProperty("--abs-offset", "0px"); */ }
+      {/* containerRef.style.setProperty("--icon-scale", "0"); */ }
     } else {
       // Reset animations
       containerRef.style.setProperty("--offset", "0px");
       containerRef.style.setProperty("--abs-offset", "0px");
       containerRef.style.setProperty("--icon-scale", "0");
+      containerRef.style.setProperty("--iconx", "0");
     }
   };
 
@@ -85,12 +90,12 @@ const Swipeable = (props: {
       style={{ "--action-size": `${limit}px`, }}
       class={`relative w-full overflow-hidden touch-pan-y select-none bg-slate-100/0 group h-auto snap-start snap-always`}
     >
-      <div class="absolute inset-0 flex justify-between items-center px-1 z-0" >
+      <div class="absolute inset-0 px-1 z-0 " >
 
         <div
           ref={boxLRef}
-          style={{ width: "clamp(0px, calc(var(--abs-offset) - 1rem), var(--action-size))" }}
-          class={`flex h-[calc(100% - 3rem)] items-center justify-center overflow-hidden 
+          style={{ width: "clamp(0px, calc(var(--abs-offset) - 1rem), var(--action-size))", transform: 'translateX(var(--iconx))' }}
+          class={`absolute left-0 top-6 flex h-20 items-center justify-center overflow-hidden 
           rounded-full shrink-0 transition-[width] duration-30 ease-[cubic-bezier(0.18,0.89,0.32,1.2)] 
           group-data-dragging:transition-none ${props.leftBg || 'bg-green-700'}`} >
           <div style={{ transform: "scale(var(--icon-scale))" }}
@@ -101,8 +106,8 @@ const Swipeable = (props: {
 
         <div
           ref={boxRRef}
-          style={{ width: "clamp(0px, calc(var(--abs-offset) - 1rem), var(--action-size))" }}
-          class={`flex h-[calc(100% - 3rem)] items-center justify-center overflow-hidden 
+          style={{ width: "clamp(0px, calc(var(--abs-offset) - 1rem), var(--action-size))", transform: 'translateX(var(--iconx))' }}
+          class={`absolute right-0 top-6 flex h-20 items-center justify-center overflow-hidden 
           rounded-full shrink-0 transition-[width] duration-30 ease-[cubic-bezier(0.18,0.89,0.32,1.2)] 
           group-data-dragging:transition-none ${props.rightBg || 'bg-red-700'}`} >
           <div style={{ transform: "scale(var(--icon-scale))" }}

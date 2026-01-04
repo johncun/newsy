@@ -10,6 +10,7 @@ import CardStyleLarge from "./CardStyleLarge"
 import CardStyleThreeQuarter from "./CardStyleThreeQuarter"
 import { settings } from "@shared/settings"
 
+const DEBUG_SWIPE = false
 
 const List = (props: {
   as: Accessor<ArticleRecords>
@@ -27,6 +28,10 @@ const List = (props: {
 
   }
   const swipeLeftAndSelect = (guid: string, action: Action) => {
+    if (DEBUG_SWIPE) {
+      console.log('swipe left', guid, action);
+      return
+    }
 
     const nxg = getNextGuidInList(guid)
     onSwipeLeft(guid, action)
@@ -35,6 +40,10 @@ const List = (props: {
 
   const swipeRightAndSelect = (guid: string, action: Action) => {
 
+    if (DEBUG_SWIPE) {
+      console.log('swipe left', guid, action);
+      return
+    }
     const nxg = getNextGuidInList(guid)
     onSwipeRight(guid, action)
     setTimeout(() => setSelectedGuid(nxg), 0)
