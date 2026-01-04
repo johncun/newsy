@@ -19,6 +19,7 @@ export const SettingsSchema = z.object({
   fullMode: z.boolean(),
   showFigureCaptions: z.boolean(),
   gotoTopAfterRefresh: z.boolean(),
+  alignStoriesInScroll: z.boolean(),
   autoRefreshTime: z.union(ALLOWABLE_REFRESH_TIMES.map(n => z.literal(n))),
   maxLiveCount: z.union(MAX_ALLOWABLE_STORIES_IN_LIVE.map(n => z.literal(n))),
   ignoreWords: z.string()
@@ -45,6 +46,7 @@ const DEFAULTS: Settings = {
   autoRefreshTime: 0,
   maxLiveCount: 50,
   gotoTopAfterRefresh: false,
+  alignStoriesInScroll: false,
   ignoreWords: ''
 
 };

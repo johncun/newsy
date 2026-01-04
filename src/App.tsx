@@ -18,7 +18,7 @@ import {
 } from './signals'
 import IntroScreen from './IntroScreen'
 import MainPage from './MainPage'
-import { allGuids, autoClearKills, lastPubTime } from './db'
+import { allGuids, autoClearKills, lastPubTime, refreshDbWithFeedItems } from './db'
 import { timestampFetch } from './common'
 
 const fetchItems = async (): Promise<FeedResult | null> => {
@@ -53,6 +53,8 @@ const fetchItems = async (): Promise<FeedResult | null> => {
       return fr
     })
 
+
+    refreshDbWithFeedItems(validatedData.items)
     setIsFetchingFeeds(false)
 
     console.log({ validatedData })

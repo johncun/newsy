@@ -16,16 +16,16 @@ import { sanitizeSettings, settings } from "@shared/settings"
 
 const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
-  createEffect(() => {
-    if (props.feed.error) {
-      console.error('Error loading or validating API data:', props.feed.error)
-    }
-    untrack(() => {
-      console.log('refresh DB: Fetched items:', props.feed()?.count)
-
-      refreshDbWithFeedItems(props.feed()?.items || [])
-    });
-  })
+  {/* createEffect(() => { */ }
+  {/*   if (props.feed.error) { */ }
+  {/*     console.error('Error loading or validating API data:', props.feed.error) */ }
+  {/*   } */ }
+  {/*   untrack(() => { */ }
+  {/*     console.log('refresh DB: Fetched items:', props.feed()?.count) */ }
+  {/**/ }
+  {/*     refreshDbWithFeedItems(props.feed()?.items || []) */ }
+  {/*   }); */ }
+  {/* }) */ }
 
   const [isUpScrolled, setIsUpScrolled] = createSignal(false)
   const [isDnScrolled, setIsDnScrolled] = createSignal(false)
@@ -113,7 +113,7 @@ const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
           </div>
           <div
             ref={scrollRef}
-            class="absolute top-14 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll snap-y">
+            class={`absolute top-14 bottom-0 left-4 right-4 overflow-x-hidden overflow-y-scroll ${settings.alignStoriesInScroll ? 'snap-y' : ''}`}>
             {/* <div class="relative flex flex-col pt-2 pb-8 gap-4 items-center py-4"> */}
             <div ref={upSentinelRef} class="h-1 w-1"></div>
             <List as={memData} mode={mode} />

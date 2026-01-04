@@ -105,6 +105,11 @@ export const SettingsPage = () => {
       type: "toggle"
     },
     {
+      id: "alignStoriesInScroll", label: "Will align stories when scrolling", desc: "When not set it can more fluid to scroll, but you may have to position more to work with a story",
+      help: "",
+      type: "toggle"
+    },
+    {
       id: "autoRefreshTime", label: "Will automatically fetch stories after this number of minutes since last fetch", desc: "Useful is you want your view to contains the latest feeds without any action",
       help: "",
       type: "selectnum", options: ALLOWABLE_REFRESH_TIMES.map(String)
