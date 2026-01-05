@@ -70,3 +70,27 @@ export const SourceRecords = z.array(SourceRecordSchema)
 
 export type SourceRecord = z.infer<typeof SourceRecordSchema>
 export type SourceRecords = z.infer<typeof SourceRecords>
+
+export type WordStruct = string[][]
+
+export const convertStringToWordStruct = (s: string): WordStruct => {
+  const x = s.trim().toLowerCase()
+  if (!x) return []
+
+  return x.split(' ').map(s => {
+    const ss = s.trim()
+    const ors = ss.split('+').map(i => i.trim())
+    return ors
+  })
+}
+
+export const hasIgnoreWord = (ws: WordStruct) => (s: string): boolean => {
+
+  const x = s.toLowerCase()
+  if (!s) return false;
+  return !!ws.find(ora => {
+    return ora.every(z => x.includes(z))
+  })
+}
+
+

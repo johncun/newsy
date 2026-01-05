@@ -3,8 +3,8 @@ import { Motion } from "solid-motionone"
 import { isSelected, setIsFetchingStory, setMenuGuid, setNetworkIssue, setReaderPageInfo } from "./signals"
 import { SvgAdd, SvgShare, SvgTrash } from "./svgs"
 import { FeedItem } from "@shared/feed-types"
-import { settings } from "@shared/settings"
 import { encodeUnicode, copyToClipboard } from "./common"
+import { settings } from "./settings-utils"
 
 export const CardButtons = (props: { data: FeedItem, swipeRight?: () => void, swipeLeft?: () => void }) => {
   const isVisible = () => isSelected(props.data.guid)

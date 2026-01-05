@@ -1,6 +1,6 @@
 import { Motion } from 'solid-motionone'
 
-import { mode, setIsFetchingFeeds, setMode, setPerformFetchFeedsTrigger, setShowOptions } from './signals'
+import { liveCount, mode, setIsFetchingFeeds, setMode, setPerformFetchFeedsTrigger, setShowOptions } from './signals'
 import { getAllByState, memData } from './db'
 import { SvgOptions, SvgPlus } from './svgs'
 
@@ -17,7 +17,7 @@ const Banner = () => {
           press={{ scale: [1, 1.3] }}
           onClick={() => setMode('live')}
           class="bg-zinc-400/60 text-white justify-center rounded-full h-8 min-w-8 flex items-center p-1">
-          {getAllByState('live')(memData()).length}
+          {liveCount()}
         </Motion.div>
         <Motion.div
           press={{ scale: [1, 1.3] }}

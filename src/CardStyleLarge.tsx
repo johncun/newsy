@@ -71,7 +71,7 @@ const PublishedTime = (props: { value: string }) => {
 }
 
 const Title = (props: { value: string }) =>
-  <div class="line-clamp-4 font-[Quicksand]">{props.value}</div>
+  <div class="line-clamp-4 font-[Quicksand] backdrop-blur-md p-1 rounded-2xl">{props.value}</div>
 
 const Byline = (props: { value: string }) =>
   <p class="text-sm font-normal text-zinc-100/70 overflow-y-hidden line-clamp-2 text-left w-full">

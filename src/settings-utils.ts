@@ -1,11 +1,11 @@
 import { createStore } from "solid-js/store";
 import { z } from "zod";
 import { DEFAULT_FEED_URLS, SETTINGS_KEY } from "@shared/constants";
-import { SourceRecord, SourceRecordSchema } from "./feed-types";
 import { setPerformFetchFeedsTrigger, setTick, tick } from "@src/signals";
 import { untrack } from "solid-js";
 import { lastFeedFetchedTime } from "@src/common";
 import { ImageVault } from "@src/db";
+import { SourceRecord, SourceRecordSchema } from "@shared/feed-types";
 
 export const ALLOWABLE_REFRESH_TIMES = [0, 1, 2, 5, 10, 20, 30, 60, 180]
 export const MAX_ALLOWABLE_STORIES_IN_LIVE = [10, 20, 30, 50, 100]

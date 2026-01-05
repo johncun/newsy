@@ -277,7 +277,7 @@ setInterval(() => {
 import { createStore, delMany, entries } from "idb-keyval";
 import { get, set } from "idb-keyval";
 import { reduceImageSize, sorterPubDate } from './common'
-import { settings } from '@shared/settings'
+import { settings } from './settings-utils'
 
 const imageCache = createStore("newsy-db", "images");
 

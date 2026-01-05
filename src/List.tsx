@@ -1,15 +1,15 @@
-import { ArticleRecord, ArticleRecords, ArticleState, FeedItem } from "@shared/feed-types"
-import { Accessor, Switch, For, Match, Show } from "solid-js"
+import { ArticleRecord, ArticleRecords, ArticleState, convertStringToWordStruct, FeedItem, hasIgnoreWord } from "@shared/feed-types"
+import { Accessor, Switch, For, Match, Show, createEffect } from "solid-js"
 import { getAllByState } from "./db"
-import { mode, selectedGuid, setSelectedGuid, setShowButtons, showButtons } from "./signals"
+import { mode, selectedGuid, setLiveCount, setSelectedGuid, setShowButtons, showButtons } from "./signals"
 import { Action, hashToBoolean, onSwipeLeft, onSwipeRight, sorterPubDate } from "./common"
 import Swipeable from "./Swipeable"
 import CardStyleThin from "./CardStyleThin"
 import { SvgPlus, SvgTrash } from "./svgs"
 import CardStyleLarge from "./CardStyleLarge"
 import CardStyleThreeQuarter from "./CardStyleThreeQuarter"
-import { settings } from "@shared/settings"
 import { invokeReader } from "./CardButtons"
+import { settings } from "./settings-utils"
 
 const DEBUG_SWIPE = false
 
@@ -17,9 +17,32 @@ const List = (props: {
   as: Accessor<ArticleRecords>
   mode: Accessor<ArticleState>
 }) => {
-  const as = () =>
-    [...getAllByState(mode())(props.as())]
+
+  const as = () => {
+    const allForMode = [...getAllByState(mode())(props.as())]
       .sort(sorterPubDate)
+
+    if (settings.ignoreWords.trim().length === 0) {
+      return allForMode
+    }
+
+    const ws = convertStringToWordStruct(settings.ignoreWords)
+    const check = hasIgnoreWord(ws)
+
+    const findNoIgnoredWords = (a: FeedItem): boolean => {
+      const res = !check(a.title) && !check(a.description)
+      if (!res) {
+        console.log(`IGNORE!! found words ${settings.ignoreWords} in title ${a.title} or description ${a.description}`)
+      }
+      return res;
+    }
+
+    return allForMode.filter(findNoIgnoredWords)
+  }
+
+  createEffect(() => {
+    setLiveCount(as().length)
+  })
 
   const getNextGuidInList = (guid: string): string => {
 

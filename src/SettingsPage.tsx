@@ -1,7 +1,7 @@
 import { createSignal, For, Show } from "solid-js";
-import { settings, updateSetting, feedActions, SettingItem, Settings, ALLOWABLE_REFRESH_TIMES, MAX_ALLOWABLE_STORIES_IN_LIVE, MAX_LOOKBACK_TIMES } from "@shared/settings";
 import { status } from "@src/_git_commit"
 import LegalModal from "./LegalModal";
+import { ALLOWABLE_REFRESH_TIMES, feedActions, MAX_ALLOWABLE_STORIES_IN_LIVE, MAX_LOOKBACK_TIMES, SettingItem, settings, Settings, updateSetting } from "./settings-utils";
 
 const InputRenderer = (props: { item: SettingItem }) => {
   const id = props.item.id;

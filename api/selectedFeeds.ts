@@ -1,8 +1,10 @@
 import {
+  convertStringToWordStruct,
   FeedItem,
   FeedItems,
   FeedRequestSchema,
   FeedResult,
+  hasIgnoreWord,
 } from '../shared/feed-types.js'
 import { distributeWeight, parseRSSFeed, VotingItem } from './common.js'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
@@ -121,27 +123,5 @@ export default async function handler(
 
     return response.status(500).json({ error: 'Internal Server Error' })
   }
-}
-
-type WordStruct = string[][]
-
-const convertStringToWordStruct = (s: string): WordStruct => {
-  const x = s.trim().toLowerCase()
-  if (!x) return []
-
-  return x.split(' ').map(s => {
-    const ss = s.trim()
-    const ors = ss.split('+').map(i => i.trim())
-    return ors
-  })
-}
-
-const hasIgnoreWord = (ws: WordStruct) => (s: string): boolean => {
-
-  const x = s.toLowerCase()
-  if (!s) return false;
-  return !!ws.find(ora => {
-    return ora.every(z => x.includes(z))
-  })
 }
 

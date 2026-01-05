@@ -1,7 +1,6 @@
 import {
   FeedResult, FeedRequestBody
 } from '@shared/feed-types'
-import { settings } from '@shared/settings'
 import { Meta } from '@solidjs/meta'
 import {
   createResource,
@@ -20,6 +19,7 @@ import IntroScreen from './IntroScreen'
 import MainPage from './MainPage'
 import { allGuids, autoClearKills, lastPubTime, refreshDbWithFeedItems } from './db'
 import { timestampFetch } from './common'
+import { settings } from './settings-utils'
 
 const fetchItems = async (): Promise<FeedResult | null> => {
   try {
@@ -80,7 +80,7 @@ const App: any = () => {
     })
 
   onMount(() => {
-    setTimeout(() => setStartup(false), 3000)
+    setTimeout(() => setStartup(false), 8000)
     autoClearKills()
   })
 
@@ -99,7 +99,7 @@ const App: any = () => {
     />
     <Switch fallback={<MainPage feed={feed} />}>
       <Match when={startup()}>
-        <IntroScreen />
+        <IntroScreen onClick={() => setStartup(false)} />
       </Match>
     </Switch>
   </ErrorBoundary >

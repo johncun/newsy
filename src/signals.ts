@@ -11,6 +11,8 @@ export const [selectedGuid, setSelectedGuid] = createSignal('')
 export const isSelected = (guid: string) => selectedGuid() === guid
 export const [showButtons, setShowButtons] = createSignal(false)
 
+export const [liveCount, setLiveCount] = createSignal(0)
+
 export const [showOptions, setShowOptions] = createSignal(false)
 export const [menuGuid, setMenuGuid] = createSignal<string>('')
 export type ReaderInput = {

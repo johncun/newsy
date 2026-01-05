@@ -3,7 +3,6 @@ import { memData } from "./db"
 import { Presence, Motion } from "solid-motionone"
 import Banner from "./Banner"
 import { Pulse } from "./Pulse"
-import { SettingsPage } from "./Settings"
 import { mode, isFetchingFeeds, menuGuid, showOptions, setShowOptions, readerPageInfo, isFetchingStory, networkIssue } from "./signals"
 import { SvgCross } from "./svgs"
 import OptionMenuItems from "./OptionMenuItems"
@@ -11,7 +10,8 @@ import List from "./List"
 import Reader from "./Reader"
 import { useOrientationDetector } from "./OrientationDetector"
 import { UpdateApplicationToast } from "./UpdateApplicationToast"
-import { sanitizeSettings, settings } from "@shared/settings"
+import { sanitizeSettings, settings } from "./settings-utils"
+import { SettingsPage } from "./SettingsPage"
 
 const MainPage: any = () => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>

@@ -3,7 +3,7 @@ import { Motion } from "solid-motionone"
 import { SvgCross } from "./svgs"
 import { ReaderInput, setIsFetchingStory, setReaderPageInfo } from "./signals"
 import { animate } from "@motionone/dom";
-import { settings } from "@shared/settings";
+import { settings } from "./settings-utils";
 
 export type ReaderContent = {
   title: string;
