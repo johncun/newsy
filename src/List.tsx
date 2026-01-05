@@ -1,7 +1,7 @@
-import { ArticleRecord, ArticleRecords, ArticleState } from "@shared/feed-types"
+import { ArticleRecord, ArticleRecords, ArticleState, FeedItem } from "@shared/feed-types"
 import { Accessor, Switch, For, Match, Show } from "solid-js"
 import { getAllByState } from "./db"
-import { mode, selectedGuid, setSelectedGuid } from "./signals"
+import { mode, selectedGuid, setSelectedGuid, setShowButtons, showButtons } from "./signals"
 import { Action, hashToBoolean, onSwipeLeft, onSwipeRight, sorterPubDate } from "./common"
 import Swipeable from "./Swipeable"
 import CardStyleThin from "./CardStyleThin"
@@ -9,6 +9,7 @@ import { SvgPlus, SvgTrash } from "./svgs"
 import CardStyleLarge from "./CardStyleLarge"
 import CardStyleThreeQuarter from "./CardStyleThreeQuarter"
 import { settings } from "@shared/settings"
+import { invokeReader } from "./CardButtons"
 
 const DEBUG_SWIPE = false
 
@@ -49,7 +50,6 @@ const List = (props: {
     setTimeout(() => setSelectedGuid(nxg), 0)
   }
 
-  const isSelected = (a: ArticleRecord) => () => selectedGuid() === a.guid
   const useThin = (a: ArticleRecord) => hashToBoolean(a.guid)
   const rightAction = (): Action => {
     return (
@@ -72,6 +72,21 @@ const List = (props: {
   const swipeLeft = (guid: string) => () => swipeLeftAndSelect(guid, leftAction())
   const swipeRight = (guid: string) => () => swipeRightAndSelect(guid, rightAction())
 
+  const showReader = (fi: FeedItem) => (ev: MouseEvent) => {
+    ev.stopPropagation()
+    setShowButtons(false)
+    setSelectedGuid(fi.guid)
+    invokeReader(fi.source, fi.image || '', fi.link)
+  }
+
+  const handleMenu = (fi: FeedItem) => (ev: MouseEvent) => {
+    ev.stopPropagation();
+    if (showButtons() && selectedGuid() !== fi.guid) setShowButtons(false)
+    setSelectedGuid(fi.guid)
+    setShowButtons(sb => !sb)
+  }
+
+
   return <Switch fallback={
     <For each={as()}>
       {(it, idx) => (
@@ -86,30 +101,20 @@ const List = (props: {
           }>
 
           <Show when={settings.fullMode}>
-            <CardStyleThreeQuarter isSelected={isSelected(it)} data={it} index={idx()} />
+            <CardStyleThreeQuarter onMenu={handleMenu(it)} onClick={showReader(it)} data={it} index={idx()} />
           </Show>
 
           <Show when={!settings.fullMode}>
             <Switch fallback={
-              <CardStyleLarge isSelected={isSelected(it)} data={it} index={idx()} />}>
+              <CardStyleLarge onMenu={handleMenu(it)} onClick={showReader(it)} data={it} index={idx()} />}>
               <Match when={useThin(it)}>
-                <CardStyleThin isSelected={isSelected(it)} data={it} index={idx()} />
+                <CardStyleThin onMenu={handleMenu(it)} onClick={showReader(it)} data={it} index={idx()} />
               </Match>
             </Switch>
           </Show>
 
 
-          {/* <div class="w-full h-30"> */}
-          {/*   <CardStyleThin isSelected={() => selectedGuid() === it.guid} data={it} index={idx()} swipeLeft={() => { }} swipeRight={() => { }} /> */}
-          {/* </div> */}
         </Swipeable>
-        // <Card
-        //           data={it}
-        //           index={idx() + 1}
-        //           onSwipeLeft={swipeLeftAndSelect}
-        //           onSwipeRight={swipeRightAndSelect}
-        //
-        //         />
       )}
     </For >
   }>

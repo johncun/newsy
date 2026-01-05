@@ -1,6 +1,5 @@
-import { FeedResult } from "@shared/feed-types"
-import { createEffect, createSignal, ErrorBoundary, onMount, Resource, Show, untrack } from "solid-js"
-import { memData, refreshDbWithFeedItems } from "./db"
+import { createEffect, createSignal, ErrorBoundary, onMount, Show } from "solid-js"
+import { memData } from "./db"
 import { Presence, Motion } from "solid-motionone"
 import Banner from "./Banner"
 import { Pulse } from "./Pulse"
@@ -14,7 +13,7 @@ import { useOrientationDetector } from "./OrientationDetector"
 import { UpdateApplicationToast } from "./UpdateApplicationToast"
 import { sanitizeSettings, settings } from "@shared/settings"
 
-const MainPage: any = (props: { feed: Resource<FeedResult> }) => {
+const MainPage: any = () => {
   // The type of the resource is automatically inferred as Resource<HelloData | undefined>
   {/* createEffect(() => { */ }
   {/*   if (props.feed.error) { */ }

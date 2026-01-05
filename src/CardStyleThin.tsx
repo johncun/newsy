@@ -1,12 +1,12 @@
 import { FeedItem } from "@shared/feed-types"
-import { Accessor } from "solid-js"
 import { Motion } from "solid-motionone"
-import { setSelectedGuid, tick } from "./signals"
+import { isSelected, showButtons, tick } from "./signals"
 import { formatTimeAgo } from "./common"
 import { CachedImage } from "./CachedImage"
 import { CardButtons } from "./CardButtons"
+import { SvgHorizontalDots } from "./svgs"
 
-const AnimatedBlackFade = () =>
+export const AnimatedBlackFade = () =>
   <Motion.div
     initial={{ opacity: 1 }}
     animate={{ opacity: 0 }}
@@ -16,38 +16,52 @@ const AnimatedBlackFade = () =>
 
 const Darken = () => <div class="absolute inset-0 bg-black/20" />
 
+
 const CardStyleThin = (props: {
-  isSelected: Accessor<boolean>,
-  data: FeedItem
-  index: number
+  data: FeedItem,
+  index: number,
+  onClick: (ev: MouseEvent) => void
+  onMenu: (ev: MouseEvent) => void
 }) => {
+
   return <div
-    class={`group cursor-pointer mx-0 rounded-lg ${!props.isSelected() ? 'h-30' : 'h-44'} relative overflow-hidden`}
-    onClick={() => setSelectedGuid(props.data.guid)}>
+    class={`group cursor-pointer mx-0 rounded-lg ${!isSelected(props.data.guid) ? 'h-42' : 'h-42'} relative overflow-hidden`}
+    onClick={props.onClick}>
     <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
-      <ImageFor data={props.data} isSelected={props.isSelected} />
-      {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
+      <ImageFor data={props.data} />
+      <Darken />
 
 
-      <div class={`absolute left-31 mx-1 right-0 ${props.isSelected() ? 'bg-black/0' : ''}`}>
+      <div class={`absolute left-31 mx-1 right-0 ${isSelected(props.data.guid) ? 'bg-black/0' : ''}`}>
         <div class="flex justify-between absolute top-1 inset-x-0 h-5 items-center">
           <Source value={props.data.source} />
           <PublishedTime value={props.data.pubDate} />
         </div>
         <div class="absolute p-1 top-6 w-full flex flex-col overflow-hidden gap-0 font-[Noto_Serif]">
           <Title value={props.data.title} />
-          <Byline value={props.data.description} isSelected={props.isSelected} />
+          <Byline value={props.data.description} />
         </div>
       </div>
       <Fade />
-      <CardButtons data={props.data} isSelected={props.isSelected} />
+      {/*
+      <div class="absolute bottom-0 right-0 translate-y-0 rounded-tl-2xl h-8 w-8 bg-black/10 
+        flex items-center justify-center p-2"
+        onClick={(ev: MouseEvent) => invokeReader(props.data.source, props.data.image || '', props.data.link, ev)} ><SvgRight fill="#808080" /></div>
+      */}
+      <div class="absolute bottom-0 left-0 translate-y-0 rounded-tr-2xl h-8 w-8 bg-black/50 
+        flex items-center justify-center p-2"
+        onClick={props.onMenu}
+      >
+        <SvgHorizontalDots stroke="#808080" />
+      </div>
+      {showButtons() && <CardButtons data={props.data} />}
     </Motion.div >
   </div >
 
 }
 
 
-const Source = (props: { value: string }) => <div class="bg-black/10 text-white/70 text-xs line-clamp-1 font-stretch-75% z-10 py-0.5 font-extrabold rounded-md w-auto">
+const Source = (props: { value: string }) => <div class="bg-black/10 px-1 text-white/70 text-xs line-clamp-1 font-stretch-75% z-10 py-0.5 font-extrabold rounded-md w-auto">
   {props.value}
 </div>
 
@@ -60,19 +74,18 @@ const PublishedTime = (props: { value: string }) => {
 }
 
 const Fade = () =>
-  <div class="absolute inset-x-0 bottom-0 h-12 bg-linear-to-b from-transparent to-gray-900"></div>
+  <div class="absolute inset-x-0 bottom-0 h-12 bg-linear-to-b from-transparent to-[#202020]"></div>
 
 const Title = (props: { value: string }) =>
-  <div class="font-normal leading-4 font-[Quicksand] pb-0.5 text-shadow-black/50 text-md font-stretch-125% text-shadow-md line-clamp-3">{props.value}</div>
+  <div class="font-bold leading-4 font-[Quicksand] pb-1 text-shadow-black/50 text-md font-stretch-125% text-shadow-md line-clamp-4">{props.value}</div>
 
-const Byline = (props: { value: string, isSelected: Accessor<boolean> }) =>
-  <div class={`text-sm leading-3.5 font-normal font-[Noto_Sans] text-zinc-100/70 overflow-y-hidden line-clamp-${props.isSelected() ? '5' : '3'} text-left w-full`}>
+const Byline = (props: { value: string }) =>
+  <div class={`text-sm leading-3.5 font-normal font-[Noto_Sans] text-zinc-100/70 overflow-y-hidden line-clamp-5 text-left w-full`}>
     {props.value}
   </div>
 
 const ImageFor = (props: {
   data: FeedItem
-  isSelected: Accessor<boolean>
   blur?: boolean
 }) => {
   const gradients = [
@@ -112,7 +125,7 @@ const ImageFor = (props: {
 
   return props.data.image && !props.data.source.startsWith('Sydney') ?
     <CachedImage src={props.data.image} alt={props.data.title}
-      class={`absolute left-0 w-30 h-full top-0 object-cover ${!props.isSelected() && props.blur ? 'blur-xs' : ''}`}
+      class={`absolute left-0 w-30 h-full top-0 object-cover ${!isSelected(props.data.guid) && props.blur ? 'blur-xs' : ''}`}
     />
     : <div
       class={`absolute inset-0 ${getDeterministicGradient(props.data.guid)}`}

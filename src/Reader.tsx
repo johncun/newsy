@@ -173,16 +173,16 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
   return (
     <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
-      class="absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 bg-linear-to-br from-white via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden" >
-      <div class="w-8 h-8 absolute z-50 right-2 top-2 bg-white rounded-full border border-slate-700 p-1"
+      class="absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 bg-linear-to-br from-orange-100 via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden" >
+      <div class="w-8 h-8 absolute z-50 right-1 top-1 bg-white rounded-full border border-slate-700 p-1"
         onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
         <SvgCross fill="#242424" />
       </div >
-      <div class="absolute inset-x-0 top-0 h-10 text-xs w-full px-4 flex items-center ">
+      <div class="absolute inset-x-0 top-0 h-10 text-xs w-full px-4 flex items-center bg-white ">
         <div onClick={() => { hide(); open(props?.value?.link || '') }}>Source: <a class={props.value?.link}>{props.value?.source}</a></div>
       </div>
       <div class="absolute inset-x-0 top-10 bottom-0 overflow-y-auto">
-        <div class="flex flex-col items-center w-full p-4">
+        <div class="relative flex flex-col items-center w-full p-4">
           {noImageInContent() ? <img class="w-[80%] mb-4 p-2 border border-slate-600 rounded-md" src={props.value?.backupImage} /> : null}
           <For each={parsedData()}>
             {rc => {
@@ -191,6 +191,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
               </>
             }}
           </For>
+          <div id="paper" class="paperOverlay absolute inset-0" />
         </div>
       </div>
     </Motion.div >

@@ -8,6 +8,8 @@ export const [performFetchFeedsTrigger, setPerformFetchFeedsTrigger] = createSig
 export const [isFetchingFeeds, setIsFetchingFeeds] = createSignal<boolean>(false)
 export const [isFetchingStory, setIsFetchingStory] = createSignal<boolean>(false)
 export const [selectedGuid, setSelectedGuid] = createSignal('')
+export const isSelected = (guid: string) => selectedGuid() === guid
+export const [showButtons, setShowButtons] = createSignal(false)
 
 export const [showOptions, setShowOptions] = createSignal(false)
 export const [menuGuid, setMenuGuid] = createSignal<string>('')

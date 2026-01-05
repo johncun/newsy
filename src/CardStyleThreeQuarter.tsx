@@ -1,34 +1,27 @@
 import { FeedItem } from "@shared/feed-types"
-import { Accessor } from "solid-js"
 import { Motion } from "solid-motionone"
-import { setSelectedGuid, tick } from "./signals"
+import { isSelected, showButtons, tick } from "./signals"
 import { formatTimeAgo } from "./common"
 import { CardButtons } from "./CardButtons"
+import { SvgHorizontalDots } from "./svgs"
+import { CachedImage } from "./CachedImage"
 
-const AnimatedBlackFade = () =>
-  <Motion.div
-    initial={{ opacity: 1 }}
-    animate={{ opacity: 0 }}
-    transition={{ duration: 0.7 }}
-    class="absolute inset-0 bg-black/20"
-  />
-
-const Darken = () => <div class="absolute inset-0 bg-black/20" />
+const Darken = () => <div class="absolute inset-0 bg-black/40" />
 
 const CardStyleThreeQuarter = (props: {
-  isSelected: Accessor<boolean>,
   data: FeedItem
   index: number
+  onClick: (ev: MouseEvent) => void
+  onMenu: (ev: MouseEvent) => void
 }) => {
   return <div
-    class="w-full flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-lg p-2 min-h-[60vh] relative overflow-hidden"
-    onClick={() => setSelectedGuid(props.isSelected() ? '' : props.data.guid)}>
+    class="w-full flex flex-col items-center group cursor-pointer mx-0 bg-slate-800/0 rounded-lg p-2 min-h-[46vh] relative overflow-hidden"
+    onClick={props.onClick}>
     <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
-      <ImageFor data={props.data} isSelected={props.isSelected} blur={true} />
-      {props.isSelected() ? <AnimatedBlackFade /> : <Darken />}
-      {/* <Darken /> */}
+      <ImageFor data={props.data} blur={false} />
+      <Darken />
 
-      {!props.isSelected() &&
+      {(!isSelected(props.data.guid) || true) &&
         <div class="absolute top-2 left-2 right-2 inset-shadow-gray-1000 flex items-center justify-between">
           <Source value={props.data.source} />
           <PublishedTime value={props.data.pubDate} />
@@ -37,13 +30,22 @@ const CardStyleThreeQuarter = (props: {
       <div
         id="title"
         class={`absolute font-bold font-[Noto_Serif] text-shadow-black/30 text-xl font-stretch-75% text-shadow-md
-        inset-x-0 mx-4 top-2 bottom-2 items-center justify-${props.isSelected() ? 'center' : 'end'} flex flex-col gap-1 rounded-xl p-2 ${props.isSelected() ? 'bg-black/0' : ''}`}>
+        inset-x-0 mx-4 top-2 bottom-2 items-center justify-${isSelected(props.data.guid) || true ? 'center' : 'end'} flex flex-col gap-1 rounded-xl p-2 ${isSelected(props.data.guid) ? 'bg-black/0' : ''}`}>
 
         <Title value={props.data.title} />
         <Byline value={props.data.description} />
       </div>
+      {/*      <div class="absolute bottom-0 right-0 translate-y-0 rounded-tl-2xl h-8 w-8 bg-black/10 
+        flex items-center justify-center p-2"
+        onClick={(ev: MouseEvent) => invokeReader(props.data.source, props.data.image || '', props.data.link, ev)} ><SvgRight fill="#808080" /></div>
+      */}
+      <div class="absolute bottom-0 left-0 translate-y-0 rounded-tr-2xl h-8 w-8 bg-black/10 
+        flex items-center justify-center p-2"
+        onClick={props.onMenu}>
+        <SvgHorizontalDots stroke="#808080" />
+      </div>
+      {showButtons() && <CardButtons data={props.data} />}
 
-      <CardButtons data={props.data} isSelected={props.isSelected} />
 
     </Motion.div >
   </div>
@@ -73,7 +75,6 @@ const Byline = (props: { value: string }) =>
 
 const ImageFor = (props: {
   data: FeedItem
-  isSelected: Accessor<boolean>
   blur?: boolean
 }) => {
   const gradients = [
@@ -114,19 +115,11 @@ const ImageFor = (props: {
   // mask-[linear-gradient(to_bottom,red_0%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,red_0%,transparent_100%)]`}
 
   return props.data.image && !props.data.source.startsWith('Sydney') ?
-    <img
+    <CachedImage
       src={props.data.image /*|| "/placeholder.svg"*/}
       alt={props.data.title}
       class={`absolute inset-0 w-full h-full object-cover ${props.blur ? 'blur-[5px]' : ''}`}
-      onError={e => {
-        const element = e.target as HTMLImageElement
-        element.src = '/the-guardian-logo.jpg'
-        element.style.opacity = '20%'
-        element.style.display = 'none'
-        // const container = element.parentElement
-        // if (container)
-        // container.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-      }}></img>
+    />
     : <div
       class={`absolute inset-0 ${getDeterministicGradient(props.data.guid)}`}
     />

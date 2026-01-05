@@ -55,7 +55,7 @@ const Swipeable = (props: {
     if (boxRRef) boxRRef.style.visibility = x < 0 ? "visible" : "hidden";
   };
 
-  const onPointerUp = (_e: PointerEvent) => {
+  const onRelease = (_e: PointerEvent) => {
     if (!isDragging) return;
     isDragging = false;
     delete containerRef.dataset.dragging;
@@ -86,11 +86,12 @@ const Swipeable = (props: {
       ref={containerRef}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      style={{ "--action-size": `${limit}px`, }}
-      class={`relative w-full overflow-hidden touch-pan-y select-none bg-slate-100/0 group h-auto snap-start snap-always`}
+      onPointerUp={onRelease}
+      onPointerCancel={onRelease} style={{ "--action-size": `${limit}px`, }}
+      class={`relative w-full overflow-hidden touch-pan-y select-none bg-slate-100/0 group h-auto snap-start snap-always
+        `}
     >
-      <div class="absolute inset-0 px-1 z-0 " >
+      <div class="absolute inset-0 px-1 z-0" >
 
         <div
           ref={boxLRef}

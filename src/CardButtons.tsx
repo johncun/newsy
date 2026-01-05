@@ -1,33 +1,34 @@
 import { Accessor, Show } from "solid-js"
 import { Motion } from "solid-motionone"
-import { setIsFetchingStory, setMenuGuid, setNetworkIssue, setReaderPageInfo } from "./signals"
+import { isSelected, setIsFetchingStory, setMenuGuid, setNetworkIssue, setReaderPageInfo } from "./signals"
 import { SvgAdd, SvgShare, SvgTrash } from "./svgs"
 import { FeedItem } from "@shared/feed-types"
 import { settings } from "@shared/settings"
 import { encodeUnicode, copyToClipboard } from "./common"
 
-export const CardButtons = (props: { data: FeedItem, isSelected: Accessor<boolean>, swipeRight?: () => void, swipeLeft?: () => void }) => {
+export const CardButtons = (props: { data: FeedItem, swipeRight?: () => void, swipeLeft?: () => void }) => {
+  const isVisible = () => isSelected(props.data.guid)
 
-  return <Show when={props.isSelected()}>
+  return <Show when={isSelected(props.data.guid)}>
 
-    <Motion.div animate={{ opacity: [0, 1], scale: [.7, 1] }}
-      class={`absolute bottom-1 h-10 z-40 inset-x-2 flex bg-white/10 items-center rounded-e-full rounded-s-full px-2 justify-between`}>
-      {props.swipeRight && <AddBtn action={props.swipeRight} isSelected={props.isSelected} />}
+    <Motion.div animate={{ opacity: [0, 1], x: [0, '2rem'], scale: [.7, 1], transition: { duration: 0.2 } }}
+      class={`absolute translate-y-1.5 bottom-1 h-10 z-40 left-2 flex bg-white/10 items-center rounded-e-full rounded-s-full px-2 justify-between`}>
+      {props.swipeRight && <AddBtn action={props.swipeRight} isVisible={isVisible} />}
       <div class="flex gap-4">
-        <OptionBtn action={(ev: MouseEvent) => {
+        <OptionBtn isVisible={isVisible} action={(ev: MouseEvent) => {
           ev.stopPropagation()
           setMenuGuid(props.data.guid)
-        }} isSelected={props.isSelected} />
-        <GoBtnDirect link={props.data.link} isSelected={props.isSelected} />
-        <ShareBtn link={props.data.link} source={props.data.source} isSelected={props.isSelected} />
+        }} />
+        <GoBtnDirect isVisible={isVisible} link={props.data.link} />
+        <ShareBtn isVisible={isVisible} link={props.data.link} source={props.data.source} />
       </div>
-      <GoBtn source={props.data.source} backupImage={props.data.image} link={props.data.link} isSelected={props.isSelected} />
-      {props.swipeLeft && <DeleteBtn action={props.swipeLeft} isSelected={props.isSelected} />}
+      {/* <GoBtn source={props.data.source} backupImage={props.data.image} link={props.data.link} isSelected={props.isSelected} /> */}
+      {props.swipeLeft && <DeleteBtn action={props.swipeLeft} isVisible={isVisible} />}
     </Motion.div>
   </Show>
 }
 
-export const ShareBtn = (props: { link: string, source: string, isSelected: Accessor<boolean> }) => {
+export const ShareBtn = (props: { link: string, source: string, isVisible: Accessor<boolean> }) => {
   const shareToClipboard = (ev: { stopPropagation: () => void }) => {
     ev.stopPropagation()
     const sharedlink = `${window.location.origin}?goto=${encodeUnicode(props.link)}&source=${encodeUnicode(props.source)}`
@@ -41,24 +42,24 @@ export const ShareBtn = (props: { link: string, source: string, isSelected: Acce
     press={{ scale: [1, 1.3, 1] }}
     class="p-1 w-8 h-8 rounded-full bg-slate-200/40 flex items-center justify-center text-black"
     onClick={shareToClipboard}
-    style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
+    style={{ visibility: props.isVisible() ? 'visible' : 'visible' }}>
     <SvgShare fill="#808080" />
   </Motion.div>
 }
 
-export const AddBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) => <Motion.div
+export const AddBtn = (props: { action: () => void, isVisible: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
   class="p-1 w-9 h-9 rounded-full bg-green-400/80 flex items-center justify-center text-black"
   onClick={props.action}
-  style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
+  style={{ visibility: props.isVisible() ? 'visible' : 'visible' }}>
   <SvgAdd fill="white" />
 </Motion.div>
 
-export const OptionBtn = (props: { action: (ev?: any) => void, isSelected: Accessor<boolean> }) => <Motion.div
+export const OptionBtn = (props: { action: (ev?: any) => void, isVisible: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
   class="text-3xl w-8 h-8 rounded-full bg-amber-200/80 p-1 flex items-center justify-center text-black"
   onClick={props.action}
-  style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
+  style={{ visibility: props.isVisible() ? 'visible' : 'visible' }}>
   <svg viewBox="0 0 24 24" class="w-6">
     <g
       stroke="none"
@@ -106,7 +107,7 @@ export const OptionBtn = (props: { action: (ev?: any) => void, isSelected: Acces
 </Motion.div>
 
 
-export const GoBtnDirect = (props: { link: string, isSelected: Accessor<boolean> }) => <Motion.div
+export const GoBtnDirect = (props: { link: string, isVisible: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
   class="w-8 font-stretch-90% font-extrabold text-2xl h-8 p-1 rounded-full bg-white/50 flex items-center justify-center text-black"
   onClick={async (ev) => {
@@ -116,45 +117,50 @@ export const GoBtnDirect = (props: { link: string, isSelected: Accessor<boolean>
       '_blank',
       'noopener,noreferrer')
   }}
-  style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
+  style={{ visibility: props.isVisible() ? 'visible' : 'visible' }}>
   🌍
   {/* <img src="/favicon.svg" class="w-8" /> */}
 </Motion.div >
 
-export const GoBtn = (props: { source: string, backupImage?: string, link: string, isSelected: Accessor<boolean> }) => <Motion.div
+export const invokeReader = async (source: string, backupImage: string, link: string, ev?: any) => {
+  ev && ev.stopPropagation();
+  setTimeout(() => setIsFetchingStory(true), 50)
+  const proxyUrl = `/summarize-news?url=${encodeURIComponent(link)}&ignoreWords=${encodeURIComponent(settings.ignoreWords)}`;
+  try {
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw "Network error"
+    const items = await res.json()
+    if (items.error) throw items.error
+    console.log({ items })
+
+    setReaderPageInfo({ source, backupImage, link, items });
+    setIsFetchingStory(false)
+  }
+  catch (err) {
+    console.error(err)
+    setNetworkIssue(true)
+    setIsFetchingStory(false)
+    setTimeout(() => setNetworkIssue(false), 2000)
+  }
+}
+
+
+
+export const GoBtn = (props: { source: string, backupImage?: string, link: string, isVisible: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
   class="w-14 font-stretch-90% font-extrabold text-xs h-8 p-1 rounded-full bg-sky-400/80 text-white flex items-center justify-center "
-  onClick={async (ev) => {
-    ev.stopPropagation();
-    setTimeout(() => setIsFetchingStory(true), 50)
-    const proxyUrl = `/summarize-news?url=${encodeURIComponent(props.link)}&ignoreWords=${encodeURIComponent(settings.ignoreWords)}`;
-    try {
-      const res = await fetch(proxyUrl);
-      if (!res.ok) throw "Network error"
-      const items = await res.json()
-      if (items.error) throw items.error
-      console.log({ items })
-
-      setReaderPageInfo({ source: props.source, backupImage: props.backupImage || '', link: props.link, items });
-      setIsFetchingStory(false)
-    }
-    catch (err) {
-      console.error(err)
-      setNetworkIssue(true)
-      setIsFetchingStory(false)
-      setTimeout(() => setNetworkIssue(false), 2000)
-    }
-  }
-  }
-  style={{ visibility: props.isSelected() ? 'visible' : 'hidden' }}>
+  onClick={(ev) => {
+    invokeReader(props.source, props.backupImage || '', props.link, ev)
+  }}
+  style={{ visibility: props.isVisible() ? 'visible' : 'hidden' }}>
   ➜
 </Motion.div >
 
-export const DeleteBtn = (props: { action: () => void, isSelected: Accessor<boolean> }) => <Motion.div
+export const DeleteBtn = (props: { action: () => void, isVisible: Accessor<boolean> }) => <Motion.div
   press={{ scale: [1, 1.3, 1] }}
   class="p-1 w-8 h-8 rounded-full bg-red-800/80 flex items-center justify-center text-black"
   onClick={props.action}
-  style={{ visibility: props.isSelected() ? 'visible' : 'visible' }}>
+  style={{ visibility: props.isVisible() ? 'visible' : 'visible' }}>
   <SvgTrash stroke="white" fill="" />
 </Motion.div>
 

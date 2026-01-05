@@ -1,6 +1,5 @@
 import { createSignal, onMount } from "solid-js";
 import { decodeUnicode } from "./common";
-import { settings } from "cluster";
 import { setIsFetchingStory, setReaderPageInfo, setNetworkIssue } from "./signals";
 
 const IntroScreen = () => {
