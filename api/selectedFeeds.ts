@@ -87,9 +87,6 @@ export default async function handler(
       }, [] as FeedItems)
     }
 
-
-
-
     console.log({
       results: results.map(f => ({ s: f.source })),
     })
@@ -112,7 +109,7 @@ export default async function handler(
       lastUpdated: new Date().toISOString(),
     }
 
-    response.status(200).json(result)
+    response.status(200).setHeader('X-Content-Type-Options', 'nosniff').json(result)
   } catch (error) {
     if (error instanceof z.ZodError) {
       return response.status(400).json({

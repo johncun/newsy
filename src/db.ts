@@ -38,6 +38,17 @@ export const autoClearKills = () => {
 
   setKilledList(ks)
 }
+const deduplicateByGiud = (as: ArticleRecords): ArticleRecords => {
+  const soFar = new Set<String>()
+  return as.flatMap(a => {
+    if (!soFar.has(a.guid)) {
+      soFar.add(a.guid);
+      return [a]
+    }
+    return []
+  })
+}
+
 
 export const lastPubTime = (): number => {
   const sorted = [...memData()].sort(sorterPubDate).slice(0, settings.maxLiveCount)
@@ -108,17 +119,6 @@ export const allGuids = (): Set<string> => {
     })
   }
   return guids
-}
-
-const deduplicateByGiud = (as: ArticleRecords): ArticleRecords => {
-  const soFar = new Set<String>()
-  return as.flatMap(a => {
-    if (!soFar.has(a.guid)) {
-      soFar.add(a.guid);
-      return [a]
-    }
-    return []
-  })
 }
 
 export const refreshDbWithFeedItems = (items: FeedItems): void => {

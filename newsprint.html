@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  :root {
+    /* Aged newsprint colors */
+    --paper: #e8e4d9;
+    --ink: #2d2b28;
+  }
+
+  body {
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+    padding: 50px;
+  }
+
+  /* 1. The Paper Container */
+  .newspaper-page {
+    background-color: var(--paper);
+    width: 600px;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+
+  /* 2. The Grainy Overlay (Texture) */
+  .newspaper-page::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0.25;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* 3. The Typography */
+  .headline {
+    font-family: "Old Standard TT", "Georgia", serif;
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--ink);
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 0.9;
+    letter-spacing: -2px;
+    
+    /* Apply the ink distortion filter */
+    filter: url(#ink-distortion);
+    
+    /* Makes ink look absorbed into the paper */
+    mix-blend-mode: multiply;
+  }
+
+  .subline {
+    font-family: "Georgia", serif;
+    font-size: 1.2rem;
+    margin-top: 10px;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 5px 0;
+    color: var(--ink);
+    filter: url(#ink-distortion);
+  }
+</style>
+</head>
+<body>
+
+  <div class="newspaper-page">
+    <h1 class="headline">The Daily <br>Pixel</h1>
+    <p class="subline">"All the Code That's Fit to Print"</p>
+<p class="subline">Families bereaved by the Manchester Arena bombing say MI5 failed them and must be fully included in a new law designed to stop cover-ups in public life.</p>
+<p class="subline">In a letter to Sir Keir Starmer, seen by the BBC, they ask the prime minister: "How many times must MI5 show that it cannot be trusted before something is done?"</p>
+<p class="subline">MI5 was found by a public inquiry not to have given an "accurate picture" of the key intelligence it held on the suicide bomber who carried out the attack which killed 22 people and injured hundreds on 22 May 2017.</p>
+<p class="subline">The "Hillsborough Law", making its way through Parliament, follows campaigning by families affected by the 1989 Hillsborough disaster that claimed 97 lives.</p>
+<p class="subline">Police leaders were found to have spread false narratives about that disaster, blaming Liverpool fans, and withheld evidence of their own failings.</p>
+<p class="subline">The new law will force public officials to tell the truth during investigations, including those into major disasters.</p>
+<p class="subline">But a director of the campaign behind the new law told the BBC he has been "misled" by the government during negotiations over how it will apply to the intelligence services.</p>
+<p class="subline">The government said: "We are listening to feedback about how to strengthen [the law] whilst also protecting national security."</p>
+<p class="subline">Known as the Public Office (Accountability) Bill, the new law has three pillars:</p>
+<p class="subline">The bill would create criminal sanctions for breaches in the duty for candour.</p>
+<p class="subline">Labour's manifesto for the 2024 general election said: "Labour will introduce a 'Hillsborough Law' which will place a legal duty of candour on public servants and authorities".</p>
+<p class="subline">Speaking last year, Sir Keir said the new legislation would change "the balance of power in Britain" to ensure the state could "never hide from the people it is supposed to serve".</p>
+<p class="subline">But barrister Pete Weatherby KC, director of Hillsborough Law Now (HLN) campaign group, told the BBC the government had "misled" him during negotiations over how the law will apply to MI5, MI6 and GCHQ.</p>
+<p class="subline">He represented victims' families during the landmark Hillsborough inquests a decade ago and has played a central role in making the new law a reality.</p>
+<p class="subline">He also represented families bereaved by the Manchester Arena attack during the public inquiry into that atrocity, during which MI5 was criticised for giving a false account.</p>
+<p class="subline">Weatherby said the "government have tried to put forward measures relating to intelligence services which look better than they are, and we've ended up in a position which certainly wasn't the position that we negotiated with them".</p>
+<p class="subline">He said it was a "major problem" and "very disappointing".</p>
+<p class="subline">He said HLN accepts there are some caveats that will apply to MI5 and the intelligence services, as the prime minister himself has said.</p>
+<p class="subline">During the Manchester Arena public inquiry, and an earlier official review, MI5 provided a false narrative about intelligence it received about the suicide bomber before the attack.</p>
+<p class="subline">The public inquiry chairman concluded that the statements had not presented an "accurate picture". He also found MI5 missed a significant opportunity to take action that might have prevented the attack.</p>
+  </div>
+
+  <svg style="display: none;">
+    <filter id="ink-distortion">
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" result="noise" />
+      
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" />
+      
+      <feGaussianBlur stdDeviation="0.4" result="blurred" />
+      
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="2" intercept="-0.2" />
+      </feComponentTransfer>
+    </filter>
+  </svg>
+
+</body>
+</html>

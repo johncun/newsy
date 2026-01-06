@@ -46,7 +46,7 @@ const TextAndImages = (props: { data: ReaderContent }) => {
   return <>
     <Switch>
       <Match when={props.data.level === 'h1'}>
-        <div class="font-[Noto_Serif] font-normal text-[#7180a4] text-2xl text-center mb-4">{props.data.title!}</div>
+        <div class="subline font-[Noto_Serif] _font-normal text-[#7180a4] text-2xl text-center mb-4">{props.data.title!}</div>
       </Match>
       <Match when={props.data.level === 'h2'}>
         <div class="font-[Noto_Serif] font-normal border-t border-t-slate-500 text-[#7180a4] text-lg text-center w-[80%] mt-3">{props.data.title!}</div>
@@ -59,8 +59,8 @@ const TextAndImages = (props: { data: ReaderContent }) => {
       return okText(sub) &&
         <Switch>
           <Match when={sub.type === "text"}>
-            <div class={`self-start font-[Nunito_Sans] first:border-t first:border-t-slate-500 ${sub.value.length < 30 ? 'font-bold' : 'font-light'} 
-                px-6 py-3 text-md max-w-90 _text-justify _hyphens-auto _indent-2.5`}>{sub.value}</div>
+            <div class={`subline self-start font-[Georgia] first:border-t first:border-t-slate-500 ${sub.value.length < 30 ? '_font-bold' : '_font-light'} 
+                px-6 py-3 leading-4.5 text-md max-w-90 text-justify hyphens-auto indent-2`}>{sub.value}</div>
           </Match>
           <Match when={sub.type === "image" && okImageSrc(sub.url, sub.alt)}>
             <div class="flex flex-col items-center w-full border border-slate-700/10 rounded-lg p-3">
@@ -173,7 +173,8 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
   return (
     <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
-      class="absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 bg-linear-to-br from-orange-100 via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden" >
+      class="absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 _bg-linear-to-br from-orange-100 via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden
+      newspaper-page" >
       <div class="w-8 h-8 absolute z-50 right-1 top-1 bg-white rounded-full border border-slate-700 p-1"
         onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
         <SvgCross fill="#242424" />
@@ -194,7 +195,64 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
           <div id="paper" class="paperOverlay absolute inset-0" />
         </div>
       </div>
-    </Motion.div >
+      <svg style="display: none;">
+        <filter id="ink-distortion">
+          <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" result="noise" />
+          <feGaussianBlur stdDeviation="0.1" result="blurred" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="2" intercept="-0.2" />
+          </feComponentTransfer>
+        </filter>
+      </svg>
+
+
+      <style>{`
+      --paper: #e8e4d9;
+      --ink: #2d2b28;
+      .newspaper-page {
+        background-color: var(--paper);
+        width: 600px;
+        padding: 40px;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        overflow: hidden;
+        }
+
+      .newspaper-page::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0.25;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      .headline {
+        font-family: "Old Standard TT", "Georgia", serif;
+        font-size: 4rem;
+        font-weight: 900;
+        color: var(--ink);
+        text-transform: uppercase;
+        margin: 0;
+        line-height: 0.9;
+        letter-spacing: -2px;
+        
+        /* Apply the ink distortion filter */
+        filter: url(#ink-distortion);
+        
+        /* Makes ink look absorbed into the paper */
+        mix-blend-mode: multiply;
+      }
+
+      .subline {
+        color: var(--ink);
+        filter: url(#ink-distortion);
+      }
+
+
+      `}</style>
+    </Motion.div>
   )
 }
 

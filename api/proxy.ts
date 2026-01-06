@@ -11,7 +11,7 @@ export default async function handler(req: any, res: any) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // The Magic Line
     res.setHeader("Content-Type", contentType || "image/jpeg");
     res.setHeader("Cache-Control", "public, max-age=86400"); // Cache on CDN for 1 day
-
+    res.setHeader("X-Content-Type-Options", "nosniff")
     return res.send(Buffer.from(buffer));
   } catch (e) {
     return res.status(500).send("Proxy error");

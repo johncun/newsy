@@ -3,11 +3,29 @@ import { VitePWA } from 'vite-plugin-pwa'
 import solid from 'vite-plugin-solid'
 import { defineConfig } from 'vite'
 import path from 'path'
+import { createHtmlPlugin } from 'vite-plugin-html';
+
+const csp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: https://*",
+  "object-src 'none'",
+  "connect-src 'self' https://www.google-analytics.com"
+].join("; ");
 
 export default defineConfig({
   plugins: [
     tailwindcss(),
     solid(),
+    createHtmlPlugin({
+      inject: {
+        data: {
+          injectMeta: `<meta http-equiv="Content-Security-Policy" content="${csp};" />`,
+        }
+      }
+    }),
     VitePWA({
       strategies: 'injectManifest',
       registerType: 'prompt',
