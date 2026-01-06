@@ -2,7 +2,7 @@ import { Motion } from 'solid-motionone'
 
 import { liveCount, mode, setIsFetchingFeeds, setMode, setPerformFetchFeedsTrigger, setShowOptions } from './signals'
 import { getAllByState, memData } from './db'
-import { SvgOptions, SvgPlus } from './svgs'
+import { SvgOptions, SvgPlus, SvgReset } from './svgs'
 
 const Banner = () => {
   const modeDesc = (): string => {
@@ -42,7 +42,7 @@ const Banner = () => {
           setPerformFetchFeedsTrigger(Date.now())
         }}
         class="w-10 h-10 px-1 flex items-center justify-center">
-        <SvgPlus fill="orange" />
+        <SvgReset fill="orange" />
       </Motion.div>
       <Motion.div
         press={{ scale: [1, 1.3] }}

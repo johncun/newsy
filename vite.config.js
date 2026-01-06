@@ -7,14 +7,14 @@ import { createHtmlPlugin } from 'vite-plugin-html';
 
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' 'sha256-/AO8vAagk08SqUGxY96ci/dGyTDsuoetPOJYMn7sc+E='",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "style-src-elem 'self' https://fonts.googleapis.com",
   "style-src-attr 'none'",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: https://*",
   "object-src 'none'",
-  "connect-src 'self'"
+  "connect-src 'self' ws://localhost:*"
 ].join("; ");
 
 export default defineConfig({
