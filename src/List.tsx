@@ -142,8 +142,11 @@ const List = (props: {
     </For >
   }>
     <Match when={!as()?.length}>
-      <div class="w-full h-40 text-zinc-500 inset-0 flex items-center justify-center">
-        <div>{`No items in ${props.mode()} list`}</div>
+      <div class="absolute z-50 inset-0 text-zinc-500 flex items-center justify-center">
+        <div class="wave" />
+        <div class="wave" />
+        <div class="wave" />
+        <div class="opacity-50 wave-bg p-6 rounded-2xl text-black">{`No items in ${props.mode()} list`}</div>
       </div>
     </Match>
   </Switch >

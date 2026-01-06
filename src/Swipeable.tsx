@@ -3,6 +3,7 @@ import { JSXElement } from "solid-js";
 const Swipeable = (props: {
   children: JSXElement | JSXElement[],
   limit?: number,
+  class?: string,
   onSwipeRight?: () => void,
   onSwipeLeft?: () => void,
   leftBg: string,
@@ -88,8 +89,7 @@ const Swipeable = (props: {
       onPointerMove={onPointerMove}
       onPointerUp={onRelease}
       onPointerCancel={onRelease} style={{ "--action-size": `${limit}px`, }}
-      class={`relative w-full overflow-hidden touch-pan-y select-none bg-slate-100/0 group h-auto snap-start snap-always
-        `}
+      class={`relative w-full overflow-hidden touch-pan-y select-none bg-slate-100/0 group h-auto snap-start snap-always ${props.class ?? ''}`}
     >
       <div class="absolute inset-0 px-1 z-0" >
 

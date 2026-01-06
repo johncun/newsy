@@ -4,6 +4,7 @@ import { SvgCross } from "./svgs"
 import { ReaderInput, setIsFetchingStory, setReaderPageInfo } from "./signals"
 import { animate } from "@motionone/dom";
 import { settings } from "./settings-utils";
+import { CachedImage } from "./CachedImage";
 
 export type ReaderContent = {
   title: string;
@@ -64,7 +65,7 @@ const TextAndImages = (props: { data: ReaderContent }) => {
           </Match>
           <Match when={sub.type === "image" && okImageSrc(sub.url, sub.alt)}>
             <div class="flex flex-col items-center w-full border border-slate-700/10 rounded-lg p-3">
-              <img class="rounded-lg" src={sub.url} alt={sub.alt} />
+              <CachedImage class="rounded-lg" src={sub.url} alt={sub.alt} />
               {settings.showFigureCaptions && <div class="text-xs text-center">{sub.alt}</div>}
             </div>
           </Match>
@@ -184,7 +185,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
       </div>
       <div class="absolute inset-x-0 top-10 bottom-0 overflow-y-auto">
         <div class="relative flex flex-col items-center w-full p-4">
-          {noImageInContent() ? <img class="w-[80%] mb-4 p-2 border border-slate-600 rounded-md" src={props.value?.backupImage} /> : null}
+          {noImageInContent() ? <CachedImage class="w-[80%] mb-4 p-2 border border-slate-600 rounded-md" src={props.value?.backupImage} /> : null}
           <For each={parsedData()}>
             {rc => {
               return <>
