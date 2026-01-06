@@ -31,9 +31,10 @@ const CardStyleThreeQuarter = (props: {
         id="title"
         class={`absolute font-bold font-[Noto_Serif] text-shadow-black/30 text-xl font-stretch-75% text-shadow-md
         inset-x-0 mx-4 top-2 bottom-2 items-center justify-${isSelected(props.data.guid) || true ? 'center' : 'end'} flex flex-col gap-1 rounded-xl p-2 ${isSelected(props.data.guid) ? 'bg-black/0' : ''}`}>
-
-        <Title value={props.data.title} />
-        <Byline value={props.data.description} />
+        <div class="backdrop-blur-md p-1 rounded-2xl">
+          <Title value={props.data.title} />
+          <Byline value={props.data.description} />
+        </div>
       </div>
       {/*      <div class="absolute bottom-0 right-0 translate-y-0 rounded-tl-2xl h-8 w-8 bg-black/10 
         flex items-center justify-center p-2"
@@ -64,9 +65,8 @@ const PublishedTime = (props: { value: string }) => {
   </div>
 }
 
-
 const Title = (props: { value: string }) =>
-  <div class="font-[Quicksand]">{props.value}</div>
+  <div class="font-[Quicksand]" >{props.value}</div>
 
 const Byline = (props: { value: string }) =>
   <p class="text-sm font-normal text-zinc-100/70 overflow-y-hidden text-left w-full">

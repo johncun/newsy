@@ -2,15 +2,15 @@ import { Motion } from 'solid-motionone'
 
 import { liveCount, mode, setIsFetchingFeeds, setMode, setPerformFetchFeedsTrigger, setShowOptions } from './signals'
 import { getAllByState, memData } from './db'
-import { SvgOptions, SvgPlus, SvgReset } from './svgs'
+import { SvgHorizontalDots, SvgOptions, SvgPlus, SvgReset } from './svgs'
 
 const Banner = () => {
   const modeDesc = (): string => {
-    return { live: 'Latest', saved: 'Saved', deleted: 'Bin' }[mode() || '']
+    return { live: 'Latest', saved: 'Saved', deleted: 'Deleted' }[mode() || '']
   }
 
   return (
-    <div class="flex justify-between items-center bg-linear-to-t from-black to-slate-900 h-14 absolute inset-x-0 p-2 z-20 gap-4">
+    <div class="flex justify-between items-center bg-linear-to-t from-black to-slate-900 h-12 absolute inset-x-0 p-2 z-20 gap-4">
       <div class="w-20 normal pl-2 font-bold text-center shadow-amber-50 shadow-2xl text-xl">{modeDesc()}</div>
       <div class="flex items-center gap-4">
         <Motion.div
@@ -42,7 +42,7 @@ const Banner = () => {
           setPerformFetchFeedsTrigger(Date.now())
         }}
         class="w-10 h-10 px-1 flex items-center justify-center">
-        <SvgReset fill="orange" />
+        <SvgReset fill="#66ccff" />
       </Motion.div>
       <Motion.div
         press={{ scale: [1, 1.3] }}
@@ -50,7 +50,7 @@ const Banner = () => {
           setShowOptions(true)
         }}
         class=" px-2 w-10 h-10 flex items-center justify-center">
-        <SvgOptions fill="white" />
+        <SvgHorizontalDots stroke="white" />
       </Motion.div>
     </div>
   )

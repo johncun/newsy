@@ -176,14 +176,15 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
     <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
       class="absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 _bg-linear-to-br from-orange-100 via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden
       newspaper-page" >
-      <div class="w-8 h-8 absolute z-50 right-1 top-1 bg-white rounded-full border border-slate-700 p-1"
+      <div class="w-8 h-8 absolute z-50 right-2 top-2 rounded-full border border-slate-700 p-1 bg-slate-300"
         onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
         <SvgCross fill="#242424" />
       </div >
-      <div class="absolute inset-x-0 top-0 h-10 text-xs w-full px-4 flex items-center bg-white ">
-        <div onClick={() => { hide(); open(props?.value?.link || '') }}>Source: <a class={props.value?.link}>{props.value?.source}</a></div>
+      <div class="absolute left-0 right-16 top-0 h-12 bg-slate-900 flex items-center justify-between text-white">
+        <div class="pl-6 font-bold text-center shadow-amber-50 shadow-2xl text-xl">Reader</div>
+        <div class="text-sky-300 flex items-center gap-2" onClick={() => { hide(); open(props?.value?.link || '') }}><div class="text-sm text-slate-400">Source: </div>{props.value?.source}</div>
       </div>
-      <div class="absolute inset-x-0 top-10 bottom-0 overflow-y-auto">
+      <div class="absolute inset-x-0 top-12 bottom-0 overflow-y-auto">
         <div class="relative flex flex-col items-center w-full p-4">
           {noImageInContent() ? <CachedImage class="w-[80%] mb-4 p-2 border border-slate-600 rounded-md" src={props.value?.backupImage} /> : null}
           <For each={parsedData()}>
@@ -253,7 +254,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
 
       `}</style>
-    </Motion.div>
+    </Motion.div >
   )
 }
 

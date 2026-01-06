@@ -8,7 +8,7 @@
     "dcm": "pnpm run git-info && git add . && git commit -m  'dcm update' && pnpm version patch && git commit --amend --no-edit && git push && ENABLE_EXPERIMENTAL_COREPACK=1 pnpx vercel build --prod && ENABLE_EXPERIMENTAL_COREPACK=1 pnpx vercel deploy --prod --prebuilt",
     "dev": "vite",
     "build": "ENABLE_EXPERIMENTAL_COREPACK=1 vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --prod"
   },
   "engines": {
     "pnpm": ">=10.24.0"

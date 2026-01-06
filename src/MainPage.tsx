@@ -112,7 +112,7 @@ const MainPage: any = () => {
           </div>
           <div
             ref={scrollRef}
-            class={`absolute top-14 bottom-0 left-2 right-2 overflow-x-hidden overflow-y-scroll ${settings.alignStoriesInScroll ? 'snap-y' : ''}`}>
+            class={`absolute top-12 bottom-0 left-2 right-2 overflow-x-hidden overflow-y-scroll ${settings.alignStoriesInScroll ? 'snap-y' : ''}`}>
             {/* <div class="relative flex flex-col pt-2 pb-8 gap-4 items-center py-4"> */}
             <div ref={upSentinelRef} class="h-1 w-1"></div>
             <List as={memData} mode={mode} />
@@ -142,19 +142,19 @@ const MainPage: any = () => {
                 initial={{ y: '100%' }}
                 animate={{ y: 0 }}
                 id="menu"
-                class="absolute z-50 inset-0 border-0 border-slate-100 bg-linear-to-b flex flex-col from-zinc-800 to-slate-800 text-black">
-                <div class="xabsolute inset-x-0 top-0 h-12 border-b border-b-slate-900 flex font-bold text-xl items-center justify-center text-white ">
-                  Configuration
+                class="absolute z-40 inset-0 border-0 border-slate-100 bg-linear-to-b flex flex-col from-zinc-800 to-slate-800 text-black">
+                <div class="absolute inset-x-0 top-0 h-12 bg-slate-900 flex font-bold text-xl items-center  text-white ">
+                  <div class="w-20 normal pl-6 font-bold text-center shadow-amber-50 shadow-2xl text-xl">Configuration</div>
                 </div>
-                <div
-                  class="absolute w-8 h-8 p-1 cursor-pointer top-2 right-2 flex items-center justify-center text-white "
+                <div class="w-8 h-8 absolute z-50 right-2 top-2 rounded-full border border-slate-700 p-1 bg-slate-300"
                   onClick={() => {
                     sanitizeSettings()
                     setShowOptions(false)
-                  }}>
-                  <SvgCross fill="white" />
-                </div>
-                <div class="absolute inset-x-2 top-12 bottom-0 overflow-x-hidden px-2">
+                  }
+                  }>
+                  <SvgCross fill="#242424" />
+                </div >
+                <div class="absolute inset-x-2 top-12 bottom-0 overflow-x-hidden px-2 ">
                   <SettingsPage />
                 </div>
               </Motion.div>
