@@ -21,13 +21,13 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     solid(),
-    createHtmlPlugin({
-      inject: {
-        data: {
-          injectMeta: `<meta http-equiv="Content-Security-Policy" content="${csp};" />`,
-        }
-      }
-    }),
+    // createHtmlPlugin({
+    //   inject: {
+    //     data: {
+    //       injectMeta: `<meta http-equiv="Content-Security-Policy" content="${csp};" />`,
+    //     }
+    //   }
+    // }),
     VitePWA({
       strategies: 'injectManifest',
       registerType: 'prompt',
