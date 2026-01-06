@@ -261,3 +261,13 @@ input::-webkit-inner-spin-button {
   opacity: 0.9;
   filter: contrast(1.1) brightness(0.9);
 }
+
+.halftone {
+  filter: contrast(.7) grayscale(1) blur(0px)
+}
+
+.halftone::after{
+  --s: 1.5em;
+  background: radial-gradient(black,white) 0 0/ var(--s) var(--s) repeat;
+  mix-blend-mode: screen;
+}

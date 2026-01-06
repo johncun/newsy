@@ -65,7 +65,7 @@ const TextAndImages = (props: { data: ReaderContent }) => {
           </Match>
           <Match when={sub.type === "image" && okImageSrc(sub.url, sub.alt)}>
             <div class="flex flex-col items-center w-full border border-slate-700/10 rounded-lg p-3">
-              <CachedImage class="rounded-lg" src={sub.url} alt={sub.alt} />
+              <div class="halftone"><CachedImage class="rounded-lg" src={sub.url} alt={sub.alt} /></div>
               {settings.showFigureCaptions && <div class="text-xs text-center">{sub.alt}</div>}
             </div>
           </Match>
@@ -139,6 +139,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
   const hide = () => {
     setIsFetchingStory(false)
+    return
     if (!elRef) return;
     animate(
       elRef,
@@ -165,8 +166,10 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
   createEffect(() => {
     console.log({ none: noImageInContent(), parsed: parsedData() })
     if (parsedData().length === 0) {
-      open(props?.value?.link || '')
-      setTimeout(() => setReaderPageInfo(undefined), 2000)
+      hide()
+      const link = props.value?.link
+      if (link) open(link)
+      setReaderPageInfo(undefined)
     }
   })
 

@@ -124,7 +124,7 @@ export const GoBtnDirect = (props: { link: string, isVisible: Accessor<boolean> 
 
 export const invokeReader = async (source: string, backupImage: string, link: string, ev?: any) => {
   ev && ev.stopPropagation();
-  setTimeout(() => setIsFetchingStory(true), 50)
+  setIsFetchingStory(true)
   const proxyUrl = `/summarize-news?url=${encodeURIComponent(link)}&ignoreWords=${encodeURIComponent(settings.ignoreWords)}`;
   try {
     const res = await fetch(proxyUrl);
