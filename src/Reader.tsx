@@ -25,58 +25,65 @@ const ImageOutput = (props: { ci: ContentItem }) => {
     </div> : null
 }
 
+const okImageSrc = (url: string, alt: string) => {
+  if (url.endsWith('jpg') && !url.includes('rte.ie')) return false
+  if (url.endsWith('jpeg')) return false
+  if (url.endsWith('svg')) return false
+  if (url.endsWith('png')) return false
+  if (alt === "sky news logo") return false
+  if (url.endsWith("width=56")) return false
+  if (url.indexOf('rte.ie/djs') >= 0) return false
+  return true
+
+
+}
+const okText = (sub: any) => {
+  if (sub.type === 'text' && sub.value.toLowerCase() === 'our apps') return false
+  if (sub.type === 'text' && sub.value.includes('©')) return false
+  if (sub.type === 'text' && sub.value.toLowerCase().includes('read more from')) return false
+  if (sub.type === 'text' && sub.value.toLowerCase().includes('images courtesy')) return false
+  return true
+}
+
+const okTitle = (t: string) => {
+  if (t.toLowerCase().startsWith("more on ")) return false;
+  if (t.toLowerCase().startsWith("related topics")) return false;
+  if (t.toLowerCase().startsWith("more sky sites")) return false;
+  return true
+}
+
+const trimContentJunk = (content: ContentItem[]): ContentItem[] => {
+  return content.flatMap(sub => {
+    if (sub.type === "text" && !okText(sub)) return []
+    if (sub.type === "image" && !okImageSrc(sub.url, sub.alt)) return []
+    return [sub]
+  })
+}
+
+const stripContent = (content: ContentItem[]): ContentItem[] | null => {
+  const lenIn = content.length
+  const els = trimContentJunk(content)
+  if (els.length === 1) {
+    console.error(`not enough content so falling back`)
+    return null
+  }
+  const lenOut = els.length
+  if (lenOut !== lenIn) console.log(`${lenIn - lenOut} content items trimmed`)
+  return els
+}
+
+
 const TextAndImages = (props: { data: SectionItem, setOnContentIssue: Setter<boolean> }) => {
-  const okImageSrc = (url: string, alt: string) => {
-    if (url.endsWith('jpg') && !url.includes('rte.ie')) return false
-    if (url.endsWith('jpeg')) return false
-    if (url.endsWith('svg')) return false
-    if (url.endsWith('png')) return false
-    if (alt === "sky news logo") return false
-    if (url.endsWith("width=56")) return false
-    if (url.indexOf('rte.ie/djs') >= 0) return false
-    return true
+  if (!okTitle(props.data.title)) return null
 
-
-  }
-
-  const okTitle = () => {
-    const t = props.data.title
-    if (t.toLowerCase().startsWith("more on ")) return false;
-    if (t.toLowerCase().startsWith("related topics")) return false;
-    if (t.toLowerCase().startsWith("more sky sites")) return false;
-    return true
-  }
-
-  if (!okTitle()) return null
-
-  const okText = (sub: any) => {
-    if (sub.type === 'text' && sub.value.toLowerCase() === 'our apps') return false
-    if (sub.type === 'text' && sub.value.includes('©')) return false
-    if (sub.type === 'text' && sub.value.toLowerCase().includes('read more from')) return false
-    if (sub.type === 'text' && sub.value.toLowerCase().includes('images courtesy')) return false
-    return true
-  }
   const fontInfo = () => settings.fauxPrint ? 'subline font-[Georgia] font-normal' : 'font-[Noto_Serif] font-normal'
   const fontInfoBold = () => settings.fauxPrint ? 'subline font-[Georgia] font-bold' : 'font-[Noto_Serif] font-bold'
 
-  const trimJunk = () => {
-    return props.data.content.flatMap(sub => {
-      if (sub.type === "text" && !okText(sub)) return []
-      if (sub.type === "image" && !okImageSrc(sub.url, sub.alt)) return []
-      return [sub]
-    })
-  }
+  const data = stripContent(props.data.content)
 
-  const data = () => {
-    const lenIn = props.data.content.length
-    const els = trimJunk()
-    if (els.length === 1) {
-      props.setOnContentIssue(true)
-      console.error(`not enough`)
-    }
-    const lenOut = els.length
-    if (lenOut !== lenIn) console.log(`${lenIn - lenOut} content items trimmed`)
-    return els
+  if (!data) {
+    props.setOnContentIssue(true)
+    return null
   }
 
   return <>
@@ -91,7 +98,7 @@ const TextAndImages = (props: { data: SectionItem, setOnContentIssue: Setter<boo
         <div class={`${fontInfo()} text-md text-[#7180a4] text-center w-[70%] mb-2`}>{props.data.title!}</div>
       </Match>
     </Switch >
-    <For each={data()}>{(sub) => {
+    <For each={data}>{(sub) => {
       return okText(sub) &&
         <Switch>
           <Match when={sub.type === "text"}>
