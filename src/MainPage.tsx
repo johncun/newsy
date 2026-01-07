@@ -113,11 +113,9 @@ const MainPage: any = () => {
           <div
             ref={scrollRef}
             class={`absolute top-12 bottom-0 left-2 right-2 overflow-x-hidden overflow-y-scroll ${settings.alignStoriesInScroll ? 'snap-y' : ''}`}>
-            {/* <div class="relative flex flex-col pt-2 pb-8 gap-4 items-center py-4"> */}
-            <div ref={upSentinelRef} class="h-1 w-1"></div>
+            <div ref={upSentinelRef} class="h-0 w-1"></div>
             <List as={memData} mode={mode} />
-            <div ref={dnSentinelRef} class="h-1 w-1"></div>
-            {/* </div> */}
+            <div ref={dnSentinelRef} class="h-0 w-1"></div>
           </div>
           <Presence exitBeforeEnter>
             {menuGuid() && (

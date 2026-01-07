@@ -1,13 +1,20 @@
 import { createSignal, onMount } from "solid-js";
 import { decodeUnicode } from "./common";
 import { setIsFetchingStory, setReaderPageInfo, setNetworkIssue } from "./signals";
+import { ImageVault } from "./db";
 
 const IntroScreen = (props: { onClick: () => void }) => {
   const [startText, setStartText] = createSignal(false);
 
-  const gotoStory = (link: string, source: string) => {
+  const gotoStory = async (link: string, source: string) => {
+    const cached = await ImageVault.getReaderInput(link)
+    if (cached) {
+      setReaderPageInfo(cached)
+      return
+    }
 
     setTimeout(async () => {
+
       setIsFetchingStory(true)
       const proxyUrl = `/summarize-news?url=${encodeURIComponent(link)}`;
       try {
@@ -17,7 +24,9 @@ const IntroScreen = (props: { onClick: () => void }) => {
         if (items.error) throw items.error
         console.log({ items })
 
-        setReaderPageInfo({ source, backupImage: '', link, items });
+        const ri = { source, backupImage: '', link, items }
+        await ImageVault.putReaderInput(link, ri)
+        setReaderPageInfo(ri);
         setIsFetchingStory(false)
       }
       catch (err) {

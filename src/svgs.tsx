@@ -798,4 +798,22 @@ export const SvgHorizontalDots = (props: { stroke: string }) => {
   );
 };
 
-
+export const SvgEx = (props: { topColor: string, midColor: string, bottomColor: string }) => {
+  return (
+    <svg preserveAspectRatio="none" style={{ height: '100%' }} class="w-full" viewBox="0 0 200 100" >
+      <defs>
+        <linearGradient id="myGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color={props.topColor} />
+          <stop offset="70%" stop-color={props.midColor} />
+          <stop offset="100%" stop-color={props.bottomColor} />
+        </linearGradient>
+      </defs>
+      <path
+        d="M 200 100 L 180 30 Q 170 0 140 0 L 0 0 L 0 100 Z"
+        stroke-width="0"
+        stroke="red"
+        fill="url(#myGradient)"
+      />
+    </svg>
+  );
+}

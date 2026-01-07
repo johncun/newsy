@@ -278,10 +278,23 @@ import { createStore, delMany, entries } from "idb-keyval";
 import { get, set } from "idb-keyval";
 import { reduceImageSize, sorterPubDate } from './common'
 import { settings } from './settings-utils'
+import { ReaderInput } from './signals'
 
 const imageCache = createStore("newsy-db", "images");
+const readerCache = createStore("newsy-pages", "summaries");
 
 export const ImageVault = {
+
+  putReaderInput: async (link: string, ri: ReaderInput): Promise<void> => {
+    const cached = await set(link, { ri, when: Date.now() }, readerCache);
+    return cached
+  },
+
+  getReaderInput: async (link: string): Promise<ReaderInput | null> => {
+    const cached = await get(link, readerCache);
+    return cached ? cached.ri : null
+  },
+
   getOrFetch: async (imageUrl: string): Promise<Blob | null> => {
     try {
       const cached = await get(imageUrl, imageCache);

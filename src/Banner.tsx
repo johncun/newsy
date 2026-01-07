@@ -2,16 +2,32 @@ import { Motion } from 'solid-motionone'
 
 import { liveCount, mode, setIsFetchingFeeds, setMode, setPerformFetchFeedsTrigger, setShowOptions } from './signals'
 import { getAllByState, memData } from './db'
-import { SvgHorizontalDots, SvgOptions, SvgPlus, SvgReset } from './svgs'
+import { ArticleState } from '@shared/feed-types'
+import { Accessor, For } from 'solid-js'
+import { SvgEx, SvgHorizontalDots, SvgReset } from './svgs'
 
 const Banner = () => {
-  const modeDesc = (): string => {
-    return { live: 'Latest', saved: 'Saved', deleted: 'Deleted' }[mode() || '']
+
+  const ModeDesc = (props: { md: Accessor<ArticleState> }) => {
+    const ar = () => [props.md()]
+    return <For each={ar()}>{_mode =>
+      <Motion
+        transition={{ duration: 0.1, easing: "ease-in-out" }} animate={{ scale: [0.3, 1] }}>
+        {{ live: 'Cuisle', saved: 'Saved', deleted: 'Deleted' }[_mode || '']}
+      </Motion>
+    }
+    </For >
   }
 
+
   return (
-    <div class="flex justify-between items-center bg-linear-to-t from-black to-slate-900 h-12 absolute inset-x-0 p-2 z-20 gap-4">
-      <div class="w-20 normal pl-2 font-bold text-center shadow-amber-50 shadow-2xl text-xl">{modeDesc()}</div>
+    <div class="flex justify-between items-center bg-linear-to-t from-black to-slate-900 h-12 absolute inset-x-0 z-20 gap-4">
+      <div class="border-0 border-red-500 overflow-hidden relative h-12 w-50 flex justify-start items-center">
+        <div class="absolute -z-10 left-0 right-0 h-12 ">
+          <SvgEx topColor="#203050" midColor="#242424" bottomColor="#242424" />
+        </div>
+        <div class="pl-8 font-bold text-center text-xl"><ModeDesc md={mode} /></div>
+      </div>
       <div class="flex items-center gap-4">
         <Motion.div
           press={{ scale: [1, 1.3] }}
@@ -52,7 +68,7 @@ const Banner = () => {
         class=" px-2 w-10 h-10 flex items-center justify-center">
         <SvgHorizontalDots stroke="white" />
       </Motion.div>
-    </div>
+    </div >
   )
 }
 

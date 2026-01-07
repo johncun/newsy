@@ -3,19 +3,19 @@ import { VitePWA } from 'vite-plugin-pwa'
 import solid from 'vite-plugin-solid'
 import { defineConfig } from 'vite'
 import path from 'path'
-import { createHtmlPlugin } from 'vite-plugin-html';
+// import { createHtmlPlugin } from 'vite-plugin-html';
 
-const csp = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'sha256-/AO8vAagk08SqUGxY96ci/dGyTDsuoetPOJYMn7sc+E='",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "style-src-elem 'self' https://fonts.googleapis.com",
-  "style-src-attr 'none'",
-  "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: https://*",
-  "object-src 'none'",
-  "connect-src 'self' ws://localhost:*"
-].join("; ");
+// const _csp = [
+//   "default-src 'self'",
+//   "script-src 'self' 'unsafe-inline' 'sha256-/AO8vAagk08SqUGxY96ci/dGyTDsuoetPOJYMn7sc+E='",
+//   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+//   "style-src-elem 'self' https://fonts.googleapis.com",
+//   "style-src-attr 'none'",
+//   "font-src 'self' https://fonts.gstatic.com",
+//   "img-src 'self' data: https://*",
+//   "object-src 'none'",
+//   "connect-src 'self' ws://localhost:*"
+// ].join("; ");
 
 export default defineConfig({
   preview: {

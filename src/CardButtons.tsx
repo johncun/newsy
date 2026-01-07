@@ -5,6 +5,7 @@ import { SvgAdd, SvgShare, SvgTrash } from "./svgs"
 import { FeedItem } from "@shared/feed-types"
 import { encodeUnicode, copyToClipboard } from "./common"
 import { settings } from "./settings-utils"
+import { ImageVault } from "./db"
 
 export const CardButtons = (props: { data: FeedItem, swipeRight?: () => void, swipeLeft?: () => void }) => {
   const isVisible = () => isSelected(props.data.guid)
@@ -124,6 +125,14 @@ export const GoBtnDirect = (props: { link: string, isVisible: Accessor<boolean> 
 
 export const invokeReader = async (source: string, backupImage: string, link: string, ev?: any) => {
   ev && ev.stopPropagation();
+
+  const cached = await ImageVault.getReaderInput(link)
+  if (cached) {
+    setReaderPageInfo(cached)
+    return
+  }
+
+
   setIsFetchingStory(true)
   const proxyUrl = `/summarize-news?url=${encodeURIComponent(link)}&ignoreWords=${encodeURIComponent(settings.ignoreWords)}`;
   try {
@@ -133,7 +142,9 @@ export const invokeReader = async (source: string, backupImage: string, link: st
     if (items.error) throw items.error
     console.log({ items })
 
-    setReaderPageInfo({ source, backupImage, link, items });
+    const ri = { source, backupImage, link, items }
+    await ImageVault.putReaderInput(link, ri)
+    setReaderPageInfo(ri);
     setIsFetchingStory(false)
   }
   catch (err) {

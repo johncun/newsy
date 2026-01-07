@@ -94,6 +94,11 @@ export const SettingsPage = () => {
       type: "selectnum", options: MAX_LOOKBACK_TIMES.map(String)
     },
     {
+      id: "useSans", label: "Use a sans serif font for news text in the reader", desc: "More modern and easier to read on a screen for some people",
+      help: "",
+      type: "toggle"
+    },
+    {
       id: "fauxPrint", label: "Shows news stories faux newsprint", desc: "Newspaper style text when reading stories",
       help: "",
       type: "toggle"

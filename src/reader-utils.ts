@@ -11,20 +11,20 @@ const DEFAULT_OPTS: ReaderOptions = {
   ignoreWords: ''
 }
 
-type ContentText = {
+export type ContentText = {
   type: 'text';
   value: string;
 }
 
-type ContentImage = {
+export type ContentImage = {
   type: 'image';
   url: string;
   alt: string;
 }
 
-type ContentItem = ContentText | ContentImage;
+export type ContentItem = ContentText | ContentImage;
 
-type SectionItem = {
+export type SectionItem = {
   title: string;
   level: string;
   content: ContentItem[]
