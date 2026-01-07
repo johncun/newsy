@@ -37,7 +37,6 @@ export async function summarizeNewsPage(targetUrl: string, proxy: string, _optio
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BunParser/1.0)' }
     });
     const htmlString = await response.text();
-    console.log(htmlString)
     // 2. Parse with LinkeDOM
     const { document } = parseHTML(htmlString);
 

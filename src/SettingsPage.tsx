@@ -93,7 +93,16 @@ export const SettingsPage = () => {
       help: "Helps keep your live stories manageable, is set to 0 then will only fetch those after latest story published time",
       type: "selectnum", options: MAX_LOOKBACK_TIMES.map(String)
     },
-
+    {
+      id: "fauxPrint", label: "Shows news stories faux newsprint", desc: "Newspaper style text when reading stories",
+      help: "",
+      type: "toggle"
+    },
+    {
+      id: "fauxImage", label: "Shows news story images in black and white", desc: "Newspaper style pictures in the Reader",
+      help: "",
+      type: "toggle"
+    },
     {
       id: "fullMode", label: "Shows news stories in 3/4 page mode", desc: "Allows swiping up to get to next story",
       help: "",

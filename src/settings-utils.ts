@@ -16,6 +16,8 @@ export const SettingsSchema = z.object({
   maxLookbackTime: z.union(MAX_LOOKBACK_TIMES.map(n => z.literal(n))),
   theme: z.enum(["Light", "Dark", "System"]),
   feeds: z.array(SourceRecordSchema),
+  fauxPrint: z.boolean(),
+  fauxImage: z.boolean(),
   fullMode: z.boolean(),
   showFigureCaptions: z.boolean(),
   gotoTopAfterRefresh: z.boolean(),
@@ -38,6 +40,8 @@ export type SettingItem = {
 
 const DEFAULTS: Settings = {
   fullMode: false,
+  fauxPrint: false,
+  fauxImage: false,
   showFigureCaptions: false,
   theme: "System",
   maxFeedsPerRequest: "50",

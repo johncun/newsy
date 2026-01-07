@@ -43,29 +43,32 @@ const TextAndImages = (props: { data: ReaderContent }) => {
     if (sub.type === 'text' && sub.value.toLowerCase().includes('images courtesy')) return false
     return true
   }
-
+  const fontInfo = () => settings.fauxPrint ? 'subline font-[Georgia] font-normal' : 'font-[Noto_Serif] font-normal'
+  const fontInfoBold = () => settings.fauxPrint ? 'subline font-[Georgia] font-bold' : 'font-[Noto_Serif] font-bold'
   return <>
     <Switch>
       <Match when={props.data.level === 'h1'}>
-        <div class="subline font-[Noto_Serif] _font-normal text-[#7180a4] text-2xl text-center mb-4">{props.data.title!}</div>
+        <div class={`${fontInfoBold()} text-[#7180a4] text-2xl text-center mb-4`}>{props.data.title!}</div>
       </Match>
       <Match when={props.data.level === 'h2'}>
-        <div class="font-[Noto_Serif] font-normal border-t border-t-slate-500 text-[#7180a4] text-lg text-center w-[80%] mt-3">{props.data.title!}</div>
+        <div class={`${fontInfoBold()} leading-4.5 border-t-slate-500 text-[#7180a4] text-lg text-center w-[80%] mt-3`}>{props.data.title!}</div>
       </Match>
       <Match when={props.data.level === 'h3'}>
-        <div class="font-[Noto_Serif] font-normal text-md text-[#7180a4] text-center w-[70%] mb-2">{props.data.title!}</div>
+        <div class={`${fontInfo()} text-md text-[#7180a4] text-center w-[70%] mb-2`}>{props.data.title!}</div>
       </Match>
-    </Switch>
+    </Switch >
     <For each={props.data.content}>{(sub) => {
       return okText(sub) &&
         <Switch>
           <Match when={sub.type === "text"}>
-            <div class={`subline self-start font-[Georgia] first:border-t first:border-t-slate-500 ${sub.value.length < 30 ? '_font-bold' : '_font-light'} 
-                px-6 py-3 leading-4.5 text-md max-w-90 text-justify hyphens-auto indent-2`}>{sub.value}</div>
+            <div class={`${settings.fauxPrint ? 'subline' : ''} self-start font-[${settings.fauxPrint ? 'Georgia' : 'Noto_Serif'}] 
+              first:border-t first:border-t-slate-500 ${sub.value.length < 30 ? '_font-bold' : '_font-light'} 
+              px-6 py-3 leading-4.5 text-md max-w-90 text-justify hyphens-auto ${settings.fauxPrint ? 'indent-2' : ''}`}>{sub.value}</div>
           </Match>
           <Match when={sub.type === "image" && okImageSrc(sub.url, sub.alt)}>
             <div class="flex flex-col items-center w-full border border-slate-700/10 rounded-lg p-3">
-              <div class="halftone"><CachedImage class="rounded-lg" src={sub.url} alt={sub.alt} /></div>
+              <div class={`${settings.fauxImage ? 'halftone' : ''}`} >
+                <CachedImage class="rounded-lg" src={sub.url} alt={sub.alt} /></div>
               {settings.showFigureCaptions && <div class="text-xs text-center">{sub.alt}</div>}
             </div>
           </Match>
@@ -87,6 +90,45 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
     if (fs) return fs;
     return undefined
   }
+  const filterEmbedInItemList = (fs: any[]) => fs.flatMap(f => {
+
+    if (f.title.indexOf('Report: ') >= 0) return []
+    if (f.title.indexOf('commentcancel') >= 0) return []
+    if (f.title.indexOf('@') >= 0) return []
+    if (f.title.indexOf('BBC is in multiple languages') >= 0) return []
+    if (f.content.length === 0) return []
+
+    f.content = f.content.filter(({ alt }: { alt: string }) => alt !== "guardian.org")
+
+    const idx = f.content.findIndex((c: { type: string, value: string }) => {
+      return (c.type === "text" &&
+        (c.value.indexOf("embed this post,") >= 0
+          || c.value.indexOf("More on this story") >= 0
+          || c.value.indexOf("You must confirm your public display name") >= 0
+          || c.value.indexOf("Follow TechRadar") >= 0))
+    })
+    if (idx === 0) return []
+    if (idx >= 0) {
+      console.log('found embed...', { idx });
+      return [{ ...f, content: f.content.slice(0, idx) }];
+    }
+    else return [f]
+  })
+
+  const truncateAfterTitles = (fs: any[], ops: [string, string][]) => {
+    const tidx = fs.findIndex(({ title }) => {
+      const lt = title.toLowerCase()
+      return ops.find(([operation, text]) => lt[operation](text))
+    })
+
+    if (tidx >= 0) {
+      console.log('found embed in titles...', { tidx });
+      return fs.slice(0, tidx);
+    }
+    else
+      return fs;
+  }
+
 
   const parseFromLevel = (startLevel: number): ReaderContent[] | undefined => {
     const tags = props.value?.source.toUpperCase().startsWith('BBC') ? [`h${startLevel}`] : [1, 2, 3].slice(startLevel - 1).map(l => 'h' + l)
@@ -96,43 +138,15 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
     if (!fs) return fs;
 
-    const filterEmbeds = fs.flatMap(f => {
-
-      if (f.title.indexOf('Report: ') >= 0) return []
-      if (f.title.indexOf('commentcancel') >= 0) return []
-      if (f.title.indexOf('@') >= 0) return []
-      if (f.title.indexOf('BBC is in multiple languages') >= 0) return []
-      if (f.content.length === 0) return []
-
-      f.content = f.content.filter(({ alt }: { alt: string }) => alt !== "guardian.org")
-
-      const idx = f.content.findIndex((c: { type: string, value: string }) => {
-        return (c.type === "text" &&
-          (c.value.indexOf("embed this post,") >= 0
-            || c.value.indexOf("More on this story") >= 0
-            || c.value.indexOf("You must confirm your public display name") >= 0
-            || c.value.indexOf("Follow TechRadar") >= 0))
-      })
-      if (idx === 0) return []
-      if (idx >= 0) {
-        console.log('found embed...', { idx });
-        return [{ ...f, content: f.content.slice(0, idx) }];
-      }
-      else return [f]
-    })
+    const filterEmbeds = filterEmbedInItemList(fs)
     console.log({ filterEmbeds })
 
-    const tidx = filterEmbeds.findIndex(({ title }) => {
-      const lt = title.toLowerCase()
-      return lt.includes("embed this post,") || lt.includes("more on this story") || lt.startsWith("more by ")
-    })
+    const truncatedTitles = truncateAfterTitles(filterEmbeds, [
+      ['includes', 'embed this post,'],
+      ['includes', 'more on this story'],
+      ['startsWith', 'more by']])
 
-    if (tidx >= 0) {
-      console.log('found embed in titles...', { tidx });
-      return filterEmbeds.slice(0, tidx);
-    }
-    else
-      return filterEmbeds;
+    return truncatedTitles
   }
 
   let elRef!: HTMLDivElement;
@@ -177,13 +191,13 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
   return (
     <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
-      class="absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 _bg-linear-to-br from-orange-100 via-[#d8d5cc] to-[#f5f5e8] text-zinc-800 overflow-hidden
-      newspaper-page" >
-      <div class="w-8 h-8 absolute z-50 right-2 top-2 rounded-full border border-slate-700 p-1 bg-slate-300"
-        onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 600) }}>
+      class={`absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 text-zinc-800 overflow-hidden
+      ${settings.fauxPrint ? 'newspaper-page' : ''}`} >
+      <div class="w-8 h-8 absolute z-50 right-2 top-2 bg-slate-300 rounded-full border border-slate-700 p-1"
+        onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 50) }}>
         <SvgCross fill="#242424" />
       </div >
-      <div class="absolute left-0 right-16 top-0 h-12 bg-slate-900 flex items-center justify-between text-white">
+      <div class="absolute left-0 right-0 pr-16 top-0 h-12 bg-slate-900 flex items-center justify-between text-white">
         <div class="pl-6 font-bold text-center shadow-amber-50 shadow-2xl text-xl">Reader</div>
         <div class="text-sky-300 flex items-center gap-2" onClick={() => { hide(); open(props?.value?.link || '') }}><div class="text-sm text-slate-400">Source: </div>{props.value?.source}</div>
       </div>
@@ -197,7 +211,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
               </>
             }}
           </For>
-          <div id="paper" class="paperOverlay absolute inset-0" />
+          {settings.fauxPrint ? <div id="paper" class="paperOverlay absolute inset-0" /> : <div class="absolute inset-0 bg-linear-to-br from-orange-100 via-[#d8d5cc] to-[#f5f5e8] -z-50"></div>}
         </div>
       </div>
       <svg style="display: none;">
