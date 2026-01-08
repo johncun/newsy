@@ -1,4 +1,9 @@
 import { JSXElement } from "solid-js";
+import { createLogger } from "./common";
+
+const _Logger = createLogger('Swipeable')
+const lg = _Logger.log
+_Logger.disable()
 
 const Swipeable = (props: {
   children: JSXElement | JSXElement[],
@@ -19,21 +24,33 @@ const Swipeable = (props: {
 
   let startX = 0;
   let isDragging = false;
+  let isWaitForDrag = false;
 
   const onPointerDown = (e: PointerEvent) => {
+    lg('onPointerDown', { e, isDragging, isWaitForDrag, hasCapture: containerRef.hasPointerCapture(e.pointerId) })
     startX = e.clientX;
-    isDragging = true;
-    containerRef.dataset.dragging = "true";
-    containerRef.setPointerCapture(e.pointerId);
+    if (containerRef.hasPointerCapture(e.pointerId))
+      containerRef.releasePointerCapture(e.pointerId);
+    isDragging = false
+    isWaitForDrag = true
   };
 
   const onPointerMove = (e: PointerEvent) => {
-    if (!isDragging) return;
 
     let x = e.clientX - startX;
     let absX = Math.abs(x);
+    lg('onPointerMove', { e, absX, isDragging, isWaitForDrag, hasCapture: containerRef.hasPointerCapture(e.pointerId) })
 
-    if (absX < 6) return; // stop jitter
+    if (absX < 6) return
+
+    if (isWaitForDrag) {
+      isWaitForDrag = false
+      if (!containerRef.hasPointerCapture(e.pointerId))
+        containerRef.setPointerCapture(e.pointerId);
+      containerRef.dataset.dragging = "true";
+      isDragging = true
+    }
+    if (!isDragging) return
 
     // Rubber-banding
     if (absX > limit) {
@@ -56,10 +73,13 @@ const Swipeable = (props: {
     if (boxRRef) boxRRef.style.visibility = x < 0 ? "visible" : "hidden";
   };
 
-  const onRelease = (_e: PointerEvent) => {
-    if (!isDragging) return;
-    isDragging = false;
+  const __onRelease = (e: PointerEvent) => {
+    isDragging = false
+    isWaitForDrag = false
     delete containerRef.dataset.dragging;
+
+    if (containerRef.hasPointerCapture(e.pointerId))
+      containerRef.releasePointerCapture(e.pointerId);
 
     const currentX = parseFloat(getComputedStyle(containerRef).getPropertyValue("--offset"));
 
@@ -81,15 +101,32 @@ const Swipeable = (props: {
     }
   };
 
+  const onPointerUp = (e: PointerEvent) => {
+    lg('onPointerUp', { e, isDragging, isWaitForDrag, hasCapture: containerRef.hasPointerCapture(e.pointerId) })
+    __onRelease(e)
+  }
+
+  const onPointerCancel = (e: PointerEvent) => {
+    lg('onPointerUp', { e, isDragging, isWaitForDrag, hasCapture: containerRef.hasPointerCapture(e.pointerId) })
+    __onRelease(e)
+  }
+
+  // const onClick = (e: MouseEvent) => {
+  //   lg('onClick', { e })
+  // }
+
+
   return (
 
     <div
       ref={containerRef}
+      style={{ "--action-size": `${limit}px`, }}
+      class={`relative w-full overflow-hidden touch-pan-y select-none bg-slate-100/0 group h-auto snap-start snap-always ${props.class ?? ''}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
-      onPointerUp={onRelease}
-      onPointerCancel={onRelease} style={{ "--action-size": `${limit}px`, }}
-      class={`relative w-full overflow-hidden touch-pan-y select-none bg-slate-100/0 group h-auto snap-start snap-always ${props.class ?? ''}`}
+      onPointerCancel={onPointerCancel}
+      onPointerUp={onPointerUp}
+    // onClick={props.onClick}
     >
       <div class="absolute inset-0 px-1 z-0" >
 
@@ -119,6 +156,7 @@ const Swipeable = (props: {
       </div >
 
       <div
+        id="swipe-content"
         style={{ transform: "translateX(var(--offset))" }}
         class="relative z-10 bg-[#242424] w-full h-full flex items-center px-1 transition-transform duration-300 ease-[cubic-bezier(0.18,0.89,0.32,1.2)] group-data-dragging:transition-none"
       >
@@ -126,6 +164,8 @@ const Swipeable = (props: {
           {props.children}
         </div>
       </div>
+      {/* <div id="tester" class="absolute bg-amber-600 w-10 h-10 left-2 bottom-2 z-20" */}
+      {/*   onClick={() => { lg('CLICK') }} onPointerUp={() => { lg('POINTER UP') }}></div> */}
     </div >
   );
 }

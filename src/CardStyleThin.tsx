@@ -1,10 +1,15 @@
 import { FeedItem } from "@shared/feed-types"
 import { Motion } from "solid-motionone"
 import { isSelected, showButtons, tick } from "./signals"
-import { formatTimeAgo } from "./common"
+import { createLogger, formatTimeAgo } from "./common"
 import { CachedImage } from "./CachedImage"
 import { CardButtons } from "./CardButtons"
 import { SvgHorizontalDots } from "./svgs"
+
+const _Logger = createLogger('Swipeable')
+const lg = _Logger.log
+_Logger.disable()
+
 
 export const AnimatedBlackFade = () =>
   <Motion.div
@@ -14,7 +19,7 @@ export const AnimatedBlackFade = () =>
     class="absolute inset-0 bg-black/20"
   />
 
-const Darken = () => <div class="absolute inset-0 bg-black/20" />
+const Darken = () => <div class="absolute inset-0 bg-black/20 pointer-events-none" />
 
 
 const CardStyleThin = (props: {
@@ -26,7 +31,7 @@ const CardStyleThin = (props: {
 
   return <div
     class={`group cursor-pointer mx-0 rounded-lg ${!isSelected(props.data.guid) ? 'h-42' : 'h-42'} relative overflow-hidden`}
-    onClick={props.onClick}>
+    onClick={props.onClick} >
     <Motion.div animate={{ scale: [.7, 1], opacity: [0, 1] }} transition={{ duration: .2 }} class="absolute inset-0 p-0">
       <ImageFor data={props.data} />
       <Darken />
@@ -48,7 +53,7 @@ const CardStyleThin = (props: {
         flex items-center justify-center p-2"
         onClick={(ev: MouseEvent) => invokeReader(props.data.source, props.data.image || '', props.data.link, ev)} ><SvgRight fill="#808080" /></div>
       */}
-      <div class="absolute bottom-0 left-0 translate-y-0 rounded-tr-2xl h-8 w-8 bg-black/50 
+      <div class="absolute bottom-0 left-0 translate-y-0 z-50 rounded-tr-2xl h-8 w-8 bg-black/50 
         flex items-center justify-center p-2"
         onClick={props.onMenu}
       >
@@ -74,7 +79,7 @@ const PublishedTime = (props: { value: string }) => {
 }
 
 const Fade = () =>
-  <div class="absolute inset-x-0 bottom-0 h-12 bg-linear-to-b from-transparent to-[#202020]"></div>
+  <div class="absolute pointer-events-none inset-x-0 bottom-0 h-12 bg-linear-to-b from-transparent to-[#202020]"></div>
 
 const Title = (props: { value: string }) =>
   <div class="font-bold leading-4 font-[Quicksand] pb-1 text-shadow-black/50 text-md font-stretch-125% text-shadow-md line-clamp-4">{props.value}</div>

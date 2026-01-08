@@ -124,7 +124,7 @@ export const GoBtnDirect = (props: { link: string, isVisible: Accessor<boolean> 
 </Motion.div >
 
 export const invokeReader = async (source: string, backupImage: string, link: string, ev?: any) => {
-  ev && ev.stopPropagation();
+  ev?.stopPropagation();
 
   const cached = await ImageVault.getReaderInput(link)
   if (cached) {

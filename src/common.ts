@@ -172,4 +172,48 @@ export const decodeUnicode = (base64: string): string => {
   return new TextDecoder().decode(bytes);
 }
 
+type Logger = (...args: any[]) => void;
+type LoggerStruct = { enable: () => void, disable: () => void, log: Logger, error: Logger, warn: Logger }
+
+type Loggers = {
+  [name: string]: LoggerStruct
+
+}
+const loggers: Loggers = {}
+
+export const createLogger = (name: string): LoggerStruct => {
+  if (loggers[name] !== undefined) return loggers[name]
+
+  const LOG = (...args: any[]) => {
+    console.log(`[${name}]`, ...args);
+  }
+
+  const WARN = (...args: any[]) => {
+    console.warn(`[${name}]`, ...args);
+  }
+
+  const ERROR = (...args: any[]) => {
+    console.log(`[${name}]`, ...args);
+  }
+
+  const NOOP = () => { }
+
+  loggers[name] = {
+    enable: () => {
+      loggers[name].log = LOG
+      loggers[name].warn = WARN
+      loggers[name].error = ERROR
+    },
+    disable: () => {
+      loggers[name].log = NOOP//console.log.bind(console)
+      loggers[name].warn = NOOP//console.warn.bind(console)
+      loggers[name].error = NOOP//console.error.bind(console)
+    },
+    log: NOOP,
+    error: NOOP,
+    warn: NOOP,
+  }
+
+  return loggers[name]
+};
 

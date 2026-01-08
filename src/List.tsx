@@ -103,6 +103,7 @@ const List = (props: {
   }
 
   const handleMenu = (fi: FeedItem) => (ev: MouseEvent) => {
+    console.log('onMenu')
     ev.stopPropagation();
     if (showButtons() && selectedGuid() !== fi.guid) setShowButtons(false)
     setSelectedGuid(fi.guid)
