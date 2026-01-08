@@ -13,7 +13,7 @@ const normalFont = () => settings.useSans ? 'Nunito_Sans' : 'Noto_Serif'
 const TextOutput = (props: { ci: ContentItem }) => props.ci.type === "text" &&
   <div class={`${settings.fauxPrint ? 'subline' : ''} self-start font-[${settings.fauxPrint ? 'Georgia' : normalFont()}] 
     first:border-t first:border-t-slate-500 ${props.ci.value.length < 30 ? '_font-bold' : '_font-light'} 
-    px-6 py-3 leading-4.5 text-md max-w-90 text-justify hyphens-auto ${settings.fauxPrint ? 'indent-2' : ''}`}>{props.ci.value}
+    px-6 py-3 leading-4.5 text-md max-w-90 mx-auto text-justify hyphens-auto ${settings.fauxPrint ? 'indent-2' : ''}`}>{props.ci.value}
   </div>
 
 const ImageOutput = (props: { ci: ContentItem }) => {

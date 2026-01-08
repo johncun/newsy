@@ -121,7 +121,7 @@ const Swipeable = (props: {
     <div
       ref={containerRef}
       style={{ "--action-size": `${limit}px`, }}
-      class={`relative w-full overflow-hidden touch-pan-y select-none bg-slate-100/0 group h-auto snap-start snap-always ${props.class ?? ''}`}
+      class={`relative w-full overflow-hidden touch-pan-y max-w-2xl mx-auto select-none bg-slate-100/0 group h-auto snap-start snap-always ${props.class ?? ''}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerCancel={onPointerCancel}

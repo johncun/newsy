@@ -61,7 +61,7 @@ const InputRenderer = (props: { item: SettingItem }) => {
 };
 
 const SettingRow = (props: { item: SettingItem }) => (
-  <div class="p-4 ">
+  <div class="p-4 w-full">
     <div class="flex justify-between items-start">
       <div class="flex-1 pr-4">
         <h3 class="text-gray-300 font-medium">{props.item.label}</h3>
@@ -149,8 +149,8 @@ export const SettingsPage = () => {
   // const _sortedFeeds = () => [...settings.feeds].sort((a, b) => b.votes - a.votes);
 
   return (
-    <div class="absolute inset-0 max-w-md overflow-hidden">
-      <div class="absolute p-2 h-12 top-0 z-10 w-full shadow-sm">
+    <div class="absolute inset-0 mx-auto max-w-md flex flex-col overflow-hidden">
+      <div id="cfg-title" class="absolute p-2 h-12 top-0 z-10 w-full shadow-sm">
         <div class="flex justify-between w-full items-center mb-4 h-8 gap-4">
           <input
             type="text"
@@ -162,7 +162,7 @@ export const SettingsPage = () => {
         </div>
       </div>
 
-      <div class="absolute inset-x-0 top-12 bottom-0 overflow-y-auto pb-2">
+      <div id="cfg-content" class="absolute inset-x-0 top-12 bottom-0 flex flex-col items-start overflow-y-auto pb-2">
         <For each={filteredGeneral()}>{(item) => <SettingRow item={item} />}</For>
 
         <div class="p-4 flex justify-between items-center mt-4">
