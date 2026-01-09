@@ -1,10 +1,10 @@
-import { createEffect, createSignal, For, Match, Switch, Setter, onMount } from "solid-js"
+import { createEffect, createSignal, For, Match, Switch, onMount } from "solid-js"
 import { Motion } from "solid-motionone"
 import { SvgCross } from "./svgs"
 import { ReaderInput, setIsFetchingStory, setReaderPageInfo } from "./signals"
 import { animate } from "@motionone/dom";
 import { settings } from "./settings-utils";
-import { CachedImage, CachedImageHalftone, CachedImageType } from "./CachedImage";
+import { CachedImage, CachedImageHalftone } from "./CachedImage";
 import { ContentItem, SectionItem } from "./reader-utils";
 
 
@@ -268,7 +268,8 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
             : <div class="absolute inset-0 bg-linear-to-br from-orange-100 via-[#d8d5cc] to-[#f5f5e8] -z-50"></div>}
         </div>
       </div>
-      <svg style="display: none;">
+      {/*
+          <svg style="display: none;">
         <filter id="ink-distortion">
           <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" result="noise" />
           <feGaussianBlur stdDeviation="0.1" result="blurred" />
@@ -278,7 +279,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
           </feComponentTransfer>
         </filter>
       </svg>
-
+*/}
 
       <style>{`
       --paper: #e8e4d9;

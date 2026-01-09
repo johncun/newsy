@@ -20,6 +20,7 @@ import MainPage from './MainPage'
 import { allGuids, autoClearKills, lastPubTime, refreshDbWithFeedItems } from './db'
 import { timestampFetch } from './common'
 import { settings } from './settings-utils'
+import SingletonHalftoneFilter from './SingletonHalftoneFilter'
 
 const fetchItems = async (): Promise<FeedResult | null> => {
   try {
@@ -100,6 +101,21 @@ const App: any = () => {
         <IntroScreen onClick={() => setStartup(false)} />
       </Match>
     </Switch>
+
+    {/* for news type */}
+    <svg style="display: none;">
+      <filter id="ink-distortion">
+        <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" result="noise" />
+        <feGaussianBlur stdDeviation="0.1" result="blurred" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.3" />
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="2" intercept="-0.2" />
+        </feComponentTransfer>
+      </filter>
+    </svg>
+    {/* for halftone */}
+    <SingletonHalftoneFilter />
+
   </ErrorBoundary >
 }
 
