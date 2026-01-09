@@ -4,7 +4,7 @@ import { SvgCross } from "./svgs"
 import { ReaderInput, setIsFetchingStory, setReaderPageInfo } from "./signals"
 import { animate } from "@motionone/dom";
 import { settings } from "./settings-utils";
-import { CachedImage } from "./CachedImage";
+import { CachedImage, CachedImageHalftone } from "./CachedImage";
 import { ContentItem, SectionItem } from "./reader-utils";
 
 
@@ -20,7 +20,7 @@ const ImageOutput = (props: { ci: ContentItem }) => {
   return props.ci.type === "image" ?
     <div class="flex flex-col items-center w-full border-0 border-slate-700/10 rounded-md _p-3">
       <div class={`${settings.fauxImage ? 'halftone' : ''}`} >
-        <CachedImage class="rounded-lg" src={props.ci.url} alt={props.ci.alt} /></div>
+        <CachedImageHalftone class="rounded-lg" src={props.ci.url} alt={props.ci.alt} /></div>
       {settings.showFigureCaptions && <div class="text-xs text-center">{props.ci.alt}</div>}
     </div> : null
 }
