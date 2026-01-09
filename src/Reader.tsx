@@ -226,7 +226,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
   return (
     <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
-      class={`absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 text-zinc-800 overflow-hidden
+      class={`absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 text-zinc-800 overflow-hidden bg-[#e8e4d9]
       ${settings.fauxPrint ? 'newspaper-page' : ''}`} >
       <div class="w-8 h-8 absolute z-50 right-2 top-2 bg-slate-300 rounded-full border border-slate-700 p-1"
         onClick={() => { hide(); setTimeout(() => setReaderPageInfo(undefined), 50) }}>
@@ -266,7 +266,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
       --ink: #2d2b28;
       .newspaper-page {
         background-color: var(--paper);
-        width: 600px;
+        width: 100px;
         padding: 40px;
         position: relative;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -276,7 +276,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
       .newspaper-page::before {
         content: "";
         position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
+        top: 0; left: 0; bottom: 0; right: 0;
         opacity: 0.25;
         pointer-events: none;
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
