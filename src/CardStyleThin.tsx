@@ -85,7 +85,7 @@ const Title = (props: { value: string }) =>
   <div class="font-bold leading-4 font-[Quicksand] pb-1 text-shadow-black/50 text-md font-stretch-125% text-shadow-md line-clamp-4">{props.value}</div>
 
 const Byline = (props: { value: string }) =>
-  <div class={`text-sm leading-3.5 font-normal font-[Noto_Sans] text-zinc-100/70 overflow-y-hidden line-clamp-5 text-left w-full`}>
+  <div class={`text-sm leading-3.5 font-normal font-[Nunito_Sans] text-zinc-100/70 overflow-y-hidden line-clamp-5 text-left w-full`}>
     {props.value}
   </div>
 
