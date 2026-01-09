@@ -1,6 +1,7 @@
 import { createResource, createMemo, onCleanup, Show } from "solid-js";
 import { ImageVault } from "./db";
 import HalftoneImage from "./HalftoneImage";
+import { settings } from "./settings-utils";
 
 export const CachedImage = (props: { src: string; alt?: string; class: string }) => {
   // Use the URL as the source for our resource
@@ -41,7 +42,7 @@ export const CachedImageHalftone = (props: { src: string; alt?: string; class: s
       when={!blob.loading}
       fallback={<div class="w-full h-48 bg-gray-200 animate-pulse rounded-lg" />}
     >
-      <HalftoneImage src={blob()} alt={props.alt} class={props.class} config={{}} />
+      <HalftoneImage src={blob()} grayscale={settings.fauxImageGrayscale} alt={props.alt} class={props.class} config={{}} />
     </Show>
   );
 };

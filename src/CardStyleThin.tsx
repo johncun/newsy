@@ -2,7 +2,7 @@ import { FeedItem } from "@shared/feed-types"
 import { Motion } from "solid-motionone"
 import { isSelected, showButtons, tick } from "./signals"
 import { createLogger, formatTimeAgo } from "./common"
-import { CachedImage, CachedImageHalftone } from "./CachedImage"
+import { CachedImage } from "./CachedImage"
 import { CardButtons } from "./CardButtons"
 import { SvgHorizontalDots } from "./svgs"
 

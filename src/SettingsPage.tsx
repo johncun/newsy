@@ -104,7 +104,12 @@ export const SettingsPage = () => {
       type: "toggle"
     },
     {
-      id: "fauxImage", label: "Shows news story images in black and white", desc: "Newspaper style pictures in the Reader",
+      id: "fauxImageGrayscale", label: "Shows news story images in black and white", desc: "Monotone newspaper style in the Reader",
+      help: "",
+      type: "toggle"
+    },
+    {
+      id: "fauxImage", label: "Shows news story images in halftone", desc: "Newspaper style pictures in the Reader",
       help: "",
       type: "toggle"
     },
