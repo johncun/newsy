@@ -66,32 +66,28 @@ const SingletonHalftoneFilter = () => {
   return (
     <svg width="0" height="0" >
       <defs>
-        <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+        <filter id={filterId} x="0" y="0" width="100vw" height="100vh" color-interpolation-filters="sRGB">
 
           {/* Stage 1: Convert to Gray (or Inverted Gray) */}
           <feColorMatrix in="SourceGraphic" type="matrix" values={grayMatrix()} result="gray" />
 
           {/* Stage 2: Generate Pattern Layer */}
-          <feImage href={patternHref()} x="0" y="0" width="3000" height="3000" result="pattern" />
+          <feImage href={patternHref()} x="0" y="0" width="500" height="500" result="pattern" />
 
           {/* Stage 3: Organic Distortion */}
           <feTurbulence type="fractalNoise" baseFrequency={config.freq} numOctaves={config.octaves} result="noise" />
           <feDisplacementMap in="pattern" in2="noise" scale={config.warp} xChannelSelector="R" yChannelSelector="G" result="distorted" />
 
-          {/* Stage 4: Blur for Ink Bleed */}
           <feGaussianBlur in="distorted" stdDeviation={config.blur} result="soft" />
 
-          {/* Stage 5: Masking (Multiply Gray * Pattern) */}
           <feComposite in="gray" in2="soft" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" result="masked" />
 
-          {/* Stage 6: Hard Threshold */}
           <feComponentTransfer in="masked" result="threshold">
             <feFuncR type="linear" slope={config.slope} intercept={config.intercept} />
             <feFuncG type="linear" slope={config.slope} intercept={config.intercept} />
             <feFuncB type="linear" slope={config.slope} intercept={config.intercept} />
           </feComponentTransfer>
 
-          {/* Stage 7: Apply Ink Color */}
           <feColorMatrix in="threshold" type="matrix" values={colorMatrix()} />
 
         </filter>
