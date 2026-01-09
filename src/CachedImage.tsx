@@ -47,3 +47,6 @@ export const CachedImageHalftone = (props: { src: string; alt?: string; class: s
   );
 };
 
+export const CachedImageType = (props: { src: string; alt?: string; class: string }) => {
+  return settings.fauxImage ? <CachedImageHalftone src={props.src} alt={props.alt} class={props.class} /> : <CachedImage src={props.src} alt={props.alt} class={props.class} />
+}
