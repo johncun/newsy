@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, Match, Switch, Setter } from "solid-js"
+import { createEffect, createSignal, For, Match, Switch, Setter, onMount } from "solid-js"
 import { Motion } from "solid-motionone"
 import { SvgCross } from "./svgs"
 import { ReaderInput, setIsFetchingStory, setReaderPageInfo } from "./signals"
@@ -76,7 +76,7 @@ const stripContent = (content: ContentItem[]): ContentItem[] | null => {
 }
 
 
-const TextAndImages = (props: { data: SectionItem, setOnContentIssue: Setter<boolean> }) => {
+const TextAndImages = (props: { data: SectionItem }) => {
   if (!okTitle(props.data.title)) return null
 
   const fontInfo = () => settings.fauxPrint ? 'subline font-[Georgia] font-normal' : 'font-[Noto_Serif] font-normal'
@@ -85,7 +85,6 @@ const TextAndImages = (props: { data: SectionItem, setOnContentIssue: Setter<boo
   const data = stripContent(props.data.content)
 
   if (!data) {
-    props.setOnContentIssue(true)
     return null
   }
 
@@ -215,20 +214,39 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
   const noImageInContent = () => !parsedData().find((rc: SectionItem) => rc.content.find(c => c.type === "image"))
 
+  const goDirect = () => {
+    hide()
+    const link = props.value?.link
+    if (link) open(link)
+    setReaderPageInfo(undefined)
+  }
+
   createEffect(() => {
     console.log({ none: noImageInContent(), parsed: parsedData() })
     if (parsedData().length === 0 || onContentIssue()) {
-      hide()
-      const link = props.value?.link
-      if (link) open(link)
-      setReaderPageInfo(undefined)
+      goDirect()
+    }
+  })
+  const taiLen = () => parsedData().length
+
+  onMount(() => {
+    // Filter out empties 
+
+    if (taiLen() === 0) goDirect()
+
+    const numSections = parsedData().reduce((total, section) => {
+      const data = stripContent(section.content)
+      return total + (!!data ? 1 : 0)
+    }, 0)
+
+    if (numSections === 0) {
+      setOnContentIssue(true)
     }
   })
 
 
-
   return (
-    <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
+    !onContentIssue() && <Motion.div id="reader" ref={elRef} initial={{ x: "120vw" }} animate={{ x: ["120vw", "-15vw", 0], opacity: 1 }} transition={{ duration: 0.3, easing: "ease-in-out" }}
       class={`absolute inset-0 flex flex-col z-50 items-center opacity-0 px-4 text-zinc-800 overflow-hidden bg-[#e8e4d9]
       ${settings.fauxPrint ? 'newspaper-page' : ''}`} >
       <div class="w-8 h-8 absolute z-50 right-2 top-2 bg-slate-300 rounded-full border border-slate-700 p-1"
@@ -243,13 +261,11 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
         <div class="relative min-h-full flex flex-col items-center w-full p-4">
           {noImageInContent() ? <CachedImage class="w-[80%] mb-4 p-2 border border-slate-600 rounded-md" src={props.value?.backupImage} /> : null}
           <For each={parsedData()}>
-            {rc => {
-              return <>
-                <TextAndImages data={rc} setOnContentIssue={setOnContentIssue} />
-              </>
-            }}
+            {rc => <TextAndImages data={rc} />}
           </For>
-          {settings.fauxPrint ? <div id="paper" class="paperOverlay absolute inset-0" /> : <div class="absolute inset-0 bg-linear-to-br from-orange-100 via-[#d8d5cc] to-[#f5f5e8] -z-50"></div>}
+          {settings.fauxPrint
+            ? <div id="paper" class="paperOverlay absolute inset-0" />
+            : <div class="absolute inset-0 bg-linear-to-br from-orange-100 via-[#d8d5cc] to-[#f5f5e8] -z-50"></div>}
         </div>
       </div>
       <svg style="display: none;">
@@ -309,7 +325,7 @@ const Reader = (props: { value: ReaderInput | undefined }) => {
 
 
       `}</style>
-    </Motion.div >
+    </Motion.div>
   )
 }
 
