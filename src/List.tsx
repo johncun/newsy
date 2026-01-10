@@ -1,7 +1,7 @@
 import { ArticleRecord, ArticleRecords, ArticleState, convertStringToWordStruct, FeedItem, hasIgnoreWord } from "@shared/feed-types"
 import { Accessor, Switch, For, Match, Show, createEffect } from "solid-js"
 import { getAllByState } from "./db"
-import { mode, selectedGuid, setLiveCount, setSelectedGuid, setShowButtons, showButtons } from "./signals"
+import { mode, selectedGuid, setCurrentListCount, setLiveCount, setSelectedGuid, setShowButtons, showButtons } from "./signals"
 import { Action, hashToBoolean, onSwipeLeft, onSwipeRight, sorterPubDate, sorterSavedDate } from "./common"
 import Swipeable from "./Swipeable"
 import CardStyleThin from "./CardStyleThin"
@@ -41,7 +41,7 @@ const List = (props: {
   }
 
   createEffect(() => {
-    setLiveCount(as().length)
+    setCurrentListCount(as().length)
   })
 
   const getNextGuidInList = (guid: string): string => {
