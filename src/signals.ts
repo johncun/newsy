@@ -10,6 +10,7 @@ export const [isFetchingStory, setIsFetchingStory] = createSignal<boolean>(false
 export const [selectedGuid, setSelectedGuid] = createSignal('')
 export const isSelected = (guid: string) => selectedGuid() === guid
 export const [showButtons, setShowButtons] = createSignal(false)
+export const [toast, setToast] = createSignal('');
 
 export const [liveCount, setLiveCount] = createSignal(0)
 

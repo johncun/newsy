@@ -2,7 +2,7 @@ import { ArticleRecord, ArticleRecords, ArticleState, convertStringToWordStruct,
 import { Accessor, Switch, For, Match, Show, createEffect } from "solid-js"
 import { getAllByState } from "./db"
 import { mode, selectedGuid, setLiveCount, setSelectedGuid, setShowButtons, showButtons } from "./signals"
-import { Action, hashToBoolean, onSwipeLeft, onSwipeRight, sorterPubDate } from "./common"
+import { Action, hashToBoolean, onSwipeLeft, onSwipeRight, sorterPubDate, sorterSavedDate } from "./common"
 import Swipeable from "./Swipeable"
 import CardStyleThin from "./CardStyleThin"
 import { SvgPlus, SvgTrash } from "./svgs"
@@ -20,7 +20,7 @@ const List = (props: {
 
   const as = () => {
     const allForMode = [...getAllByState(mode())(props.as())]
-      .sort(sorterPubDate)
+      .sort(sorterSavedDate)
 
     if (settings.ignoreWords.trim().length === 0) {
       return allForMode

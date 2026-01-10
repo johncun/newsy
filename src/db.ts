@@ -123,6 +123,7 @@ export const allGuids = (): Set<string> => {
 
 export const refreshDbWithFeedItems = (items: FeedItems): void => {
   if (items.length === 0) return
+
   const guids = allGuids()
   console.log({ guids: guids.size })
 
@@ -131,7 +132,13 @@ export const refreshDbWithFeedItems = (items: FeedItems): void => {
     .filter((record: ArticleRecord) => !guids.has(record.guid))
 
   console.log({ newRecords: newRecords.length })
-  if (newRecords.length === 0) return
+  if (newRecords.length === 0) {
+    setToast('No new stories')
+    return
+  }
+
+  const savedTime = Date.now()
+  newRecords.forEach((a, idx) => a.savedAt = savedTime + idx)
 
   const amalgamated = [...newRecords, ...memData()]
   console.log({ amalgamated: amalgamated.length })
@@ -146,6 +153,7 @@ export const refreshDbWithFeedItems = (items: FeedItems): void => {
     console.log('setMemData with amalgamated');
   }
   else {
+    popupToast(`Bumping ${extractedLive.length - settings.maxLiveCount} old stories`, 3000)
     const sorted = extractedLive.sort(sorterPubDate).slice(0, settings.maxLiveCount)
     console.log({ sorted: sorted.length })
     setMemData([...sorted, ...amalgamated.filter(a => a.state !== 'live')])
@@ -220,6 +228,7 @@ export const removeLiveAfterHours = () => {
       return a
     })
   })
+  popupToast(`${toDeletes.size} timed out and removed`, 5000)
 }
 
 export const killArticles = (guids: string[]) => {
@@ -235,6 +244,7 @@ export const killArticles = (guids: string[]) => {
       } else return [a]
     })
   })
+  popupToast(`${guids.length} stories killed`, 2000)
 
   setKilledList(ks)
 }
@@ -278,7 +288,8 @@ import { createStore, delMany, entries } from "idb-keyval";
 import { get, set } from "idb-keyval";
 import { reduceImageSize, sorterPubDate } from './common'
 import { settings } from './settings-utils'
-import { ReaderInput } from './signals'
+import { ReaderInput, setToast } from './signals'
+import { popupToast } from './UpdateApplicationToast'
 
 const imageCache = createStore("newsy-db", "images");
 const readerCache = createStore("newsy-pages", "summaries");

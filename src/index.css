@@ -262,6 +262,48 @@ input::-webkit-inner-spin-button {
   filter: contrast(1.1) brightness(0.9);
 }
 
+--paper: #e8e4d9;
+--ink: #2d2b28;
+.newspaper-page {
+  background-color: var(--paper);
+  width: 100px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  overflow: hidden;
+  }
+
+.newspaper-page::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  opacity: 0.25;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.headline {
+  font-family: "Old Standard TT", "Georgia", serif;
+  font-size: 4rem;
+  font-weight: 900;
+  color: var(--ink);
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 0.9;
+  letter-spacing: -2px;
+  
+  /* Apply the ink distortion filter */
+  filter: url(#ink-distortion);
+  
+  /* Makes ink look absorbed into the paper */
+  mix-blend-mode: multiply;
+}
+
+.subline {
+  color: var(--ink);
+  filter: url(#ink-distortion);
+}
+
+
 /* .halftone { */
 /*   filter: contrast(.7) grayscale(1) blur(0px) */
 /* } */

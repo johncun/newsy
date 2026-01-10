@@ -9,7 +9,7 @@ import OptionMenuItems from "./OptionMenuItems"
 import List from "./List"
 import Reader from "./Reader"
 import { useOrientationDetector } from "./OrientationDetector"
-import { UpdateApplicationToast } from "./UpdateApplicationToast"
+import { Toast, UpdateApplicationToast } from "./UpdateApplicationToast"
 import { sanitizeSettings, settings } from "./settings-utils"
 import { SettingsPage } from "./SettingsPage"
 
@@ -162,7 +162,7 @@ const MainPage: any = () => {
             <Reader value={readerPageInfo()} />
           </Show>
         </ErrorBoundary>
-
+        <Toast />
         <UpdateApplicationToast />
       </div>
     </Show>

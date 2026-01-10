@@ -28,6 +28,10 @@ export const sorterPubDate = (a: ArticleRecord, b: ArticleRecord) => {
   return dateB - dateA
 }
 
+export const sorterSavedDate = (a: ArticleRecord, b: ArticleRecord) => {
+  return (b.savedAt || 0) - (a.savedAt || 0)
+}
+
 
 export function formatTimeAgo(dateInput: Date | string | number | undefined): string {
 
