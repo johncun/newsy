@@ -1,7 +1,7 @@
 {
   "name": "cuisle",
   "private": true,
-  "version": "0.0.63",
+  "version": "0.0.64",
   "type": "module",
   "scripts": {
     "git-info": "echo export const status \"= {\\\"logMessage\\\": \\\"$(git log -1 --oneline)\\\",\\\"when\\\": \\\"$(date +%s)000\\\"}\"  > src/_git_commit.ts",
